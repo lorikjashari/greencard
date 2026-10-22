@@ -1,0 +1,17 @@
+rules_version = '2';
+
+// Green Card Kosova stores applicant, payment and audit data in Firestore.
+// The browser never reads or writes Firestore directly: all access goes
+// through Next.js server routes/server actions using the Firebase Admin SDK,
+// which re-checks sessions, ownership and roles.
+//
+// Keeping client access denied is intentional. Do not relax these rules to
+// "fix" a query; add a server endpoint instead. The Admin SDK bypasses rules,
+// so verify authorisation in application code on every route.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

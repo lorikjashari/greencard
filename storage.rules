@@ -1,0 +1,15 @@
+rules_version = '2';
+
+// Uploads and photo reads are proxied by the Next.js server. The server:
+//  - verifies the draft secret or the signed-in owner/staff session,
+//  - validates magic bytes, dimensions and size,
+//  - strips JPEG metadata before writing,
+//  - serves files with private, no-store headers or short-lived signed URLs.
+// Therefore direct browser access to Storage stays denied.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

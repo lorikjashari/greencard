@@ -14,11 +14,12 @@ import {
 import { requireAdminPage } from "@/lib/admin/guard";
 import { adminLocale } from "@/lib/admin/locale";
 import { copy } from "@/messages/get";
-import { hasPermission, nextApplicationStatuses, canRoleTransition } from "@/lib/status/transitions";
 import {
-  getApplication,
-  listActivity,
-} from "@/lib/repo/applications";
+  hasPermission,
+  nextApplicationStatuses,
+  canRoleTransition,
+} from "@/lib/status/transitions";
+import { getApplication, listActivity } from "@/lib/repo/applications";
 import { getOrderForApplication } from "@/lib/repo/orders";
 import { getFilingForApplication } from "@/lib/repo/filings";
 import { listEditRequests } from "@/lib/repo/requests";
@@ -26,7 +27,14 @@ import { listUsers } from "@/lib/repo/users";
 import { countryName } from "@/lib/countries";
 import { formatCurrency, formatDate, formatDateTime } from "@/lib/format";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { AdminNotice, AdminPageHeader, AdminEmpty, SectionCard } from "@/components/admin/ui";
+import {
+  AdminNotice,
+  AdminPageHeader,
+  AdminEmpty,
+  SectionCard,
+} from "@/components/admin/ui";
+import { photoIssues } from "@/lib/photos";
+import { PrintButton } from "@/components/admin/print-button";
 import {
   addNoteAction,
   assignAction,
@@ -56,7 +64,9 @@ function maskDob(date: string): string {
   return date ? `${date.slice(0, 4)}-••-••` : "—";
 }
 
-const consentLabels = (t: ReturnType<typeof copy>): Record<ConsentRecord["type"], string> => ({
+const consentLabels = (
+  t: ReturnType<typeof copy>,
+): Record<ConsentRecord["type"], string> => ({
   terms: t.apply.consentTerms,
   privacy: t.apply.consentPrivacy,
   immediate_performance: t.apply.consentImmediate,
@@ -69,8 +79,10 @@ function Info({ label, value }: { label: string; value: React.ReactNode }) {
   const empty = value === null || value === undefined || value === "";
   return (
     <div>
-      <dt className="text-2xs font-semibold uppercase tracking-wide text-muted">{label}</dt>
-      <dd className="mt-0.5 text-[12.5px] leading-5 text-ink">{empty ? "—" : value}</dd>
+      <dt className="eyebrow-muted text-[10px]">{label}</dt>
+      <dd className="mt-0.5 text-[12.5px] leading-5 text-ink">
+        {empty ? "—" : value}
+      </dd>
     </div>
   );
 }
@@ -108,11 +120,18 @@ export default async function ApplicationDetailPage({
   const canReconcile = hasPermission(staff.role, "payments.reconcile");
   const canRefund = hasPermission(staff.role, "payments.refund");
   const canFile = hasPermission(staff.role, "filing.file");
-  const canNote = sensitive && (staff.role === "admin" || staff.role === "operator");
+  const canNote =
+    sensitive && (staff.role === "admin" || staff.role === "operator");
 
-  const staffUsers = users.filter((user) => user.active && user.role !== "client");
-  const assignee = application.assigneeId ? users.find((user) => user.id === application.assigneeId) : null;
-  const visibleActivity = sensitive ? activity : activity.filter((item) => item.visibility === "client");
+  const staffUsers = users.filter(
+    (user) => user.active && user.role !== "client",
+  );
+  const assignee = application.assigneeId
+    ? users.find((user) => user.id === application.assigneeId)
+    : null;
+  const visibleActivity = sensitive
+    ? activity
+    : activity.filter((item) => item.visibility === "client");
 
   const nextStatuses = canTransition
     ? nextApplicationStatuses(application.status).filter(
@@ -131,23 +150,44 @@ export default async function ApplicationDetailPage({
         : t.common.pkgFamily;
 
   const personRows = (person: PersonData, title: string) => (
-    <div className="rounded-md border border-line p-3">
-      <p className="text-2xs font-semibold uppercase tracking-wide text-muted">{title}</p>
+    <div className="border border-line p-3">
+      <p className="eyebrow-muted text-[10px]">{title}</p>
       <dl className="mt-2 grid gap-2.5 sm:grid-cols-2">
         <Info label={t.apply.firstName} value={person.firstName} />
         <Info label={t.apply.lastName} value={person.lastName} />
         <Info label={t.apply.middleName} value={person.middleName} />
-        <Info label={t.apply.dob} value={sensitive ? person.dateOfBirth : maskDob(person.dateOfBirth)} />
-        <Info label={t.apply.gender} value={person.gender === "male" ? t.apply.male : person.gender === "female" ? t.apply.female : "—"} />
+        <Info
+          label={t.apply.dob}
+          value={sensitive ? person.dateOfBirth : maskDob(person.dateOfBirth)}
+        />
+        <Info
+          label={t.apply.gender}
+          value={
+            person.gender === "male"
+              ? t.apply.male
+              : person.gender === "female"
+                ? t.apply.female
+                : "—"
+          }
+        />
         <Info label={t.apply.birthCity} value={person.birthCity} />
-        <Info label={t.apply.birthCountry} value={countryName(person.birthCountry, locale)} />
+        <Info
+          label={t.apply.birthCountry}
+          value={countryName(person.birthCountry, locale)}
+        />
         <Info
           label={t.apply.eligibilityCountry}
-          value={person.eligibilityCountry ? countryName(person.eligibilityCountry, locale) : "—"}
+          value={
+            person.eligibilityCountry
+              ? countryName(person.eligibilityCountry, locale)
+              : "—"
+          }
         />
         <Info
           label={t.apply.nationality}
-          value={person.nationality ? countryName(person.nationality, locale) : "—"}
+          value={
+            person.nationality ? countryName(person.nationality, locale) : "—"
+          }
         />
         <Info
           label={t.apply.education}
@@ -174,13 +214,36 @@ export default async function ApplicationDetailPage({
 
   return (
     <div>
+      {/* Paper copy masthead: the file is printed for the consular officer. */}
+      <div className="mb-6 hidden border-b-2 border-ink pb-3 print:block">
+        <p
+          className="font-mono text-[10px] uppercase"
+          style={{ letterSpacing: "0.2em" }}
+        >
+          {t.common.brand}
+        </p>
+        <p className="mt-1 font-serif text-[20px] leading-tight">
+          {application.ref} · {application.applicant.firstName}{" "}
+          {application.applicant.lastName}
+        </p>
+        <p className="mt-1 text-[11px] text-muted">
+          DV {application.dvYear} · {tx("Shtypur", "Printed")}{" "}
+          {formatDateTime(new Date().toISOString(), locale)}
+        </p>
+      </div>
+
       <AdminPageHeader
-        title={`${application.ref} · ${application.applicant.firstName} ${application.applicant.lastName}`}
-        description={`${packageLabel} · ${formatCurrency(application.amountCents, locale)} · DV ${application.dvYear}`}
+        eyebrow={`${application.ref} · DV ${application.dvYear}`}
+        title={`${application.applicant.firstName} ${application.applicant.lastName}`}
+        description={`${packageLabel} · ${formatCurrency(application.amountCents, locale)}`}
         actions={
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2" data-print="hide">
+            <PrintButton label={tx("Printo dosjen", "Print file")} />
             {canFile && (
-              <Link href={`/admin/filing/${application.id}`} className="btn-primary btn-sm">
+              <Link
+                href={`/admin/filing/${application.id}`}
+                className="btn-primary btn-sm"
+              >
                 <FileCheck2 className="h-3.5 w-3.5" aria-hidden="true" />
                 {tx("Hapësira e dorëzimit", "Filing workspace")}
               </Link>
@@ -198,18 +261,19 @@ export default async function ApplicationDetailPage({
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <StatusBadge kind="application" value={application.status} t={t} />
         <StatusBadge kind="payment" value={application.paymentStatus} t={t} />
-        <span className="chip border-line bg-white text-muted">
+        <span className="chip border-line bg-paper text-muted">
           {tx("Caktuar", "Assignee")}: {assignedName}
         </span>
         {application.duplicate.level !== "none" && (
-          <span className="chip border-amber-200 bg-amber-50 text-amber-800">
+          <span className="chip border-warning/40 bg-warning-50 text-warning">
             <AlertTriangle className="h-3 w-3" aria-hidden="true" />
             {tx("Duplikat i mundshëm", "Possible duplicate")}
           </span>
         )}
         {!application.completeness.dataComplete && (
-          <span className="chip border-amber-200 bg-amber-50 text-amber-800">
-            {tx("Të dhëna që mungojnë", "Missing data")}: {application.completeness.missing.length}
+          <span className="chip border-warning/40 bg-warning-50 text-warning">
+            {tx("Të dhëna që mungojnë", "Missing data")}:{" "}
+            {application.completeness.missing.length}
           </span>
         )}
         {!sensitive && (
@@ -232,14 +296,33 @@ export default async function ApplicationDetailPage({
             {canTransition ? (
               <div className="grid gap-4 lg:grid-cols-2">
                 <form action={changeStatusAction} className="space-y-2">
-                  <input type="hidden" name="applicationId" value={application.id} />
-                  <input type="hidden" name="redirectTo" value={`/admin/applications/${application.id}`} />
+                  <input
+                    type="hidden"
+                    name="applicationId"
+                    value={application.id}
+                  />
+                  <input
+                    type="hidden"
+                    name="redirectTo"
+                    value={`/admin/applications/${application.id}`}
+                  />
                   <label className="label" htmlFor="status">
                     {tx("Ndrysho statusin", "Change status")}
                   </label>
-                  <select id="status" name="status" className="field" required disabled={nextStatuses.length === 0}>
+                  <select
+                    id="status"
+                    name="status"
+                    className="field"
+                    required
+                    disabled={nextStatuses.length === 0}
+                  >
                     {nextStatuses.length === 0 ? (
-                      <option value="">{tx("Nuk ka tranzicion të lejuar", "No allowed transition")}</option>
+                      <option value="">
+                        {tx(
+                          "Nuk ka tranzicion të lejuar",
+                          "No allowed transition",
+                        )}
+                      </option>
                     ) : (
                       nextStatuses.map((status) => (
                         <option key={status} value={status}>
@@ -257,9 +340,16 @@ export default async function ApplicationDetailPage({
                     rows={2}
                     maxLength={1000}
                     className="field"
-                    placeholder={tx("E detyrueshme për kërkesë informacioni", "Required when requesting information")}
+                    placeholder={tx(
+                      "E detyrueshme për kërkesë informacioni",
+                      "Required when requesting information",
+                    )}
                   />
-                  <button type="submit" className="btn-primary btn-sm" disabled={nextStatuses.length === 0}>
+                  <button
+                    type="submit"
+                    className="btn-primary btn-sm"
+                    disabled={nextStatuses.length === 0}
+                  >
                     {t.common.save}
                   </button>
                   <p className="text-2xs leading-5 text-muted">
@@ -272,12 +362,25 @@ export default async function ApplicationDetailPage({
 
                 {canAssign ? (
                   <form action={assignAction} className="space-y-2">
-                    <input type="hidden" name="applicationId" value={application.id} />
-                    <input type="hidden" name="redirectTo" value={`/admin/applications/${application.id}`} />
+                    <input
+                      type="hidden"
+                      name="applicationId"
+                      value={application.id}
+                    />
+                    <input
+                      type="hidden"
+                      name="redirectTo"
+                      value={`/admin/applications/${application.id}`}
+                    />
                     <label className="label" htmlFor="assigneeId">
                       {tx("Cakto stafin", "Assign staff")}
                     </label>
-                    <select id="assigneeId" name="assigneeId" className="field" defaultValue={application.assigneeId ?? ""}>
+                    <select
+                      id="assigneeId"
+                      name="assigneeId"
+                      className="field"
+                      defaultValue={application.assigneeId ?? ""}
+                    >
                       <option value="">{tx("Pa caktim", "Unassigned")}</option>
                       {staffUsers.map((user) => (
                         <option key={user.id} value={user.id}>
@@ -291,7 +394,10 @@ export default async function ApplicationDetailPage({
                   </form>
                 ) : (
                   <div className="text-[12.5px] text-muted">
-                    {tx("Vetëm administratori dhe operatori mund të caktojnë raste.", "Only admins and operators can assign cases.")}
+                    {tx(
+                      "Vetëm administratori dhe operatori mund të caktojnë raste.",
+                      "Only admins and operators can assign cases.",
+                    )}
                   </div>
                 )}
               </div>
@@ -307,41 +413,92 @@ export default async function ApplicationDetailPage({
 
           <SectionCard title={tx("Të dhënat e aplikimit", "Application data")}>
             <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <Info label={t.apply.maritalLabel} value={application.household.maritalStatus ? t.apply[`marital${application.household.maritalStatus.charAt(0).toUpperCase()}${application.household.maritalStatus.slice(1)}` as keyof typeof t.apply] : "—"} />
-              <Info label={t.apply.spouseIncludedLabel} value={application.household.spouseIncluded ? t.common.yes : t.common.no} />
-              <Info label={t.apply.childrenDeclared} value={application.household.declaredChildren} />
-              <Info label={t.apply.childrenTitle} value={application.children.length} />
+              <Info
+                label={t.apply.maritalLabel}
+                value={
+                  application.household.maritalStatus
+                    ? t.apply[
+                        `marital${application.household.maritalStatus.charAt(0).toUpperCase()}${application.household.maritalStatus.slice(1)}` as keyof typeof t.apply
+                      ]
+                    : "—"
+                }
+              />
+              <Info
+                label={t.apply.spouseIncludedLabel}
+                value={
+                  application.household.spouseIncluded
+                    ? t.common.yes
+                    : t.common.no
+                }
+              />
+              <Info
+                label={t.apply.childrenDeclared}
+                value={application.household.declaredChildren}
+              />
+              <Info
+                label={t.apply.childrenTitle}
+                value={application.children.length}
+              />
             </dl>
             {application.household.spouseExclusionReason && (
-              <p className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-2xs leading-5 text-amber-900">
-                {tx("Arsyeja e përjashtimit të bashkëshortit", "Spouse exclusion reason")}:{" "}
-                {application.household.spouseExclusionReason}
+              <p className="mt-3 bg-warning-50 px-3 py-2 text-2xs leading-5 text-warning">
+                {tx(
+                  "Arsyeja e përjashtimit të bashkëshortit",
+                  "Spouse exclusion reason",
+                )}
+                : {application.household.spouseExclusionReason}
               </p>
             )}
 
             <div className="mt-4 space-y-3">
-              {personRows(application.applicant, t.apply.applicantTitle ?? t.apply.step2)}
-              {application.spouse && personRows(application.spouse, t.apply.spouseTitle ?? t.apply.step3)}
+              {personRows(
+                application.applicant,
+                t.apply.applicantTitle ?? t.apply.step2,
+              )}
+              {application.spouse &&
+                personRows(
+                  application.spouse,
+                  t.apply.spouseTitle ?? t.apply.step3,
+                )}
               {application.children.map((child, index) => (
                 <div key={child.id}>
                   {personRows(child, `${t.apply.child} ${index + 1}`)}
                   <p className="mt-1 text-2xs text-muted">
-                    {t.apply.childMarried}: {child.married ? t.common.yes : t.common.no} · {t.apply.childLivesWith}:{" "}
-                    {child.livesWithApplicant ? t.common.yes : t.common.no} · {t.apply.childStepchild}:{" "}
+                    {t.apply.childMarried}:{" "}
+                    {child.married ? t.common.yes : t.common.no} ·{" "}
+                    {t.apply.childLivesWith}:{" "}
+                    {child.livesWithApplicant ? t.common.yes : t.common.no} ·{" "}
+                    {t.apply.childStepchild}:{" "}
                     {child.isStepchild ? t.common.yes : t.common.no}
                   </p>
                 </div>
               ))}
               {application.children.length === 0 && (
-                <p className="text-2xs text-muted">{t.apply.reviewNoChildren}</p>
+                <p className="text-2xs text-muted">
+                  {t.apply.reviewNoChildren}
+                </p>
               )}
             </div>
 
-            <div className="mt-4 rounded-md border border-line p-3">
-              <p className="text-2xs font-semibold uppercase tracking-wide text-muted">{t.apply.step5}</p>
+            <div className="mt-4 border border-line p-3">
+              <p className="eyebrow-muted text-[10px]">{t.apply.step5}</p>
               <dl className="mt-2 grid gap-2.5 sm:grid-cols-2">
-                <Info label={t.common.email} value={sensitive ? application.contact.email : maskEmail(application.contact.email)} />
-                <Info label={t.common.phone} value={sensitive ? application.contact.phone : maskPhone(application.contact.phone)} />
+                <Info
+                  label={t.common.email}
+                  value={
+                    sensitive
+                      ? application.contact.email
+                      : maskEmail(application.contact.email)
+                  }
+                />
+                <Info
+                  label={t.common.phone}
+                  value={
+                    sensitive
+                      ? application.contact.phone
+                      : maskPhone(application.contact.phone)
+                  }
+                />
                 <Info
                   label={t.apply.address1}
                   value={
@@ -350,58 +507,108 @@ export default async function ApplicationDetailPage({
                       : "••••"
                   }
                 />
-                <Info label={t.apply.city} value={sensitive ? application.contact.city : "••••"} />
-                <Info label={t.apply.postalCode} value={application.contact.postalCode || "—"} />
-                <Info label={t.apply.country} value={countryName(application.contact.country, locale)} />
-                <Info label={t.apply.preferredLanguage} value={application.contact.preferredLocale.toUpperCase()} />
-                <Info label={tx("Gjuha e aplikimit", "Application language")} value={application.locale.toUpperCase()} />
+                <Info
+                  label={t.apply.city}
+                  value={sensitive ? application.contact.city : "••••"}
+                />
+                <Info
+                  label={t.apply.postalCode}
+                  value={application.contact.postalCode || "—"}
+                />
+                <Info
+                  label={t.apply.country}
+                  value={countryName(application.contact.country, locale)}
+                />
+                <Info
+                  label={t.apply.preferredLanguage}
+                  value={application.contact.preferredLocale.toUpperCase()}
+                />
+                <Info
+                  label={tx("Gjuha e aplikimit", "Application language")}
+                  value={application.locale.toUpperCase()}
+                />
               </dl>
             </div>
 
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-md border border-line p-3">
-                <p className="text-2xs font-semibold uppercase tracking-wide text-muted">{t.apply.consentTitle}</p>
+              <div className="border border-line p-3">
+                <p className="eyebrow-muted text-[10px]">
+                  {t.apply.consentTitle}
+                </p>
                 <ul className="mt-2 space-y-1.5">
                   {application.consents.map((consent) => (
-                    <li key={`${consent.type}-${consent.memberId ?? ""}`} className="flex items-start gap-1.5 text-2xs leading-5 text-ink/80">
-                      <CheckCircle2 className="mt-0.5 h-3 w-3 shrink-0 text-forest" aria-hidden="true" />
+                    <li
+                      key={`${consent.type}-${consent.memberId ?? ""}`}
+                      className="flex items-start gap-1.5 text-2xs leading-5 text-ink/80"
+                    >
+                      <CheckCircle2
+                        className="mt-0.5 h-3 w-3 shrink-0 text-forest-800"
+                        aria-hidden="true"
+                      />
                       <span>
-                        {consentLabels(t)[consent.type]} <span className="text-muted">· {formatDateTime(consent.acceptedAt, locale)}</span>
+                        {consentLabels(t)[consent.type]}{" "}
+                        <span className="text-muted">
+                          · {formatDateTime(consent.acceptedAt, locale)}
+                        </span>
                       </span>
                     </li>
                   ))}
-                  {application.consents.length === 0 && <li className="text-2xs text-muted">{t.common.none}</li>}
+                  {application.consents.length === 0 && (
+                    <li className="text-2xs text-muted">{t.common.none}</li>
+                  )}
                 </ul>
               </div>
 
-              <div className="rounded-md border border-line p-3">
-                <p className="text-2xs font-semibold uppercase tracking-wide text-muted">
+              <div className="border border-line p-3">
+                <p className="eyebrow-muted text-[10px]">
                   {tx("Kontrolli i plotësisë", "Completeness")}
                 </p>
                 <ul className="mt-2 space-y-1.5 text-2xs leading-5">
                   <li className="flex items-center gap-1.5">
                     {application.completeness.dataComplete ? (
-                      <CheckCircle2 className="h-3 w-3 text-forest" aria-hidden="true" />
+                      <CheckCircle2
+                        className="h-3 w-3 text-forest-800"
+                        aria-hidden="true"
+                      />
                     ) : (
-                      <AlertTriangle className="h-3 w-3 text-amber-600" aria-hidden="true" />
+                      <AlertTriangle
+                        className="h-3 w-3 text-warning"
+                        aria-hidden="true"
+                      />
                     )}
-                    {tx("Të dhënat e formularit", "Form data")}: {application.completeness.dataComplete ? tx("të plota", "complete") : tx("mungojnë", "missing")}
+                    {tx("Të dhënat e formularit", "Form data")}:{" "}
+                    {application.completeness.dataComplete
+                      ? tx("të plota", "complete")
+                      : tx("mungojnë", "missing")}
                   </li>
                   <li className="flex items-center gap-1.5">
                     {application.completeness.photosApproved ? (
-                      <CheckCircle2 className="h-3 w-3 text-forest" aria-hidden="true" />
+                      <CheckCircle2
+                        className="h-3 w-3 text-forest-800"
+                        aria-hidden="true"
+                      />
                     ) : (
-                      <AlertTriangle className="h-3 w-3 text-amber-600" aria-hidden="true" />
+                      <AlertTriangle
+                        className="h-3 w-3 text-warning"
+                        aria-hidden="true"
+                      />
                     )}
-                    {tx("Fotot e aprovuara", "Approved photos")}: {application.completeness.photosApproved ? t.common.yes : t.common.no}
+                    {tx("Fotot e aprovuara", "Approved photos")}:{" "}
+                    {application.completeness.photosApproved
+                      ? t.common.yes
+                      : t.common.no}
                   </li>
                 </ul>
                 {sensitive && application.completeness.missing.length > 0 && (
-                  <p className="mt-2 break-words text-2xs text-muted">{application.completeness.missing.join(", ")}</p>
+                  <p className="mt-2 break-words text-2xs text-muted">
+                    {application.completeness.missing.join(", ")}
+                  </p>
                 )}
                 <p className="mt-2 text-2xs text-muted">
                   {tx("Duplikat", "Duplicate")}: {application.duplicate.level}
-                  {application.duplicate.matches.length > 0 ? ` (${application.duplicate.matches.join(", ")})` : ""}
+                  {application.duplicate.matches.length > 0
+                    ? ` (${application.duplicate.matches.join(", ")})`
+                    : ""}
                 </p>
               </div>
             </div>
@@ -413,101 +620,150 @@ export default async function ApplicationDetailPage({
               description={t.apply.photoAdvisory}
             >
               {application.photos.length === 0 ? (
-                <AdminEmpty text={tx("Nuk ka foto të ngarkuara.", "No photos uploaded.")} />
+                <AdminEmpty
+                  text={tx("Nuk ka foto të ngarkuara.", "No photos uploaded.")}
+                />
               ) : (
                 <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                  {application.photos.map((photo) => (
-                    <li key={photo.id} className="rounded-md border border-line p-3">
-                      <div className="aspect-square overflow-hidden rounded bg-ivory">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={`/api/files/${photo.storageKey}`}
-                          alt={`${photo.memberName} — ${application.ref}`}
-                          className="h-full w-full object-cover"
-                          loading="lazy"
-                        />
-                      </div>
-                      <div className="mt-2 flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <p className="truncate text-2xs font-semibold text-ink">{photo.memberName}</p>
-                          <p className="text-2xs text-muted">
-                            {photo.width}×{photo.height} · {Math.round(photo.bytes / 1024)} KB
+                  {application.photos.map((photo) => {
+                    const issues = photoIssues(photo);
+                    const memberLabel = photo.memberName || photo.memberKey;
+                    return (
+                      <li key={photo.id} className="border border-line p-3">
+                        <div className="aspect-square overflow-hidden rounded bg-ivory">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={`/api/files/${photo.storageKey}`}
+                            alt={`${memberLabel} — ${application.ref}`}
+                            className="h-full w-full object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+                        <div className="mt-2 flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="truncate text-2xs font-semibold text-ink">
+                              {memberLabel}
+                            </p>
+                            <p className="text-2xs text-muted">
+                              {photo.width}×{photo.height} ·{" "}
+                              {Math.round(photo.bytes / 1024)} KB
+                            </p>
+                          </div>
+                          <StatusBadge
+                            kind="photo"
+                            value={photo.status}
+                            t={t}
+                          />
+                        </div>
+                        {issues.length > 0 && (
+                          <ul className="mt-2 space-y-0.5">
+                            {issues.map((issue) => (
+                              <li
+                                key={issue.code}
+                                className={`text-2xs leading-4 ${issue.severity === "error" ? "text-danger" : "text-warning"}`}
+                              >
+                                {locale === "sq"
+                                  ? issue.messageSq
+                                  : issue.messageEn}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                        {photo.reviewedAt && (
+                          <p className="mt-1 text-2xs text-muted">
+                            {photo.reviewedBy} ·{" "}
+                            {formatDateTime(photo.reviewedAt, locale)}
+                            {photo.reviewNote ? ` · ${photo.reviewNote}` : ""}
                           </p>
-                        </div>
-                        <StatusBadge kind="photo" value={photo.status} t={t} />
-                      </div>
-                      {photo.issues.length > 0 && (
-                        <ul className="mt-2 space-y-0.5">
-                          {photo.issues.map((issue) => (
-                            <li
-                              key={issue.code}
-                              className={`text-2xs leading-4 ${issue.severity === "error" ? "text-red-700" : "text-amber-700"}`}
+                        )}
+                        <form
+                          action={reviewPhotoAction}
+                          className="mt-2 space-y-1.5"
+                        >
+                          <input
+                            type="hidden"
+                            name="applicationId"
+                            value={application.id}
+                          />
+                          <input
+                            type="hidden"
+                            name="photoId"
+                            value={photo.id}
+                          />
+                          <input
+                            type="hidden"
+                            name="redirectTo"
+                            value={`/admin/applications/${application.id}`}
+                          />
+                          <input
+                            name="note"
+                            className="field px-2 py-1 text-2xs"
+                            maxLength={500}
+                            placeholder={tx(
+                              "Shënim (i detyrueshëm për refuzim)",
+                              "Note (required for rejection)",
+                            )}
+                            aria-label={tx("Shënim për foton", "Photo note")}
+                          />
+                          <div className="flex gap-1.5">
+                            <button
+                              type="submit"
+                              name="decision"
+                              value="approve"
+                              className="btn-primary btn-sm flex-1"
+                              disabled={photo.status === "approved"}
                             >
-                              {locale === "sq" ? issue.messageSq : issue.messageEn}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                      {photo.reviewedAt && (
-                        <p className="mt-1 text-2xs text-muted">
-                          {photo.reviewedBy} · {formatDateTime(photo.reviewedAt, locale)}
-                          {photo.reviewNote ? ` · ${photo.reviewNote}` : ""}
-                        </p>
-                      )}
-                      <form action={reviewPhotoAction} className="mt-2 space-y-1.5">
-                        <input type="hidden" name="applicationId" value={application.id} />
-                        <input type="hidden" name="photoId" value={photo.id} />
-                        <input type="hidden" name="redirectTo" value={`/admin/applications/${application.id}`} />
-                        <input
-                          name="note"
-                          className="field px-2 py-1 text-2xs"
-                          maxLength={500}
-                          placeholder={tx("Shënim (i detyrueshëm për refuzim)", "Note (required for rejection)")}
-                          aria-label={tx("Shënim për foton", "Photo note")}
-                        />
-                        <div className="flex gap-1.5">
-                          <button
-                            type="submit"
-                            name="decision"
-                            value="approve"
-                            className="btn-primary btn-sm flex-1"
-                            disabled={photo.status === "approved"}
-                          >
-                            {t.apply.photoApproved}
-                          </button>
-                          <button
-                            type="submit"
-                            name="decision"
-                            value="reject"
-                            className="btn-secondary btn-sm flex-1"
-                            disabled={photo.status === "rejected"}
-                          >
-                            {t.apply.photoRejected}
-                          </button>
-                        </div>
-                      </form>
-                    </li>
-                  ))}
+                              {t.apply.photoApproved}
+                            </button>
+                            <button
+                              type="submit"
+                              name="decision"
+                              value="reject"
+                              className="btn-secondary btn-sm flex-1"
+                              disabled={photo.status === "rejected"}
+                            >
+                              {t.apply.photoRejected}
+                            </button>
+                          </div>
+                        </form>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </SectionCard>
           )}
 
-          <SectionCard title={t.account.timeline} description={tx("Të gjitha veprimet, përfshirë shënimet e brendshme.", "All activity, including internal notes.")}>
+          <SectionCard
+            title={t.account.timeline}
+            description={tx(
+              "Të gjitha veprimet, përfshirë shënimet e brendshme.",
+              "All activity, including internal notes.",
+            )}
+          >
             {visibleActivity.length === 0 ? (
               <AdminEmpty text={tx("Nuk ka aktivitet.", "No activity.")} />
             ) : (
               <ol className="space-y-4">
                 {visibleActivity.map((item) => (
-                  <li key={item.id} className="relative border-l border-line pl-4">
+                  <li
+                    key={item.id}
+                    className="relative border-l border-line pl-4"
+                  >
                     <span
-                      className={`absolute -left-[3px] top-1.5 h-1.5 w-1.5 rounded-full ${
-                        item.visibility === "client" ? "bg-forest" : "bg-amber-500"
+                      className={`absolute -left-[3px] top-1.5 h-1.5 w-1.5 ${
+                        item.visibility === "client"
+                          ? "bg-forest"
+                          : "bg-warning"
                       }`}
                     />
-                    <p className="text-[12.5px] leading-5 text-ink">{item.message}</p>
+                    <p className="text-[12.5px] leading-5 text-ink">
+                      {item.message}
+                    </p>
                     <p className="mt-0.5 text-2xs text-muted">
-                      {item.actorName} · {formatDateTime(item.createdAt, locale)} · {item.visibility}
+                      {item.actorName} ·{" "}
+                      {formatDateTime(item.createdAt, locale)} ·{" "}
+                      {item.visibility}
                     </p>
                   </li>
                 ))}
@@ -516,20 +772,47 @@ export default async function ApplicationDetailPage({
           </SectionCard>
 
           {canNote && (
-            <SectionCard title={tx("Shënime dhe mesazhe", "Notes and messages")}>
+            <SectionCard
+              title={tx("Shënime dhe mesazhe", "Notes and messages")}
+            >
               <form action={addNoteAction} className="space-y-2">
-                <input type="hidden" name="applicationId" value={application.id} />
-                <input type="hidden" name="redirectTo" value={`/admin/applications/${application.id}`} />
+                <input
+                  type="hidden"
+                  name="applicationId"
+                  value={application.id}
+                />
+                <input
+                  type="hidden"
+                  name="redirectTo"
+                  value={`/admin/applications/${application.id}`}
+                />
                 <label className="label" htmlFor="message">
                   {tx("Shënim", "Note")}
                 </label>
-                <textarea id="message" name="message" rows={3} maxLength={2000} className="field" required minLength={3} />
+                <textarea
+                  id="message"
+                  name="message"
+                  rows={3}
+                  maxLength={2000}
+                  className="field"
+                  required
+                  minLength={3}
+                />
                 <label className="label" htmlFor="visibility">
                   {tx("Dukshmëria", "Visibility")}
                 </label>
-                <select id="visibility" name="visibility" className="field" defaultValue="internal">
-                  <option value="internal">{tx("Vetëm staf (i brendshëm)", "Staff only (internal)")}</option>
-                  <option value="client">{tx("I dukshëm për klientin", "Visible to the client")}</option>
+                <select
+                  id="visibility"
+                  name="visibility"
+                  className="field"
+                  defaultValue="internal"
+                >
+                  <option value="internal">
+                    {tx("Vetëm staf (i brendshëm)", "Staff only (internal)")}
+                  </option>
+                  <option value="client">
+                    {tx("I dukshëm për klientin", "Visible to the client")}
+                  </option>
                 </select>
                 <button type="submit" className="btn-secondary btn-sm">
                   {tx("Shto", "Add")}
@@ -549,23 +832,37 @@ export default async function ApplicationDetailPage({
             title={t.account.payment}
             action={
               canViewPayments ? (
-                <Link href={`/admin/payments?q=${application.ref}`} className="text-2xs font-semibold text-forest">
+                <Link
+                  href={`/admin/payments?q=${application.ref}`}
+                  className="text-2xs font-semibold text-forest-800"
+                >
                   {t.admin.nav.payments}
                 </Link>
               ) : null
             }
           >
             {!canViewPayments ? (
-              <p className="text-2xs text-muted">{tx("Nuk ke leje për të dhënat e pagesës.", "You do not have payment permission.")}</p>
+              <p className="text-2xs text-muted">
+                {tx(
+                  "Nuk ke leje për të dhënat e pagesës.",
+                  "You do not have payment permission.",
+                )}
+              </p>
             ) : order ? (
               <div className="space-y-2 text-[12.5px] leading-5">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-muted">{t.account.paymentReference}</span>
-                  <span className="font-mono text-xs font-semibold text-ink">{order.ref}</span>
+                  <span className="text-muted">
+                    {t.account.paymentReference}
+                  </span>
+                  <span className="font-mono text-xs font-semibold text-ink">
+                    {order.ref}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-muted">{t.common.amount}</span>
-                  <span className="font-medium text-ink">{formatCurrency(order.amountCents, locale)}</span>
+                  <span className="font-medium text-ink">
+                    {formatCurrency(order.amountCents, locale)}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-muted">{t.common.status}</span>
@@ -577,23 +874,31 @@ export default async function ApplicationDetailPage({
                 </div>
                 {order.receivedAmountCents != null && (
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-muted">{tx("Arkëtuar", "Received")}</span>
+                    <span className="text-muted">
+                      {tx("Arkëtuar", "Received")}
+                    </span>
                     <span className="text-ink">
-                      {formatCurrency(order.receivedAmountCents, locale)} · {formatDate(order.receivedAt, locale)}
+                      {formatCurrency(order.receivedAmountCents, locale)} ·{" "}
+                      {formatDate(order.receivedAt, locale)}
                     </span>
                   </div>
                 )}
                 {order.amountMismatch && (
-                  <p className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1.5 text-2xs text-amber-900">
-                    {tx("Mospërputhje shume", "Amount mismatch")}: {order.evidenceNote}
+                  <p className="border border-warning/40 bg-warning-50 px-2 py-1.5 text-2xs text-warning">
+                    {tx("Mospërputhje shume", "Amount mismatch")}:{" "}
+                    {order.evidenceNote}
                     {order.mismatchReviewedAt ? (
-                      <span className="mt-1 block font-medium text-emerald-800">
-                        {tx("U shqyrtua", "Reviewed")}: {order.mismatchReviewNote} ·{" "}
+                      <span className="mt-1 block font-medium text-forest-700">
+                        {tx("U shqyrtua", "Reviewed")}:{" "}
+                        {order.mismatchReviewNote} ·{" "}
                         {formatDate(order.mismatchReviewedAt, locale)}
                       </span>
                     ) : (
                       <span className="mt-1 block font-medium">
-                        {tx("Shqyrtoje në rakordim para dorëzimit.", "Review it in reconciliation before filing.")}
+                        {tx(
+                          "Shqyrtoje në rakordim para dorëzimit.",
+                          "Review it in reconciliation before filing.",
+                        )}
                       </span>
                     )}
                   </p>
@@ -606,10 +911,17 @@ export default async function ApplicationDetailPage({
                 )}
 
                 {canReconcile && order.status === "pending_cash" && (
-                  <form action={recordCashAction} className="mt-3 space-y-2 border-t border-line pt-3">
+                  <form
+                    action={recordCashAction}
+                    className="mt-3 space-y-2 border-t border-line pt-3"
+                  >
                     <input type="hidden" name="orderId" value={order.id} />
-                    <input type="hidden" name="redirectTo" value={`/admin/applications/${application.id}`} />
-                    <p className="text-2xs font-semibold uppercase tracking-wide text-muted">
+                    <input
+                      type="hidden"
+                      name="redirectTo"
+                      value={`/admin/applications/${application.id}`}
+                    />
+                    <p className="eyebrow-muted text-[10px]">
                       {tx("Regjistro arkëtimin", "Record receipt")}
                     </p>
                     <div className="grid grid-cols-2 gap-2">
@@ -632,24 +944,47 @@ export default async function ApplicationDetailPage({
                         <label className="label" htmlFor="receivedAt">
                           {tx("Data", "Date")}
                         </label>
-                        <input id="receivedAt" name="receivedAt" type="date" defaultValue={new Date().toISOString().slice(0, 10)} className="field" required />
+                        <input
+                          id="receivedAt"
+                          name="receivedAt"
+                          type="date"
+                          defaultValue={new Date().toISOString().slice(0, 10)}
+                          className="field"
+                          required
+                        />
                       </div>
                     </div>
                     <div>
                       <label className="label" htmlFor="receivingMethod">
                         {tx("Mënyra", "Receipt method")}
                       </label>
-                      <select id="receivingMethod" name="receivingMethod" className="field" defaultValue="office">
-                        <option value="office">{tx("Në zyrë", "At the office")}</option>
-                        <option value="post">{tx("Me postë", "By post")}</option>
-                        <option value="bank">{tx("Në bankë", "Bank transfer")}</option>
+                      <select
+                        id="receivingMethod"
+                        name="receivingMethod"
+                        className="field"
+                        defaultValue="office"
+                      >
+                        <option value="office">
+                          {tx("Në zyrë", "At the office")}
+                        </option>
+                        <option value="post">
+                          {tx("Me postë", "By post")}
+                        </option>
+                        <option value="bank">
+                          {tx("Në bankë", "Bank transfer")}
+                        </option>
                       </select>
                     </div>
                     <div>
                       <label className="label" htmlFor="paymentNote">
                         {t.common.notes}
                       </label>
-                      <input id="paymentNote" name="note" className="field" maxLength={500} />
+                      <input
+                        id="paymentNote"
+                        name="note"
+                        className="field"
+                        maxLength={500}
+                      />
                     </div>
                     <button type="submit" className="btn-primary btn-sm w-full">
                       {tx("Konfirmo pagesën", "Confirm payment")}
@@ -657,27 +992,47 @@ export default async function ApplicationDetailPage({
                   </form>
                 )}
 
-                {canRefund && order.status === "paid" && order.method === "cash" && (
-                  <form action={refundAction} className="mt-3 space-y-2 border-t border-line pt-3">
-                    <input type="hidden" name="orderId" value={order.id} />
-                    <input type="hidden" name="redirectTo" value={`/admin/applications/${application.id}`} />
-                    <label className="label" htmlFor="refundReason">
-                      {tx("Arsyeja e rimbursimit", "Refund reason")}
-                    </label>
-                    <input id="refundReason" name="reason" className="field" minLength={5} required />
-                    <button type="submit" className="btn-secondary btn-sm w-full">
-                      {tx("Regjistro rimbursim", "Record refund")}
-                    </button>
-                  </form>
-                )}
-                {canRefund && order.status === "paid" && order.method === "card" && (
-                  <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-2xs leading-5 text-amber-900">
-                    {tx(
-                      "Rimbursimet me kartë nuk procesohen nga ky ekran. Përdor panelin e ofruesit të pagesave dhe rakordoje manualisht.",
-                      "Card refunds are not processed from this screen. Use the payment provider dashboard and reconcile manually.",
-                    )}
-                  </p>
-                )}
+                {canRefund &&
+                  order.status === "paid" &&
+                  order.method === "cash" && (
+                    <form
+                      action={refundAction}
+                      className="mt-3 space-y-2 border-t border-line pt-3"
+                    >
+                      <input type="hidden" name="orderId" value={order.id} />
+                      <input
+                        type="hidden"
+                        name="redirectTo"
+                        value={`/admin/applications/${application.id}`}
+                      />
+                      <label className="label" htmlFor="refundReason">
+                        {tx("Arsyeja e rimbursimit", "Refund reason")}
+                      </label>
+                      <input
+                        id="refundReason"
+                        name="reason"
+                        className="field"
+                        minLength={5}
+                        required
+                      />
+                      <button
+                        type="submit"
+                        className="btn-secondary btn-sm w-full"
+                      >
+                        {tx("Regjistro rimbursim", "Record refund")}
+                      </button>
+                    </form>
+                  )}
+                {canRefund &&
+                  order.status === "paid" &&
+                  order.method === "card" && (
+                    <p className="mt-3 border border-warning/40 bg-warning-50 px-3 py-2 text-2xs leading-5 text-warning">
+                      {tx(
+                        "Rimbursimet me kartë nuk procesohen nga ky ekran. Përdor panelin e ofruesit të pagesave dhe rakordoje manualisht.",
+                        "Card refunds are not processed from this screen. Use the payment provider dashboard and reconcile manually.",
+                      )}
+                    </p>
+                  )}
               </div>
             ) : (
               <AdminEmpty text={tx("Nuk ka porosi.", "No order.")} />
@@ -686,21 +1041,51 @@ export default async function ApplicationDetailPage({
 
           <SectionCard title={t.account.confirmation}>
             {!canFile ? (
-              <p className="text-2xs text-muted">{tx("Vetëm stafi i dorëzimit shikon këtë seksion.", "Only filing staff see this section.")}</p>
+              <p className="text-2xs text-muted">
+                {tx(
+                  "Vetëm stafi i dorëzimit shikon këtë seksion.",
+                  "Only filing staff see this section.",
+                )}
+              </p>
             ) : filing ? (
               <div className="space-y-2 text-[12.5px]">
-                <p className="text-2xs text-muted">{t.account.confirmationNumber}</p>
-                <p className="font-mono text-sm font-semibold text-forest-900">{filing.confirmationNumber}</p>
+                <p className="text-2xs text-muted">
+                  {t.account.confirmationNumber}
+                </p>
+                <p className="font-mono text-sm font-semibold text-forest-900">
+                  {filing.confirmationNumber}
+                </p>
                 <p className="text-2xs text-muted">
                   {formatDateTime(filing.filedAt, locale)} · {filing.filedBy}
                 </p>
-                {filing.notes && <p className="rounded-md bg-ivory px-2 py-1.5 text-2xs text-ink/80">{filing.notes}</p>}
+                {filing.notes && (
+                  <p className="bg-ivory px-2 py-1.5 text-2xs text-ink/80">
+                    {filing.notes}
+                  </p>
+                )}
                 {application.status !== "confirmation_sent" && (
-                  <form action={sendConfirmationAction} className="border-t border-line pt-2">
-                    <input type="hidden" name="applicationId" value={application.id} />
-                    <input type="hidden" name="redirectTo" value={`/admin/applications/${application.id}`} />
-                    <button type="submit" className="btn-secondary btn-sm w-full">
-                      {tx("Dërgo njoftimin e konfirmimit", "Send confirmation notice")}
+                  <form
+                    action={sendConfirmationAction}
+                    className="border-t border-line pt-2"
+                  >
+                    <input
+                      type="hidden"
+                      name="applicationId"
+                      value={application.id}
+                    />
+                    <input
+                      type="hidden"
+                      name="redirectTo"
+                      value={`/admin/applications/${application.id}`}
+                    />
+                    <button
+                      type="submit"
+                      className="btn-secondary btn-sm w-full"
+                    >
+                      {tx(
+                        "Dërgo njoftimin e konfirmimit",
+                        "Send confirmation notice",
+                      )}
                     </button>
                     <p className="mt-1 text-2xs text-muted">
                       {tx(
@@ -713,8 +1098,16 @@ export default async function ApplicationDetailPage({
               </div>
             ) : application.status === "ready_to_file" ? (
               <form action={recordFilingAction} className="space-y-2">
-                <input type="hidden" name="applicationId" value={application.id} />
-                <input type="hidden" name="redirectTo" value={`/admin/applications/${application.id}`} />
+                <input
+                  type="hidden"
+                  name="applicationId"
+                  value={application.id}
+                />
+                <input
+                  type="hidden"
+                  name="redirectTo"
+                  value={`/admin/applications/${application.id}`}
+                />
                 <label className="label" htmlFor="confirmationNumber">
                   {t.account.confirmationNumber}
                 </label>
@@ -725,19 +1118,30 @@ export default async function ApplicationDetailPage({
                   required
                   minLength={6}
                   autoComplete="off"
-                  placeholder={tx("Nga faqja zyrtare", "From the official site")}
+                  placeholder={tx(
+                    "Nga faqja zyrtare",
+                    "From the official site",
+                  )}
                 />
                 <label className="label" htmlFor="filingNotes">
                   {t.common.notes}
                 </label>
-                <input id="filingNotes" name="notes" className="field" maxLength={500} />
+                <input
+                  id="filingNotes"
+                  name="notes"
+                  className="field"
+                  maxLength={500}
+                />
                 <button type="submit" className="btn-primary btn-sm w-full">
                   {tx("Regjistro dorëzimin", "Record filing")}
                 </button>
               </form>
             ) : (
               <p className="flex items-start gap-2 text-2xs leading-5 text-muted">
-                <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                <Lock
+                  className="mt-0.5 h-3.5 w-3.5 shrink-0"
+                  aria-hidden="true"
+                />
                 {tx(
                   "Dorëzimi regjistrohet vetëm kur rasti është i gatshëm dhe pagesa konfirmuar.",
                   "Filing is recorded only when the case is ready and payment is confirmed.",
@@ -752,20 +1156,40 @@ export default async function ApplicationDetailPage({
             ) : (
               <ul className="space-y-2">
                 {editRequests.map((request) => (
-                  <li key={request.id} className="rounded-md border border-line p-2.5">
-                    <p className="text-[12px] leading-5 text-ink">{request.message}</p>
+                  <li key={request.id} className="border border-line p-2.5">
+                    <p className="text-[12px] leading-5 text-ink">
+                      {request.message}
+                    </p>
                     <p className="mt-1 text-2xs text-muted">
-                      {formatDateTime(request.createdAt, locale)} · {request.status}
+                      {formatDateTime(request.createdAt, locale)} ·{" "}
+                      {request.status}
                       {request.resolvedBy ? ` · ${request.resolvedBy}` : ""}
                     </p>
                     {request.status === "open" && canTransition && (
-                      <form action={resolveEditRequestAction} className="mt-2 flex gap-1.5">
+                      <form
+                        action={resolveEditRequestAction}
+                        className="mt-2 flex gap-1.5"
+                      >
                         <input type="hidden" name="id" value={request.id} />
-                        <input type="hidden" name="redirectTo" value={`/admin/applications/${application.id}`} />
-                        <button type="submit" name="status" value="resolved" className="btn-primary btn-sm flex-1">
+                        <input
+                          type="hidden"
+                          name="redirectTo"
+                          value={`/admin/applications/${application.id}`}
+                        />
+                        <button
+                          type="submit"
+                          name="status"
+                          value="resolved"
+                          className="btn-primary btn-sm flex-1"
+                        >
                           {tx("Zgjidhur", "Resolved")}
                         </button>
-                        <button type="submit" name="status" value="declined" className="btn-secondary btn-sm flex-1">
+                        <button
+                          type="submit"
+                          name="status"
+                          value="declined"
+                          className="btn-secondary btn-sm flex-1"
+                        >
                           {tx("Refuzuar", "Declined")}
                         </button>
                       </form>
@@ -791,20 +1215,32 @@ export default async function ApplicationDetailPage({
                 <dd>{formatDateTime(application.updatedAt, locale)}</dd>
               </div>
               <div className="flex justify-between gap-2">
-                <dt className="text-muted">{tx("Rregullat e çmimit", "Pricing rules")}</dt>
+                <dt className="text-muted">
+                  {tx("Rregullat e çmimit", "Pricing rules")}
+                </dt>
                 <dd>{application.pricingRulesVersion}</dd>
               </div>
               <div className="flex justify-between gap-2">
                 <dt className="text-muted">{tx("Pronari", "Owner")}</dt>
-                <dd className="truncate">{sensitive ? application.ownerEmail : maskEmail(application.ownerEmail ?? "—")}</dd>
+                <dd className="truncate">
+                  {sensitive
+                    ? application.ownerEmail
+                    : maskEmail(application.ownerEmail ?? "—")}
+                </dd>
               </div>
             </dl>
             <div className="mt-3 flex flex-wrap gap-2 border-t border-line pt-2 text-2xs">
-              <Link href={`/sq/account/${application.id}`} className="inline-flex items-center gap-1 text-forest hover:underline">
+              <Link
+                href={`/sq/account/${application.id}`}
+                className="inline-flex items-center gap-1 text-forest-800 hover:text-clay-600 hover:underline"
+              >
                 {tx("Pamja e klientit", "Client view")}
                 <ExternalLink className="h-3 w-3" aria-hidden="true" />
               </Link>
-              <Link href={`/admin/audit?q=${application.ref}`} className="inline-flex items-center gap-1 text-forest hover:underline">
+              <Link
+                href={`/admin/audit?q=${application.ref}`}
+                className="inline-flex items-center gap-1 text-forest-800 hover:text-clay-600 hover:underline"
+              >
                 <ShieldCheck className="h-3 w-3" aria-hidden="true" />
                 {t.admin.nav.audit}
               </Link>

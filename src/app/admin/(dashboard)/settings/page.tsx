@@ -182,7 +182,7 @@ export default async function SettingsPage({
           )}
         >
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-md border border-line p-3">
+            <div className="border border-line p-3">
               <label className="label" htmlFor="postSelectionFee">
                 {tx("Tarifa pas përzgjedhjes (750 € e propozuar)", "Post-selection fee (proposed €750)")}
               </label>
@@ -212,7 +212,7 @@ export default async function SettingsPage({
               </div>
             </div>
 
-            <div className="space-y-2.5 rounded-md border border-line p-3 text-[12.5px]">
+            <div className="space-y-2.5 border border-line p-3 text-[12.5px]">
               <label className="flex items-start gap-2">
                 <input
                   type="checkbox"
@@ -263,7 +263,7 @@ export default async function SettingsPage({
                   {tx("Teksti ligjor është miratuar", "Legal copy is approved")}
                 </span>
               </label>
-              <div className="rounded border border-amber-200 bg-amber-50 px-2 py-1.5 text-2xs leading-5 text-amber-900">
+              <div className="rounded border border-warning/40 bg-warning-50 px-2 py-1.5 text-2xs leading-5 text-warning">
                 {tx(
                   "MFA për stafin nuk është aktiv në këtë version. Është bllokues lansimi dhe nuk mund të aktivizohet nga ky ekran.",
                   "Staff MFA is not active in this build. It is a launch blocker and cannot be switched on from this screen.",
@@ -272,7 +272,7 @@ export default async function SettingsPage({
             </div>
           </div>
 
-          <div className="mt-4 flex items-start gap-2 rounded-md border border-amber-300 bg-amber-50 p-3 text-2xs leading-5 text-amber-900">
+          <div className="mt-4 flex items-start gap-2 border border-warning/50 bg-warning-50 p-3 text-2xs leading-5 text-warning">
             <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             {tx(
               "Tarifa pas përzgjedhjes, çmimi i prindit të vetëm dhe përjashtimi i bashkëshortit janë vendime biznesi të pazgjidhura. Sistemi nuk i zbaton pa miratim të qartë.",
@@ -281,7 +281,7 @@ export default async function SettingsPage({
           </div>
         </SectionCard>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-white p-4">
+        <div className="sticky bottom-0 z-10 flex flex-wrap items-center justify-between gap-3 border border-line bg-paper p-4">
           <p className="flex items-center gap-1.5 text-2xs text-muted">
             <Info className="h-3.5 w-3.5" aria-hidden="true" />
             {tx("Përditësuar", "Updated")}: {formatDateTime(settings.updatedAt, locale)} · {settings.updatedBy}

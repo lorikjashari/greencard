@@ -1,34 +1,57 @@
 import Link from "next/link";
+import { cn } from "@/lib/cn";
 
+/**
+ * The mark is typographic, not pictorial: a spruce square holding a serif
+ * "G", with a clay corner tick that echoes a filing stamp. No icon font,
+ * no emoji, no decorative gradients.
+ */
 export function Logo({
   href,
   compact = false,
   inverted = false,
+  className,
 }: {
   href?: string;
   compact?: boolean;
   inverted?: boolean;
+  className?: string;
 }) {
   const content = (
-    <span className="inline-flex items-center gap-2.5">
+    <span className={cn("inline-flex items-center gap-2.5", className)}>
       <span
-        className={`relative inline-flex h-9 w-9 items-center justify-center rounded-[10px] ${
-          inverted ? "bg-white/10 text-white" : "bg-forest text-white"
-        }`}
+        className={cn(
+          "relative grid h-[30px] w-[30px] shrink-0 place-items-center",
+          inverted ? "bg-paper text-forest-900" : "bg-forest-800 text-paper",
+        )}
         aria-hidden="true"
       >
-        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.7">
-          <path d="M16.5 7.5A5.6 5.6 0 1 0 17.4 14H12v-2.6h5.7" strokeLinecap="round" />
-          <circle cx="18.2" cy="6" r="1.2" fill="#C5A56A" stroke="none" />
-        </svg>
+        <span className="font-serif text-[18px] font-normal leading-none -mt-px">G</span>
+        <span
+          className={cn(
+            "absolute -bottom-px -right-px h-1.5 w-1.5",
+            inverted ? "bg-clay-300" : "bg-clay",
+          )}
+        />
       </span>
       {!compact && (
-        <span className="flex flex-col leading-none">
-          <span className={`text-[15px] font-semibold tracking-tight ${inverted ? "text-white" : "text-ink"}`}>
+        <span className="flex min-w-0 flex-col">
+          <span
+            className={cn(
+              "truncate font-serif text-[16px] font-medium leading-none tracking-[-0.01em]",
+              inverted ? "text-paper" : "text-forest-900",
+            )}
+          >
             Green Card Kosova
           </span>
-          <span className={`mt-1 text-[10px] font-medium uppercase tracking-[0.14em] ${inverted ? "text-white/60" : "text-muted"}`}>
-            DV Application Service
+          <span
+            className={cn(
+              "mt-[5px] font-mono text-[9px] uppercase leading-none",
+              inverted ? "text-paper/55" : "text-muted",
+            )}
+            style={{ letterSpacing: "0.19em" }}
+          >
+            DV · Prishtinë
           </span>
         </span>
       )}

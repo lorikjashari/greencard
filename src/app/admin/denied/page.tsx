@@ -11,8 +11,8 @@ export default async function AdminDeniedPage() {
 
   return (
     <div className="flex min-h-dvh items-center justify-center bg-ivory px-4">
-      <div className="w-full max-w-md rounded-lg border border-line bg-white p-8 text-center shadow-card">
-        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-red-200 bg-red-50 text-danger">
+      <div className="w-full max-w-md border border-line bg-paper p-8 text-center ">
+        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-sm border border-danger/40 bg-danger-50 text-danger">
           <ShieldAlert className="h-5 w-5" aria-hidden="true" />
         </span>
         <h1 className="mt-4 text-lg font-semibold text-ink">{t.admin.noPermission}</h1>

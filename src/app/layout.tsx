@@ -1,12 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Manrope } from "next/font/google";
+import "@fontsource-variable/instrument-sans";
+import "@fontsource-variable/newsreader";
+import "@fontsource-variable/newsreader/wght-italic.css";
+import "@fontsource-variable/jetbrains-mono";
 import "./globals.css";
 
-const manrope = Manrope({
-  subsets: ["latin", "latin-ext"],
-  variable: "--font-sans",
-  display: "swap",
-});
+/**
+ * Fonts are self-hosted through @fontsource instead of next/font/google.
+ * Builds no longer depend on reaching fonts.googleapis.com, which previously
+ * failed the production build in offline/restricted environments.
+ */
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
@@ -27,20 +30,20 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#153D32",
+  themeColor: "#18372E",
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="sq" className={manrope.variable} suppressHydrationWarning>
-      <body className="min-h-dvh bg-ivory font-sans text-ink">
+    <html lang="sq" suppressHydrationWarning>
+      <body className="min-h-dvh bg-ivory font-sans text-ink antialiased">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-forest focus:px-4 focus:py-2 focus:text-white"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-sm focus:bg-forest focus:px-4 focus:py-2 focus:text-sm focus:text-paper"
         >
-          Kalo në përmbajtje
+          Kalo në përmbajtje / Skip to content
         </a>
         {children}
       </body>

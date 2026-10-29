@@ -109,10 +109,10 @@ export function LoginForm({
     <div className="space-y-6">
       {message && (
         <p
-          className={`flex items-start gap-2 rounded-md border p-3 text-[13px] leading-5 ${
+          className={`flex items-start gap-2 border-l-2 px-3.5 py-2.5 text-[12.5px] leading-5 ${
             status === "error"
-              ? "border-red-200 bg-red-50 text-red-900"
-              : "border-forest-200 bg-forest-50 text-forest-800"
+              ? "border-danger bg-danger-50 text-danger"
+              : "border-forest-400 bg-forest-50 text-forest-800"
           }`}
           role={status === "error" ? "alert" : "status"}
         >
@@ -149,12 +149,12 @@ export function LoginForm({
       </form>
 
       {demo && demoAccounts.length > 0 && (
-        <div className="rounded-lg border border-dashed border-amber-300 bg-amber-50/60 p-4">
-          <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-amber-900">
+        <div className="border border-dashed border-clay-300 bg-clay-50/50 p-4">
+          <p className="flex items-center gap-1.5 font-mono text-3xs uppercase text-clay-700" style={{ letterSpacing: "0.12em" }}>
             <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
             {t.auth.demoAccounts}
           </p>
-          <p className="mt-1 text-2xs leading-5 text-amber-900/80">{t.auth.demoNote}</p>
+          <p className="mt-1.5 text-[11px] leading-5 text-clay-700/80">{t.auth.demoNote}</p>
           <div className="mt-3 space-y-1.5">
             {demoAccounts.map((account) => (
               <button
@@ -162,13 +162,13 @@ export function LoginForm({
                 type="button"
                 onClick={() => void demoSignIn(account)}
                 disabled={demoBusy !== null}
-                className="flex w-full items-center justify-between gap-3 rounded-md border border-amber-200 bg-white px-3 py-2 text-left text-[13px] transition-colors hover:border-amber-400 disabled:opacity-60"
+                className="flex w-full items-center justify-between gap-3 border border-line-strong bg-paper px-3 py-2 text-left text-[12.5px] transition-colors hover:border-clay-400 hover:bg-paper disabled:opacity-60"
               >
                 <span className="min-w-0">
                   <span className="block truncate font-medium text-ink">{account.name}</span>
                   <span className="block truncate text-2xs text-muted">{account.email}</span>
                 </span>
-                <span className="flex shrink-0 items-center gap-1.5 text-2xs font-semibold uppercase tracking-wide text-amber-800">
+                <span className="flex shrink-0 items-center gap-1.5 font-mono text-3xs uppercase text-clay-600" style={{ letterSpacing: "0.1em" }}>
                   {account.role === "client" ? t.admin.roleClient : roleLabel(account.role)}
                   {demoBusy === account.email ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />

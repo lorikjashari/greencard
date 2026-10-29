@@ -51,7 +51,7 @@ export default async function LocaleLayout({
     <>
       <LocaleLang locale={locale} />
       {config.demo && <DemoBanner t={t} />}
-      <SiteHeader locale={locale} t={t} />
+      <SiteHeader locale={locale} t={t} contact={config.contact} />
       <main id="main" className="min-h-[60vh]">
         {children}
       </main>

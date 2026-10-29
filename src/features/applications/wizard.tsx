@@ -409,14 +409,18 @@ export function ApplicationWizard({
     return (
       <div className="container-page py-10" aria-busy="true" aria-live="polite">
         <div className="mx-auto max-w-3xl">
-          <div className="skeleton h-4 w-32" />
-          <div className="mt-6 skeleton h-10 w-2/3" />
+          <div className="flex items-center gap-3">
+            <span className="h-px w-6 bg-clay" aria-hidden="true" />
+            <div className="skeleton h-3 w-24" />
+          </div>
+          <div className="mt-6 skeleton h-9 w-2/3" />
+          <div className="mt-3 skeleton h-3 w-1/2" />
           <div className="mt-8 space-y-4">
-            <div className="skeleton h-12 w-full" />
-            <div className="skeleton h-12 w-full" />
+            <div className="skeleton h-11 w-full" />
+            <div className="skeleton h-11 w-full" />
             <div className="skeleton h-28 w-full" />
           </div>
-          <p className="mt-6 text-xs text-muted">{t.common.loading}</p>
+          <p className="mt-6 meta text-[10px]">{t.common.loading}</p>
         </div>
       </div>
     );
@@ -425,13 +429,11 @@ export function ApplicationWizard({
   if (phase === "error" || !data) {
     return (
       <div className="container-page py-16">
-        <div className="mx-auto max-w-md text-center">
-          <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-red-200 bg-red-50 text-danger">
-            <AlertCircle className="h-5 w-5" />
-          </span>
-          <h1 className="mt-4 text-lg font-semibold text-ink">{t.errors.generic}</h1>
-          <p className="mt-2 text-sm leading-6 text-muted">{bootError}</p>
-          <button type="button" onClick={() => void bootstrap("retry")} className="btn-primary mt-6">
+        <div className="mx-auto max-w-md border border-line bg-paper p-7">
+          <AlertCircle className="h-5 w-5 text-danger" aria-hidden="true" />
+          <h1 className="display mt-3 text-[24px] leading-tight">{t.errors.generic}</h1>
+          <p className="mt-2 text-[13px] leading-6 text-muted">{bootError}</p>
+          <button type="button" onClick={() => void bootstrap("retry")} className="btn-primary mt-5">
             {t.common.retry}
           </button>
         </div>
@@ -459,67 +461,117 @@ export function ApplicationWizard({
     demo,
   };
 
+  const currentLabel = stepLabels[step - 1];
+  const stepOfLabel = t.apply.stepOf.replace("{current}", String(step)).replace("{total}", "8");
+
   return (
-    <div className="container-page py-7 lg:py-10">
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_19rem] lg:gap-10">
-        <div className="min-w-0">
-          {/* Progress */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between gap-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted">
-                {t.apply.stepOf.replace("{current}", String(step)).replace("{total}", "8")}
-              </p>
+    <div className="container-page py-6 lg:py-10">
+      {/* Single accessible progress indicator for the whole wizard. */}
+      <div
+        role="progressbar"
+        aria-valuenow={step}
+        aria-valuemin={1}
+        aria-valuemax={8}
+        aria-label={t.apply.progress}
+        className="sr-only"
+      >
+        {stepOfLabel}
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-12">
+        <aside className="lg:self-start">
+          {/* Mobile: a single line of progress, no decoration. */}
+          <div className="lg:hidden">
+            <div className="flex items-baseline justify-between gap-3">
+              <p className="meta text-[10px] text-forest-700">{stepOfLabel}</p>
               <SaveIndicator state={saveState} t={t} />
             </div>
-            <div
-              className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-line"
-              role="progressbar"
-              aria-valuenow={step}
-              aria-valuemin={1}
-              aria-valuemax={8}
-              aria-label={t.apply.progress}
-            >
-              <div
-                className="h-full rounded-full bg-forest transition-all duration-300"
-                style={{ width: `${(step / 8) * 100}%` }}
-              />
+            <div className="mt-2 h-[3px] w-full bg-line" aria-hidden="true">
+              <div className="h-full bg-forest transition-all duration-300 ease-out" style={{ width: `${(step / 8) * 100}%` }} />
             </div>
-            <ol className="mt-3 hidden items-center gap-1 sm:flex" aria-label={t.apply.progress}>
+            <p className="mt-2 font-serif text-[19px] leading-none text-forest-900">{currentLabel}</p>
+          </div>
+
+          {/* Desktop: the step ledger stays in view for the whole application. */}
+          <div className="hidden lg:sticky lg:top-24 lg:block">
+            <div className="flex items-baseline justify-between gap-3">
+              <p className="eyebrow-muted text-[10px]">{t.apply.progress}</p>
+              <p className="font-mono text-[10px] tabular text-muted">
+                {String(step).padStart(2, "0")} / 08
+              </p>
+            </div>
+
+            <ol className="mt-4 border-t border-line" aria-label={t.apply.progress}>
               {stepLabels.map((label, index) => {
                 const number = index + 1;
                 const done = number < step;
                 const active = number === step;
                 return (
-                  <li key={label} className="min-w-0 flex-1">
+                  <li key={label} className="border-b border-line">
                     <button
                       type="button"
                       onClick={() => goTo(number)}
                       disabled={number >= step}
-                      className={cn(
-                        "flex w-full items-center gap-1.5 rounded-sm py-1 text-left text-2xs font-medium",
-                        active ? "text-forest" : done ? "text-ink/70 hover:text-forest" : "text-muted/60",
-                      )}
                       aria-current={active ? "step" : undefined}
+                      className={cn(
+                        "group flex w-full items-center gap-3 py-2.5 text-left transition-colors",
+                        number < step && "cursor-pointer hover:text-clay-600",
+                        number >= step && "cursor-default",
+                      )}
                     >
                       <span
                         className={cn(
-                          "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold",
-                          active && "border-forest bg-forest text-white",
-                          done && "border-forest-200 bg-forest-50 text-forest",
-                          !active && !done && "border-line bg-white text-muted",
+                          "grid h-4 w-4 shrink-0 place-items-center border",
+                          active && "border-forest bg-forest text-paper",
+                          done && "border-forest-300 bg-forest-50 text-forest-700",
+                          !active && !done && "border-line-strong bg-transparent text-transparent",
                         )}
+                        aria-hidden="true"
                       >
-                        {done ? <Check className="h-3 w-3" /> : number}
+                        {active ? (
+                          <span className="h-1.5 w-1.5 bg-paper" />
+                        ) : (
+                          <svg viewBox="0 0 10 10" className={cn("h-2.5 w-2.5", done ? "opacity-100" : "opacity-0")}>
+                            <path d="M1.5 5.2 4 7.5 8.5 2.6" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                          </svg>
+                        )}
                       </span>
-                      <span className="truncate">{label}</span>
+                      <span className="min-w-0 flex-1">
+                        <span
+                          className={cn(
+                            "block truncate text-[13px] leading-5",
+                            active ? "font-semibold text-ink" : done ? "text-ink/75" : "text-muted/70",
+                          )}
+                        >
+                          {label}
+                        </span>
+                      </span>
+                      <span className="font-mono text-3xs tabular text-muted/60" aria-hidden="true">
+                        {String(number).padStart(2, "0")}
+                      </span>
                     </button>
                   </li>
                 );
               })}
             </ol>
-          </div>
 
-          <div ref={topRef} tabIndex={-1} className="scroll-mt-24 focus:outline-none">
+            <div className="mt-5">
+              <PriceCard tier={tier} t={t} locale={locale} />
+            </div>
+
+            <div className="mt-4 flex items-center justify-between gap-2 border-t border-line pt-3">
+              <SaveIndicator state={saveState} t={t} />
+            </div>
+
+            <p className="mt-4 flex items-start gap-2 text-[11px] leading-5 text-muted">
+              <Lock className="mt-0.5 h-3 w-3 shrink-0 text-forest-600" aria-hidden="true" />
+              {t.apply.emailHelp}
+            </p>
+          </div>
+        </aside>
+
+        <div className="min-w-0">
+          <div ref={topRef} tabIndex={-1} className="scroll-mt-24 border border-line bg-paper p-5 focus:outline-none sm:p-7 lg:p-9">
             {step === 1 && <StepHousehold {...stepProps} />}
             {step === 2 && <StepApplicant {...stepProps} />}
             {step === 3 && <StepSpouse {...stepProps} />}
@@ -546,32 +598,27 @@ export function ApplicationWizard({
           {submitError && (
             <div
               role="alert"
-              className="mt-6 flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3.5 text-[13px] leading-6 text-red-900"
+              className="mt-5 flex items-start gap-2 border-l-2 border-danger bg-danger-50 px-4 py-3 text-[13px] leading-6 text-danger"
             >
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
               <span>{submitError}</span>
             </div>
           )}
 
-          <div className="mt-8 flex flex-col-reverse items-stretch gap-3 border-t border-line pt-5 sm:flex-row sm:items-center sm:justify-between">
-            <button
-              type="button"
-              onClick={goBack}
-              disabled={step === 1 || submitting}
-              className="btn-secondary sm:w-auto"
-            >
+          <div className="mt-6 lg:hidden">
+            <PriceCard tier={tier} t={t} locale={locale} compact />
+          </div>
+
+          {/* On phones the primary action stays reachable while the form scrolls. */}
+          <div className="sticky bottom-0 z-20 -mx-5 mt-6 flex flex-col-reverse items-stretch gap-3 border-t border-line bg-ivory px-5 py-3 sm:-mx-7 sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:py-4 lg:static lg:mx-0 lg:border-t lg:bg-transparent lg:px-0 lg:pt-5">
+            <button type="button" onClick={goBack} disabled={step === 1 || submitting} className="btn-secondary sm:w-auto">
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
               {t.common.back}
             </button>
 
             <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
               <span className="hidden text-2xs text-muted sm:inline">{t.apply.savedLocally}</span>
-              <button
-                type="button"
-                onClick={goNext}
-                disabled={submitting}
-                className="btn-primary sm:min-w-44"
-              >
+              <button type="button" onClick={goNext} disabled={submitting} className="btn-primary sm:min-w-44">
                 {submitting ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -592,42 +639,7 @@ export function ApplicationWizard({
             </div>
           </div>
 
-          {/* Mobile summary */}
-          <div className="mt-6 lg:hidden">
-            <PriceCard tier={tier} t={t} locale={locale} compact />
-          </div>
         </div>
-
-        <aside className="hidden lg:block">
-          <div className="sticky top-24 space-y-4">
-            <PriceCard tier={tier} t={t} locale={locale} />
-
-            <div className="rounded-lg border border-line bg-white p-4">
-              <h2 className="text-[12px] font-semibold uppercase tracking-wide text-muted">
-                {t.complete.nextTitle}
-              </h2>
-              <ul className="mt-3 space-y-2.5 text-[12.5px] leading-5 text-ink/80">
-                <li className="flex gap-2">
-                  <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-forest" />
-                  {t.home.step6Body}
-                </li>
-                <li className="flex gap-2">
-                  <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-forest" />
-                  {t.home.step7Body}
-                </li>
-                <li className="flex gap-2">
-                  <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-forest" />
-                  {t.apply.submitConsentNote}
-                </li>
-              </ul>
-            </div>
-
-            <div className="flex items-start gap-2 rounded-lg border border-line bg-forest-50/50 p-3.5 text-2xs leading-5 text-forest-800">
-              <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-              {t.apply.emailHelp}
-            </div>
-          </div>
-        </aside>
       </div>
     </div>
   );
@@ -653,30 +665,30 @@ function PriceCard({
     : null;
 
   return (
-    <div className={cn("rounded-lg border border-line bg-white p-4", !compact && "shadow-card")}>
+    <div className={cn("border border-line bg-ivory/70 p-4", !compact && "bg-paper")}>
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">{t.apply.priceTitle}</p>
-          <p className="mt-1 text-[13px] font-medium text-ink">{label ?? t.apply.pricePending}</p>
+        <div className="min-w-0">
+          <p className="eyebrow-muted text-[10px]">{t.apply.priceTitle}</p>
+          <p className="mt-1.5 truncate text-[13px] font-medium text-ink">{label ?? t.apply.pricePending}</p>
         </div>
         {tier?.priceCents != null && (
-          <p className="whitespace-nowrap font-serif text-xl text-forest-900">
+          <p className="whitespace-nowrap font-serif text-[22px] leading-none tabular text-forest-900">
             {formatCurrency(tier.priceCents, locale)}
           </p>
         )}
       </div>
-      <p className="mt-2 text-2xs text-muted">{t.apply.priceCalculated}</p>
+      <p className="mt-2 text-[11px] leading-4 text-muted">{t.apply.priceCalculated}</p>
 
       {tier && tier.warnings.length > 0 && (
         <div className="mt-3 space-y-1.5 border-t border-line pt-3">
           {tier.warnings.map((warning) => (
-            <p key={`${warning.code}-${warning.count ?? ""}`} className="flex gap-1.5 text-2xs leading-5 text-amber-800">
-              <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />
+            <p key={`${warning.code}-${warning.count ?? ""}`} className="flex gap-1.5 text-[11px] leading-4 text-warning">
+              <AlertCircle className="mt-px h-3 w-3 shrink-0" aria-hidden="true" />
               {tierWarningText(locale, warning)}
             </p>
           ))}
           {tier.needsReview && (
-            <p className="text-2xs font-medium text-amber-800">{t.apply.reviewPolicyNote}</p>
+            <p className="text-[11px] font-medium leading-4 text-warning">{t.apply.reviewPolicyNote}</p>
           )}
         </div>
       )}
@@ -711,7 +723,7 @@ function SaveIndicator({ state, t }: { state: SaveState; t: Copy }) {
   }
   if (state === "offline") {
     return (
-      <span className="inline-flex items-center gap-1.5 text-2xs text-amber-800" role="status">
+      <span className="inline-flex items-center gap-1.5 text-2xs text-warning" role="status">
         <CloudOff className="h-3 w-3" aria-hidden="true" />
         {t.apply.offline}
       </span>

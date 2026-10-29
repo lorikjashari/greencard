@@ -14,6 +14,7 @@ import { formatCurrency, formatDate } from "@/lib/format";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { CopyButton } from "@/components/ui/copy-button";
 import { AdminPageHeader, SectionCard } from "@/components/admin/ui";
+import { PrintButton } from "@/components/admin/print-button";
 import type { PersonData } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Filing workspace" };
@@ -179,25 +180,37 @@ export default async function FilingWorkspacePage({ params }: { params: Promise<
 
   return (
     <div>
+      <div className="mb-6 hidden border-b-2 border-ink pb-3 print:block">
+        <p className="font-mono text-[10px] uppercase" style={{ letterSpacing: "0.2em" }}>
+          {t.common.brand} · {tx("Fletë dorëzimi", "Filing worksheet")}
+        </p>
+        <p className="mt-1 font-serif text-[20px] leading-tight">
+          {application.ref} · {application.applicant.firstName} {application.applicant.lastName}
+        </p>
+      </div>
+
       <AdminPageHeader
         title={tx(`Hapësira e dorëzimit · ${application.ref}`, `Filing workspace · ${application.ref}`)}
         description={`${application.applicant.firstName} ${application.applicant.lastName} · DV ${application.dvYear} · ${formatCurrency(application.amountCents, locale)}`}
         actions={
-          <Link href={`/admin/applications/${application.id}`} className="btn-secondary btn-sm">
-            <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
-            {tx("Aplikimi", "Application")}
-          </Link>
+          <div className="flex flex-wrap gap-2" data-print="hide">
+            <PrintButton label={tx("Printo fletën", "Print worksheet")} />
+            <Link href={`/admin/applications/${application.id}`} className="btn-secondary btn-sm">
+              <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+              {tx("Aplikimi", "Application")}
+            </Link>
+          </div>
         }
       />
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <StatusBadge kind="application" value={application.status} t={t} />
         <StatusBadge kind="payment" value={application.paymentStatus} t={t} />
-        <span className="chip border-line bg-white text-muted">
+        <span className="chip border-line bg-paper text-muted">
           {tx("Dorëzuar", "Submitted")} {formatDate(application.submittedAt, locale)}
         </span>
         {order?.amountMismatch && order.mismatchReviewedAt && (
-          <span className="chip border-emerald-200 bg-emerald-50 text-emerald-800">
+          <span className="chip border-forest-300 bg-forest-50 text-forest-700">
             {tx("Mospërputhja u shqyrtua", "Mismatch reviewed")}
           </span>
         )}
@@ -205,7 +218,7 @@ export default async function FilingWorkspacePage({ params }: { params: Promise<
 
       <div className="mt-4 space-y-4">
         {blockers.length === 0 ? (
-          <div className="flex items-start gap-2 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-[13px] leading-6 text-emerald-900">
+          <div className="flex items-start gap-2 border-l-2 border-forest-400 bg-forest-50 px-3 py-3 text-[13px] leading-6 text-forest-800">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
             <span>
               {tx(
@@ -215,7 +228,7 @@ export default async function FilingWorkspacePage({ params }: { params: Promise<
             </span>
           </div>
         ) : (
-          <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-[13px] leading-6 text-amber-900">
+          <div className="border-l-2 border-warning bg-warning-50 px-3 py-3 text-[13px] leading-6 text-warning">
             <p className="flex items-center gap-2 font-semibold">
               <AlertTriangle className="h-4 w-4" aria-hidden="true" />
               {tx("Zgjidhi këto bllokues para se të regjistrojë një dorëzim", "Resolve these blockers before recording a filing")}
@@ -229,13 +242,13 @@ export default async function FilingWorkspacePage({ params }: { params: Promise<
         )}
 
         {duplicateWarning && (
-          <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-white p-3 text-[13px] leading-6 text-amber-900">
+          <div className="flex items-start gap-2 border-l-2 border-warning bg-paper px-3 py-3 text-[13px] leading-6 text-warning">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
             {duplicateWarning}
           </div>
         )}
 
-        <div className="rounded-md border border-line bg-white p-3.5 text-[13px] leading-6 text-ink/80">
+        <div className="border border-line bg-paper p-3.5 text-[13px] leading-6 text-ink/80">
           <p className="font-semibold text-ink">{tx("Si të përdoret kjo hapësirë", "How to use this workspace")}</p>
           <p className="mt-1">
             {tx(
@@ -249,7 +262,7 @@ export default async function FilingWorkspacePage({ params }: { params: Promise<
               href={dvYear.instructionsUrl}
               target="_blank"
               rel="noreferrer noopener"
-              className="inline-flex items-center gap-1 font-semibold text-forest underline underline-offset-2"
+              className="inline-flex items-center gap-1 font-semibold text-forest-800 underline underline-offset-2"
             >
               dvprogram.state.gov
               <ExternalLink className="h-3 w-3" aria-hidden="true" />
@@ -385,7 +398,7 @@ export default async function FilingWorkspacePage({ params }: { params: Promise<
           ) : (
             <ul className="space-y-2">
               {application.photos.map((photo) => (
-                <li key={photo.id} className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-line bg-ivory/50 px-3 py-2">
+                <li key={photo.id} className="flex flex-wrap items-center justify-between gap-2 border border-line bg-ivory/50 px-3 py-2">
                   <div className="min-w-0">
                     <p className="flex items-center gap-1.5 text-[13px] font-medium text-ink">
                       <ImageIcon className="h-3.5 w-3.5 text-muted" aria-hidden="true" />

@@ -7,16 +7,19 @@ export function AdminPageHeader({
   title,
   description,
   actions,
+  eyebrow,
 }: {
   title: string;
   description?: string;
   actions?: React.ReactNode;
+  eyebrow?: string;
 }) {
   return (
-    <div className="flex flex-wrap items-start justify-between gap-4">
+    <div className="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-4">
       <div className="min-w-0">
-        <h1 className="font-serif text-2xl tracking-[-0.01em] text-forest-900 sm:text-[28px]">{title}</h1>
-        {description && <p className="mt-1 max-w-3xl text-[13px] leading-6 text-muted">{description}</p>}
+        {eyebrow && <p className="eyebrow-muted text-[9px]">{eyebrow}</p>}
+        <h1 className="display mt-1.5 text-[24px] leading-tight sm:text-[27px]">{title}</h1>
+        {description && <p className="mt-1.5 max-w-3xl text-[12.5px] leading-5 text-muted">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </div>
@@ -136,7 +139,7 @@ export function AdminNotice({
     <div className="mt-4 space-y-2">
       {problem && (
         <p
-          className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3 text-[13px] leading-5 text-red-900"
+          className="flex items-start gap-2 border-l-2 border-danger bg-danger-50 px-3.5 py-2.5 text-[12.5px] leading-5 text-danger"
           role="alert"
         >
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
@@ -145,13 +148,32 @@ export function AdminNotice({
       )}
       {info && (
         <p
-          className="flex items-start gap-2 rounded-md border border-forest-200 bg-forest-50 p-3 text-[13px] leading-5 text-forest-800"
+          className="flex items-start gap-2 border-l-2 border-forest-400 bg-forest-50 px-3.5 py-2.5 text-[12.5px] leading-5 text-forest-800"
           role="status"
         >
           <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
           {info[locale]}
         </p>
       )}
+    </div>
+  );
+}
+
+/**
+ * A ledger strip: one bordered band, divided by hairlines. Numbers sit in the
+ * serif face like figures typed onto a form, labels above them in mono.
+ * Grouping the counters this way keeps dashboards from reading as a deck of
+ * identical SaaS cards.
+ */
+export function StatStrip({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div
+      className={cn(
+        "mt-5 grid gap-px border border-line bg-line [grid-template-columns:repeat(auto-fit,minmax(10.5rem,1fr))]",
+        className,
+      )}
+    >
+      {children}
     </div>
   );
 }
@@ -170,23 +192,32 @@ export function StatCard({
   tone?: "default" | "warning" | "danger" | "success";
 }) {
   const body = (
-    <div
-      className={cn(
-        "h-full rounded-lg border bg-white p-4 transition-colors",
-        tone === "warning" && "border-amber-200",
-        tone === "danger" && "border-red-200",
-        tone === "success" && "border-emerald-200",
-        tone === "default" && "border-line",
-        href && "hover:border-forest-300",
-      )}
-    >
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">{label}</p>
-      <p className="mt-1.5 font-serif text-2xl text-forest-900">{value}</p>
-      {detail && <p className="mt-1 text-2xs leading-5 text-muted">{detail}</p>}
+    <div className="group relative h-full bg-paper px-4 py-3.5 transition-colors">
+      <span
+        className={cn(
+          "absolute inset-x-0 top-0 h-[2px]",
+          tone === "warning" && "bg-warning",
+          tone === "danger" && "bg-danger",
+          tone === "success" && "bg-forest-400",
+          tone === "default" && "bg-line-strong",
+        )}
+        aria-hidden="true"
+      />
+      <p className="eyebrow-muted text-[9px] leading-4">{label}</p>
+      <p className="mt-1.5 font-serif text-[26px] leading-none tabular text-forest-900 transition-colors group-hover:text-clay-700">
+        {value}
+      </p>
+      {detail && <p className="mt-1.5 text-[10.5px] leading-4 text-muted">{detail}</p>}
     </div>
   );
 
-  return href ? <Link href={href}>{body}</Link> : body;
+  return href ? (
+    <Link href={href} className="block focus-visible:outline-none">
+      {body}
+    </Link>
+  ) : (
+    body
+  );
 }
 
 export function SectionCard({
@@ -203,11 +234,13 @@ export function SectionCard({
   className?: string;
 }) {
   return (
-    <section className={cn("rounded-lg border border-line bg-white", className)}>
-      <div className="flex flex-wrap items-start justify-between gap-2 border-b border-line px-4 py-3.5">
+    <section className={cn("border border-line bg-paper", className)}>
+      <div className="flex flex-wrap items-start justify-between gap-2 border-b border-line px-4 py-2.5">
         <div>
-          <h2 className="text-[13px] font-semibold text-ink">{title}</h2>
-          {description && <p className="mt-0.5 text-2xs leading-5 text-muted">{description}</p>}
+          <h2 className="font-mono text-3xs uppercase text-forest-700" style={{ letterSpacing: "0.14em" }}>
+            {title}
+          </h2>
+          {description && <p className="mt-1 text-[11px] leading-4 text-muted">{description}</p>}
         </div>
         {action}
       </div>
@@ -218,7 +251,7 @@ export function SectionCard({
 
 export function AdminEmpty({ text }: { text: string }) {
   return (
-    <div className="flex items-center justify-center gap-2 rounded-md border border-dashed border-line px-4 py-10 text-[13px] text-muted">
+    <div className="flex items-center justify-center gap-2 border border-dashed border-line-strong px-4 py-10 text-[12.5px] text-muted">
       <Info className="h-4 w-4" aria-hidden="true" />
       {text}
     </div>

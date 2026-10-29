@@ -9,7 +9,7 @@ import { listApplications } from "@/lib/repo/applications";
 import { listUsers } from "@/lib/repo/users";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { AdminPageHeader, AdminEmpty } from "@/components/admin/ui";
+import { AdminPageHeader, AdminEmpty, StatStrip, StatCard } from "@/components/admin/ui";
 import type { ApplicationStatus, PaymentStatus } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Applications" };
@@ -115,7 +115,44 @@ export default async function ApplicationsPage({
         }
       />
 
-      <form method="get" className="mt-6 rounded-lg border border-line bg-white p-4">
+      {/* Status rollup: one click jumps into a filtered queue. */}
+      <StatStrip className="mt-5">
+        <StatCard
+          label={tx("Të gjitha", "All")}
+          value={all.length}
+          detail={tx("Në sistem", "In the system")}
+          href="/admin/applications"
+        />
+        <StatCard
+          label={t.status.submitted}
+          value={all.filter((item) => item.status === "submitted").length}
+          detail={tx("Pa marrë në punë", "Unclaimed")}
+          href="/admin/applications?status=submitted"
+          tone={all.some((item) => item.status === "submitted") ? "warning" : "default"}
+        />
+        <StatCard
+          label={t.status.in_review}
+          value={all.filter((item) => item.status === "in_review").length}
+          detail={tx("Në kontroll", "In review")}
+          href="/admin/applications?status=in_review"
+        />
+        <StatCard
+          label={t.status.needs_information}
+          value={all.filter((item) => item.status === "needs_information").length}
+          detail={tx("Në pritje të klientit", "Waiting on client")}
+          href="/admin/applications?status=needs_information"
+          tone={all.some((item) => item.status === "needs_information") ? "warning" : "default"}
+        />
+        <StatCard
+          label={t.status.ready_to_file}
+          value={all.filter((item) => item.status === "ready_to_file").length}
+          detail={tx("Në radhën e dorëzimit", "Filing queue")}
+          href="/admin/applications?status=ready_to_file"
+          tone="success"
+        />
+      </StatStrip>
+
+      <form method="get" className="mt-5 border border-line bg-paper p-4">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))_auto]">
           <div>
             <label className="label" htmlFor="q">
@@ -188,13 +225,13 @@ export default async function ApplicationsPage({
       <p className="mt-4 text-2xs text-muted">
         {filtered.length} {tx("rezultate", "results")} · {tx("faqja", "page")} {currentPage}/{totalPages}
         {!sensitive && (
-          <span className="ml-2 rounded bg-amber-50 px-1.5 py-0.5 font-medium text-amber-800">
+          <span className="ml-2 rounded bg-warning-50 px-1.5 py-0.5 font-medium text-warning">
             {tx("Të dhëna të ndjeshme të fshehura", "Sensitive fields hidden")}
           </span>
         )}
       </p>
 
-      <div className="mt-2 rounded-lg border border-line bg-white">
+      <div className="mt-2 border border-line bg-paper">
         {rows.length === 0 ? (
           <div className="p-4">
             <AdminEmpty text={tx("Asnjë aplikim nuk përputhet me filtrat.", "No applications match the filters.")} />
@@ -203,7 +240,7 @@ export default async function ApplicationsPage({
           <div className="overflow-x-auto">
             <table className="w-full min-w-[920px] text-left text-[12.5px]">
               <thead>
-                <tr className="border-b border-line text-2xs uppercase tracking-wide text-muted">
+                <tr className="border-b border-line font-mono text-2xs uppercase text-muted">
                   <th className="px-4 py-2.5 font-semibold">{tx("Referenca", "Reference")}</th>
                   <th className="px-3 py-2.5 font-semibold">{tx("Aplikanti", "Applicant")}</th>
                   <th className="px-3 py-2.5 font-semibold">{t.apply.step1}</th>
@@ -224,16 +261,16 @@ export default async function ApplicationsPage({
                     application.photos.some((photo) => photo.status === "invalid" || photo.status === "rejected");
 
                   return (
-                    <tr key={application.id} className="border-b border-line/70 last:border-0 hover:bg-ivory/60">
+                    <tr key={application.id} className="border-b border-line/70 last:border-0 hover:bg-paper">
                       <td className="px-4 py-3 align-top">
                         <Link
                           href={`/admin/applications/${application.id}`}
-                          className="font-mono text-xs font-semibold text-forest hover:underline"
+                          className="font-mono text-xs font-semibold text-forest-800 hover:text-clay-600 hover:underline"
                         >
                           {application.ref}
                         </Link>
                         {flagged && (
-                          <span className="mt-1 flex items-center gap-1 text-2xs text-amber-700">
+                          <span className="mt-1 flex items-center gap-1 text-2xs text-warning">
                             <AlertTriangle className="h-3 w-3" aria-hidden="true" />
                             {tx("Vëmendje", "Attention")}
                           </span>
@@ -260,7 +297,7 @@ export default async function ApplicationsPage({
                       <td className="px-4 py-3 align-top">
                         <Link
                           href={`/admin/applications/${application.id}`}
-                          className="text-2xs font-semibold text-forest hover:underline"
+                          className="text-2xs font-semibold text-forest-800 hover:text-clay-600 hover:underline"
                         >
                           {t.common.details}
                         </Link>

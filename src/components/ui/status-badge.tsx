@@ -6,11 +6,11 @@ type Tone = "neutral" | "success" | "warning" | "danger" | "info" | "forest";
 
 const TONES: Record<Tone, string> = {
   neutral: "border-line bg-ivory text-muted",
-  success: "border-emerald-200 bg-emerald-50 text-emerald-800",
-  warning: "border-amber-200 bg-amber-50 text-amber-800",
-  danger: "border-red-200 bg-red-50 text-red-800",
-  info: "border-sky-200 bg-sky-50 text-sky-800",
-  forest: "border-forest-200 bg-forest-50 text-forest-700",
+  success: "border-forest-300 bg-forest-50 text-forest-700",
+  warning: "border-warning/40 bg-warning-50 text-warning",
+  danger: "border-danger/40 bg-danger-50 text-danger",
+  info: "border-info/25 bg-info-50 text-info",
+  forest: "border-forest-300 bg-forest-50 text-forest-700",
 };
 
 const APPLICATION_TONE: Record<ApplicationStatus, Tone> = {
@@ -76,11 +76,11 @@ export function StatusBadge({
     <span className={cn("chip", TONES[tone], className)}>
       <span
         className={cn(
-          "h-1.5 w-1.5 rounded-full",
-          tone === "success" && "bg-emerald-600",
-          tone === "warning" && "bg-amber-600",
-          tone === "danger" && "bg-red-600",
-          tone === "info" && "bg-sky-600",
+          "h-1.5 w-1.5",
+          tone === "success" && "bg-forest-500",
+          tone === "warning" && "bg-warning",
+          tone === "danger" && "bg-danger",
+          tone === "info" && "bg-info",
           tone === "forest" && "bg-forest-600",
           tone === "neutral" && "bg-muted/60",
         )}

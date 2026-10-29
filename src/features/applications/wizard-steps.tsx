@@ -19,6 +19,33 @@ export interface StepProps {
   demo: boolean;
 }
 
+
+/**
+ * One heading treatment for all eight steps: the step counter, a serif title
+ * and a short brief. Keeps the wizard from drifting step to step.
+ */
+export function StepHeading({
+  index,
+  title,
+  intro,
+  t,
+}: {
+  index: number;
+  title: string;
+  intro: string;
+  t: Copy;
+}) {
+  return (
+    <header className="border-b border-line pb-5">
+      <p className="eyebrow-muted text-[10px]">
+        {t.apply.stepOf.replace("{current}", String(index)).replace("{total}", "8")}
+      </p>
+      <h2 className="display mt-2.5 text-[26px] leading-[1.15] sm:text-[30px]">{title}</h2>
+      <p className="mt-2.5 max-w-2xl text-[13.5px] leading-6 text-muted">{intro}</p>
+    </header>
+  );
+}
+
 const today = () => new Date().toISOString().slice(0, 10);
 
 function TextField({
@@ -147,10 +174,10 @@ function RadioCards<T extends string>({
           return (
             <label
               key={option.value}
-              className={`flex cursor-pointer items-start gap-2.5 rounded-md border p-3 text-sm transition-colors ${
+              className={`flex cursor-pointer items-start gap-2.5 border p-3 text-sm transition-colors ${
                 checked
-                  ? "border-forest bg-forest-50/60 ring-1 ring-forest/20"
-                  : "border-line bg-white hover:border-forest-300"
+                  ? "border-forest-400 bg-forest-50/60"
+                  : "border-line bg-paper hover:border-forest-300"
               } ${option.disabled ? "cursor-not-allowed opacity-50" : ""}`}
             >
               <input
@@ -160,7 +187,7 @@ function RadioCards<T extends string>({
                 checked={checked}
                 disabled={option.disabled}
                 onChange={() => onChange(option.value)}
-                className="mt-0.5 h-4 w-4 shrink-0 accent-forest"
+                className="mt-0.5 h-4 w-4 shrink-0 accent-forest-800"
               />
               <span>
                 <span className="block font-medium text-ink">{option.label}</span>
@@ -201,10 +228,7 @@ export function StepHousehold({ data, setData, errors, t }: StepProps) {
 
   return (
     <div className="space-y-7">
-      <header>
-        <h2 className="font-serif text-2xl text-forest-900 sm:text-[28px]">{t.apply.householdTitle}</h2>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{t.apply.householdIntro}</p>
-      </header>
+      <StepHeading index={1} title={t.apply.householdTitle} intro={t.apply.householdIntro} t={t} />
 
       <RadioCards
         legend={t.apply.maritalLabel}
@@ -222,7 +246,7 @@ export function StepHousehold({ data, setData, errors, t }: StepProps) {
       />
 
       {married && (
-        <div className="space-y-4 rounded-lg border border-line bg-white p-4 sm:p-5">
+        <div className="space-y-4 border border-line bg-paper p-4 sm:p-5">
           <RadioCards
             legend={t.apply.spouseIncludedLabel}
             name="spouseIncluded"
@@ -291,7 +315,7 @@ export function StepHousehold({ data, setData, errors, t }: StepProps) {
                 error={errors["household.spouseExclusionReason"]}
                 required
               />
-              <p className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-900">
+              <p className="flex items-start gap-2 border border-warning/40 bg-warning-50 p-3 text-xs leading-5 text-warning">
                 <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                 {t.apply.spouseExcludedWarning}
               </p>
@@ -300,7 +324,7 @@ export function StepHousehold({ data, setData, errors, t }: StepProps) {
         </div>
       )}
 
-      <div className="rounded-lg border border-line bg-white p-4 sm:p-5">
+      <div className="border border-line bg-paper p-4 sm:p-5">
         <span className="label">{t.apply.childrenQuestion}</span>
         <p className="mb-3 text-xs leading-5 text-muted">{t.apply.childrenHelp}</p>
         <div className="flex items-center gap-3">
@@ -315,7 +339,7 @@ export function StepHousehold({ data, setData, errors, t }: StepProps) {
                 },
               }))
             }
-            className="flex h-11 w-11 items-center justify-center rounded-md border border-line bg-white text-ink hover:border-forest-300 disabled:opacity-40"
+            className="flex h-11 w-11 items-center justify-center border border-line bg-paper text-ink hover:border-forest-300 disabled:opacity-40"
             disabled={data.household.declaredChildren <= 0}
             aria-label={t.apply.childRemove}
           >
@@ -338,7 +362,7 @@ export function StepHousehold({ data, setData, errors, t }: StepProps) {
                 },
               }))
             }
-            className="flex h-11 w-11 items-center justify-center rounded-md border border-line bg-white text-ink hover:border-forest-300 disabled:opacity-40"
+            className="flex h-11 w-11 items-center justify-center border border-line bg-paper text-ink hover:border-forest-300 disabled:opacity-40"
             disabled={data.household.declaredChildren >= 15}
             aria-label={t.apply.childAdd}
           >
@@ -428,10 +452,10 @@ function PersonFields({
           ].map((option) => (
             <label
               key={option.value}
-              className={`flex flex-1 cursor-pointer items-center gap-2 rounded-md border p-3 text-sm ${
+              className={`flex flex-1 cursor-pointer items-center gap-2 border p-3 text-sm ${
                 person.gender === option.value
                   ? "border-forest bg-forest-50/60"
-                  : "border-line bg-white hover:border-forest-300"
+                  : "border-line bg-paper hover:border-forest-300"
               }`}
             >
               <input
@@ -440,7 +464,7 @@ function PersonFields({
                 value={option.value}
                 checked={person.gender === option.value}
                 onChange={() => setPerson({ gender: option.value as "male" | "female" })}
-                className="h-4 w-4 accent-forest"
+                className="h-4 w-4 accent-forest-800"
               />
               {option.label}
             </label>
@@ -524,10 +548,7 @@ function PersonFields({
 export function StepApplicant({ data, setData, errors, t, locale }: StepProps) {
   return (
     <div className="space-y-7">
-      <header>
-        <h2 className="font-serif text-2xl text-forest-900 sm:text-[28px]">{t.apply.applicantTitle}</h2>
-        <p className="mt-2 text-sm leading-6 text-muted">{t.apply.applicantIntro}</p>
-      </header>
+      <StepHeading index={2} title={t.apply.applicantTitle} intro={t.apply.applicantIntro} t={t} />
       <PersonFields
         person={data.applicant}
         prefix="applicant"
@@ -548,8 +569,8 @@ export function StepSpouse({ data, setData, errors, t, locale }: StepProps) {
   if (!included) {
     return (
       <div className="space-y-5">
-        <h2 className="font-serif text-2xl text-forest-900 sm:text-[28px]">{t.apply.spouseTitle}</h2>
-        <div className="rounded-lg border border-dashed border-line bg-ivory/70 p-6">
+        <StepHeading index={3} title={t.apply.spouseTitle} intro={t.apply.spouseNotApplicable} t={t} />
+        <div className="border border-dashed border-line-strong bg-paper p-6">
           <p className="text-sm font-medium text-ink">{t.apply.spouseNotApplicable}</p>
           <p className="mt-1 text-[13px] leading-6 text-muted">
             {married ? t.apply.spouseExcludedBody : t.apply.spouseNotApplicableBody}
@@ -561,10 +582,7 @@ export function StepSpouse({ data, setData, errors, t, locale }: StepProps) {
 
   return (
     <div className="space-y-7">
-      <header>
-        <h2 className="font-serif text-2xl text-forest-900 sm:text-[28px]">{t.apply.spouseTitle}</h2>
-        <p className="mt-2 text-sm leading-6 text-muted">{t.apply.spouseIntro}</p>
-      </header>
+      <StepHeading index={3} title={t.apply.spouseTitle} intro={t.apply.spouseIntro} t={t} />
       <PersonFields
         person={data.spouse}
         prefix="spouse"
@@ -612,12 +630,9 @@ export function StepChildren({ data, setData, errors, t, locale }: StepProps) {
 
   return (
     <div className="space-y-6">
-      <header>
-        <h2 className="font-serif text-2xl text-forest-900 sm:text-[28px]">{t.apply.childrenTitle}</h2>
-        <p className="mt-2 text-sm leading-6 text-muted">{t.apply.childrenIntro}</p>
-      </header>
+      <StepHeading index={4} title={t.apply.childrenTitle} intro={t.apply.childrenIntro} t={t} />
 
-      <p className="rounded-md border border-line bg-forest-50/50 p-3 text-xs leading-5 text-forest-800">
+      <p className="border border-line bg-forest-50/50 p-3 text-xs leading-5 text-forest-800">
         {t.apply.childEligibilityNote}
       </p>
 
@@ -629,7 +644,7 @@ export function StepChildren({ data, setData, errors, t, locale }: StepProps) {
       )}
 
       {data.children.length === 0 && (
-        <div className="rounded-lg border border-dashed border-line bg-white p-8 text-center">
+        <div className="border border-dashed border-line bg-paper p-8 text-center">
           <p className="text-sm text-muted">
             {t.apply.childrenDeclared}: {data.household.declaredChildren}
           </p>
@@ -638,7 +653,7 @@ export function StepChildren({ data, setData, errors, t, locale }: StepProps) {
 
       <div className="space-y-4">
         {data.children.map((child, index) => (
-          <div key={child.id} className="rounded-lg border border-line bg-white p-4 sm:p-5">
+          <div key={child.id} className="border border-line bg-paper p-4 sm:p-5">
             <div className="mb-4 flex items-center justify-between gap-3">
               <h3 className="text-sm font-semibold text-ink">
                 {t.apply.child} {index + 1}
@@ -646,7 +661,7 @@ export function StepChildren({ data, setData, errors, t, locale }: StepProps) {
               <button
                 type="button"
                 onClick={() => removeChild(child.id)}
-                className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-danger hover:bg-red-50"
+                className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-danger hover:bg-danger-50"
               >
                 <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                 {t.common.remove}
@@ -689,10 +704,10 @@ export function StepChildren({ data, setData, errors, t, locale }: StepProps) {
                   ].map((option) => (
                     <label
                       key={option.value}
-                      className={`flex flex-1 cursor-pointer items-center gap-2 rounded-md border p-2.5 text-sm ${
+                      className={`flex flex-1 cursor-pointer items-center gap-2 border p-2.5 text-sm ${
                         child.gender === option.value
                           ? "border-forest bg-forest-50/60"
-                          : "border-line bg-white"
+                          : "border-line bg-paper"
                       }`}
                     >
                       <input
@@ -700,7 +715,7 @@ export function StepChildren({ data, setData, errors, t, locale }: StepProps) {
                         name={`child-${index}-gender`}
                         checked={child.gender === option.value}
                         onChange={() => updateChild(child.id, { gender: option.value as "male" | "female" })}
-                        className="h-4 w-4 accent-forest"
+                        className="h-4 w-4 accent-forest-800"
                       />
                       {option.label}
                     </label>
@@ -743,7 +758,7 @@ export function StepChildren({ data, setData, errors, t, locale }: StepProps) {
                     type="checkbox"
                     checked={child[option.key]}
                     onChange={(event) => updateChild(child.id, { [option.key]: event.target.checked })}
-                    className="h-4 w-4 rounded border-line accent-forest"
+                    className="h-4 w-4 rounded border-line accent-forest-800"
                   />
                   {option.label}
                 </label>
@@ -767,10 +782,7 @@ export function StepContact({ data, setData, errors, t, locale }: StepProps) {
   const countries = useMemo(() => countryOptions(locale), [locale]);
   return (
     <div className="space-y-7">
-      <header>
-        <h2 className="font-serif text-2xl text-forest-900 sm:text-[28px]">{t.apply.contactTitle}</h2>
-        <p className="mt-2 text-sm leading-6 text-muted">{t.apply.contactIntro}</p>
-      </header>
+      <StepHeading index={5} title={t.apply.contactTitle} intro={t.apply.contactIntro} t={t} />
 
       <div className="grid gap-5 sm:grid-cols-2">
         <TextField
@@ -895,12 +907,9 @@ export function StepPhotos(props: StepProps & { draftId: string; draftSecret: st
 
   return (
     <div className="space-y-6">
-      <header>
-        <h2 className="font-serif text-2xl text-forest-900 sm:text-[28px]">{t.apply.photosTitle}</h2>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{t.apply.photosIntro}</p>
-      </header>
+      <StepHeading index={6} title={t.apply.photosTitle} intro={t.apply.photosIntro} t={t} />
 
-      <div className="rounded-md border border-line bg-white p-3.5 text-xs leading-5 text-muted">
+      <div className="border border-line bg-paper p-3.5 text-xs leading-5 text-muted">
         {t.apply.photoRequirements}
       </div>
 
@@ -950,10 +959,10 @@ function ReviewSection({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-lg border border-line bg-white">
+    <section className="border border-line bg-paper">
       <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-2.5">
         <h3 className="text-[13px] font-semibold uppercase tracking-wide text-muted">{title}</h3>
-        <button type="button" onClick={onEdit} className="text-xs font-semibold text-forest hover:underline">
+        <button type="button" onClick={onEdit} className="text-xs font-semibold text-forest-800 hover:text-clay-600 hover:underline">
           {editLabel}
         </button>
       </div>
@@ -992,10 +1001,7 @@ export function StepReview({
 
   return (
     <div className="space-y-5">
-      <header>
-        <h2 className="font-serif text-2xl text-forest-900 sm:text-[28px]">{t.apply.reviewTitle}</h2>
-        <p className="mt-2 text-sm leading-6 text-muted">{t.apply.reviewIntro}</p>
-      </header>
+      <StepHeading index={7} title={t.apply.reviewTitle} intro={t.apply.reviewIntro} t={t} />
 
       <ReviewSection title={t.apply.reviewApplicant} onEdit={() => goTo(2)} editLabel={t.common.edit}>
         <dl>
@@ -1070,7 +1076,7 @@ export function StepReview({
         </ul>
       </ReviewSection>
 
-      <section className="rounded-lg border border-line bg-white p-4">
+      <section className="border border-line bg-paper p-4">
         <h3 className="text-[13px] font-semibold uppercase tracking-wide text-muted">{t.apply.consentTitle}</h3>
         <div className="mt-3 space-y-3">
           {consents.map((consent) => (
@@ -1084,7 +1090,7 @@ export function StepReview({
                     consents: { ...current.consents, [consent.key]: event.target.checked },
                   }))
                 }
-                className="mt-1 h-4 w-4 shrink-0 rounded border-line accent-forest"
+                className="mt-1 h-4 w-4 shrink-0 accent-forest-800"
               />
               <span>{consent.label}</span>
             </label>
@@ -1116,17 +1122,14 @@ export function StepPayment({
 }: StepProps & { cardEnabled: boolean; tier: PackageKey | null; priceCents: number | null }) {
   return (
     <div className="space-y-6">
-      <header>
-        <h2 className="font-serif text-2xl text-forest-900 sm:text-[28px]">{t.apply.paymentTitle}</h2>
-        <p className="mt-2 text-sm leading-6 text-muted">{t.apply.paymentIntro}</p>
-      </header>
+      <StepHeading index={8} title={t.apply.paymentTitle} intro={t.apply.paymentIntro} t={t} />
 
       <fieldset aria-invalid={errors["paymentMethod"] ? true : undefined}>
         <legend className="sr-only">{t.apply.paymentTitle}</legend>
         <div className="space-y-3">
           <label
-            className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 ${
-              data.paymentMethod === "cash" ? "border-forest bg-forest-50/50 ring-1 ring-forest/20" : "border-line bg-white"
+            className={`flex cursor-pointer items-start gap-3 border p-4 ${
+              data.paymentMethod === "cash" ? "border-forest-400 bg-forest-50/60" : "border-line bg-paper"
             }`}
           >
             <input
@@ -1135,24 +1138,24 @@ export function StepPayment({
               value="cash"
               checked={data.paymentMethod === "cash"}
               onChange={() => setData((current) => ({ ...current, paymentMethod: "cash" }))}
-              className="mt-1 h-4 w-4 accent-forest"
+              className="mt-1 h-4 w-4 accent-forest-800"
             />
             <span>
               <span className="flex flex-wrap items-center gap-2 font-medium text-ink">
                 {t.apply.paymentCash}
-                <span className="chip border-forest-200 bg-white text-forest-700">{t.apply.paymentDefault}</span>
+                <span className="chip border-forest-200 bg-paper text-forest-700">{t.apply.paymentDefault}</span>
               </span>
               <span className="mt-1 block text-[13px] leading-6 text-muted">{t.apply.paymentCashDesc}</span>
             </span>
           </label>
 
           <label
-            className={`flex items-start gap-3 rounded-lg border p-4 ${
+            className={`flex items-start gap-3 border p-4 ${
               !cardEnabled
-                ? "cursor-not-allowed border-line bg-ivory/60 opacity-70"
+                ? "cursor-not-allowed border-line bg-ivory/50 opacity-70"
                 : data.paymentMethod === "card"
-                  ? "cursor-pointer border-forest bg-forest-50/50 ring-1 ring-forest/20"
-                  : "cursor-pointer border-line bg-white"
+                  ? "cursor-pointer border-forest-400 bg-forest-50/60"
+                  : "cursor-pointer border-line bg-paper"
             }`}
           >
             <input
@@ -1162,7 +1165,7 @@ export function StepPayment({
               checked={data.paymentMethod === "card"}
               disabled={!cardEnabled}
               onChange={() => setData((current) => ({ ...current, paymentMethod: "card" }))}
-              className="mt-1 h-4 w-4 accent-forest"
+              className="mt-1 h-4 w-4 accent-forest-800"
             />
             <span>
               <span className="font-medium text-ink">{t.apply.paymentCard}</span>
@@ -1179,7 +1182,7 @@ export function StepPayment({
         )}
       </fieldset>
 
-      <div className="rounded-lg border border-line bg-white p-4">
+      <div className="border border-line bg-paper p-4">
         <div className="flex items-baseline justify-between gap-4">
           <span className="text-sm text-muted">
             {tier ? t.common[`pkg${tier === "individual" ? "Individual" : tier === "couple" ? "Couple" : "Family"}` as keyof Copy["common"]] : ""}

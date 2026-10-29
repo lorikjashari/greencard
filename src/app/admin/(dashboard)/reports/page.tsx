@@ -8,7 +8,7 @@ import { listOrders } from "@/lib/repo/orders";
 import { listFilings } from "@/lib/repo/filings";
 import { getActiveDvYear } from "@/lib/repo/dv-years";
 import { formatCurrency, formatDate } from "@/lib/format";
-import { AdminPageHeader, AdminEmpty, SectionCard, StatCard } from "@/components/admin/ui";
+import { AdminPageHeader, AdminEmpty, SectionCard, StatCard, StatStrip } from "@/components/admin/ui";
 import type { ApplicationStatus, PaymentStatus } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Reports" };
@@ -33,8 +33,8 @@ function Bars({
             <span className="text-ink">{row.label}</span>
             <span className="font-semibold text-ink">{formatValue ? formatValue(row.value) : row.value}</span>
           </div>
-          <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-ivory">
-            <div className="h-full rounded-full bg-forest" style={{ width: `${Math.max(2, (row.value / max) * 100)}%` }} />
+          <div className="mt-1 h-1.5 overflow-hidden bg-ivory">
+            <div className="h-full bg-forest" style={{ width: `${Math.max(2, (row.value / max) * 100)}%` }} />
           </div>
           {row.detail && <p className="mt-0.5 text-2xs text-muted">{row.detail}</p>}
         </li>
@@ -141,13 +141,13 @@ export default async function ReportsPage() {
         }
       />
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+      <StatStrip>
         <StatCard label={tx("Aplikime", "Applications")} value={applications.length} detail={`DV ${dvYear.year}`} />
         <StatCard label={tx("Dorëzuar", "Filed")} value={filed} detail={`${filings.length} ${tx("konfirmime", "confirmations")}`} tone="success" />
         <StatCard label={tx("Konvertim", "Conversion")} value={`${conversion}%`} detail={tx("Dorëzuar / aplikime", "Filed / applications")} />
         <StatCard label={tx("Arkëtuar", "Collected")} value={formatCurrency(collected, locale)} detail={`${tx("Rimbursuar", "Refunded")}: ${formatCurrency(refunded, locale)}`} />
         <StatCard label={tx("Cash në pritje", "Cash outstanding")} value={formatCurrency(outstanding, locale)} tone={outstanding > 0 ? "warning" : "default"} />
-      </div>
+      </StatStrip>
 
       <div className="mt-5 grid gap-5 lg:grid-cols-2">
         <SectionCard title={tx("Aplikime sipas statusit", "Applications by status")}>
@@ -195,7 +195,7 @@ export default async function ReportsPage() {
       </div>
 
       {applications.length === 0 && (
-        <div className="mt-5 rounded-lg border border-line bg-white p-4">
+        <div className="mt-5 border border-line bg-paper p-4">
           <AdminEmpty text={tx("Nuk ka të dhëna për këtë vit DV.", "No data for this DV year.")} />
         </div>
       )}

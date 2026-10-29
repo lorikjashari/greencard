@@ -26,19 +26,19 @@ export function DemoPortalLink({ t, locale }: { t: Copy; locale: Locale }) {
   if (!link) return null;
 
   return (
-    <div className="rounded-lg border border-dashed border-amber-300 bg-amber-50 p-4">
-      <p className="text-[11px] font-bold uppercase tracking-wide text-amber-900">
+    <div className="border border-dashed border-clay-300 bg-clay-50/50 p-4">
+      <p className="font-mono text-3xs uppercase text-clay-700" style={{ letterSpacing: "0.12em" }}>
         {t.complete.demoLinkTitle}
       </p>
       <Link
         href={link}
-        className="mt-2 inline-flex items-center gap-1.5 text-[13px] font-semibold text-amber-900 underline decoration-amber-500 underline-offset-4"
+        className="mt-2 inline-flex items-center gap-1.5 text-[13px] font-semibold text-clay-700 underline decoration-clay-400 underline-offset-4 hover:text-clay-600"
       >
         {t.complete.portalCta}
         <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
       </Link>
-      <p className="mt-2 text-2xs leading-5 text-amber-900/80">{t.complete.emailNotConfigured}</p>
-      <p className="mt-1 text-2xs leading-5 text-amber-900/80">
+      <p className="mt-2 text-2xs leading-5 text-clay-700/80">{t.complete.emailNotConfigured}</p>
+      <p className="mt-1 text-2xs leading-5 text-clay-700/80">
         {locale === "sq"
           ? "E njëjta lidhje gjendet edhe në /admin/outbox."
           : "The same link is also available in /admin/outbox."}

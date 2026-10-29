@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { AlertTriangle, ArrowLeft, ShieldCheck } from "lucide-react";
+import { AlertTriangle, ArrowLeft } from "lucide-react";
 import { getSession, isStaffRole } from "@/lib/auth/session";
 import { getPublicConfig } from "@/lib/config";
 import { ensureDemoSeed, DEMO_ACCOUNTS } from "@/lib/demo/seed";
@@ -52,54 +52,59 @@ export default async function AdminLoginPage({
             }
           : null;
 
-  return (
-    <div className="min-h-dvh bg-forest-950">
-      <div className="mx-auto grid min-h-dvh max-w-5xl gap-8 px-4 py-10 lg:grid-cols-[1fr_26rem] lg:items-center lg:py-16">
-        <div className="text-white">
-          <Logo inverted />
-          <h1 className="mt-10 font-serif text-4xl tracking-[-0.02em]">{t.auth.adminTitle}</h1>
-          <p className="mt-3 max-w-md text-sm leading-7 text-white/70">{t.auth.adminIntro}</p>
+  const facts = [
+    locale === "sq"
+      ? "Roli dhe lejet kontrollohen në server për çdo veprim."
+      : "Role and permissions are enforced on the server for every action.",
+    locale === "sq"
+      ? "Sesionet e stafit skadojnë pas 8 orësh, me mbyllje pas 30 minutash pasiviteti."
+      : "Staff sessions expire after 8 hours, with a 30-minute idle lock.",
+    locale === "sq" ? "Të gjitha veprimet e ndjeshme regjistrohen në audit." : "All sensitive actions are written to the audit log.",
+  ];
 
-          <ul className="mt-8 space-y-3 text-[13px] text-white/70">
-            <li className="flex items-start gap-2">
-              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-gold" aria-hidden="true" />
-              {locale === "sq"
-                ? "Roli dhe lejet kontrollohen në server për çdo veprim."
-                : "Role and permissions are enforced on the server for every action."}
-            </li>
-            <li className="flex items-start gap-2">
-              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-gold" aria-hidden="true" />
-              {locale === "sq"
-                ? "Sesionet e stafit skadojnë pas 8 orësh, me mbyllje pas 30 minutash pasiviteti."
-                : "Staff sessions expire after 8 hours, with a 30-minute idle lock."}
-            </li>
-            <li className="flex items-start gap-2">
-              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-gold" aria-hidden="true" />
-              {locale === "sq"
-                ? "Të gjitha veprimet e ndjeshme regjistrohen në audit."
-                : "All sensitive actions are written to the audit log."}
-            </li>
-          </ul>
+  return (
+    <div className="min-h-dvh bg-forest-950 text-paper">
+      <div className="mx-auto grid min-h-dvh max-w-6xl gap-10 px-5 py-10 lg:grid-cols-[minmax(0,1fr)_25rem] lg:items-center lg:gap-20 lg:py-16">
+        <div>
+          <Logo inverted />
+          <div className="mt-12 flex items-center gap-3">
+            <span className="h-px w-8 bg-clay-300" aria-hidden="true" />
+            <p className="font-mono text-3xs uppercase text-clay-200" style={{ letterSpacing: "0.2em" }}>
+              Administration
+            </p>
+          </div>
+          <h1 className="display mt-4 text-[clamp(2rem,4vw,3rem)] text-paper">{t.auth.adminTitle}</h1>
+          <p className="mt-4 max-w-md text-[14px] leading-7 text-paper/60">{t.auth.adminIntro}</p>
+
+          <ol className="mt-10 max-w-md border-t border-white/10">
+            {facts.map((fact, index) => (
+              <li key={fact} className="flex items-start gap-4 border-b border-white/10 py-3.5">
+                <span className="mt-0.5 font-mono text-3xs tabular text-clay-200" aria-hidden="true">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span className="text-[12.5px] leading-6 text-paper/70">{fact}</span>
+              </li>
+            ))}
+          </ol>
 
           <Link
             href="/sq"
-            className="mt-8 inline-flex items-center gap-1.5 text-xs font-medium text-white/60 hover:text-white"
+            className="mt-8 inline-flex items-center gap-1.5 font-mono text-3xs uppercase text-paper/45 transition-colors hover:text-paper"
+            style={{ letterSpacing: "0.12em" }}
           >
             <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
             {t.legal.backHome}
           </Link>
         </div>
 
-        <div className="rounded-xl border border-white/10 bg-white p-6 shadow-2xl">
+        <div className="border border-white/15 bg-paper p-6 text-ink sm:p-7">
           {isClient && session ? (
-            <div className="text-center">
-              <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-amber-50 text-amber-700">
-                <AlertTriangle className="h-5 w-5" aria-hidden="true" />
-              </span>
+            <div>
+              <AlertTriangle className="h-5 w-5 text-warning" aria-hidden="true" />
               <p className="mt-3 text-[14px] font-semibold text-ink">{t.auth.noAccess}</p>
-              <p className="mt-1.5 text-[12.5px] leading-6 text-muted">{session.email}</p>
-              <div className="mt-4 flex flex-col gap-2">
-                <Link href={`/${locale}/account`} className="btn-primary btn-sm">
+              <p className="mt-1.5 font-mono text-[11px] text-muted">{session.email}</p>
+              <div className="mt-5 flex flex-col gap-2">
+                <Link href={`/${locale}/account`} className="btn-primary btn-sm w-full">
                   {t.nav.account}
                 </Link>
                 <SignOutButton label={t.common.signOut} redirectTo="/admin/login" />
@@ -107,13 +112,13 @@ export default async function AdminLoginPage({
             </div>
           ) : (
             <>
-              <div className="flex items-center justify-between">
-                <h2 className="text-[15px] font-semibold text-ink">{t.auth.adminTitle}</h2>
-                <span className="chip border-forest-200 bg-forest-50 text-forest-700">STAFF</span>
+              <div className="flex items-baseline justify-between gap-3 border-b border-line pb-3">
+                <h2 className="font-serif text-[19px] leading-none text-forest-900">{t.auth.adminTitle}</h2>
+                <span className="stamp border-forest-300 text-forest-700">Staff</span>
               </div>
 
               {warning && (
-                <div className="mt-4 flex items-start gap-2 rounded-md border border-amber-300 bg-amber-50 p-3 text-[12.5px] leading-5 text-amber-900">
+                <div className="mt-4 flex items-start gap-2 border-l-2 border-warning bg-warning-50 px-3.5 py-2.5 text-[12px] leading-5 text-warning">
                   <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
                   {warning[locale]}
                 </div>
@@ -129,10 +134,6 @@ export default async function AdminLoginPage({
                   initialError={error === "inactive" ? "inactive" : undefined}
                 />
               </div>
-
-              <p className="mt-5 border-t border-line pt-4 text-2xs leading-5 text-muted">
-                {t.auth.adminIntro}
-              </p>
             </>
           )}
         </div>

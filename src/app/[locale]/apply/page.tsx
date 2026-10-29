@@ -32,13 +32,13 @@ export default async function ApplyPage({
 
   return (
     <div>
-      <div className="border-b border-line bg-white">
-        <div className="container-page py-5">
-          <p className="eyebrow">{t.common.brand}</p>
-          <h1 className="mt-1 font-serif text-2xl tracking-[-0.01em] text-forest-900 sm:text-[28px]">
-            {t.apply.title}
-          </h1>
-          <p className="mt-1 max-w-2xl text-[13px] leading-6 text-muted">{t.apply.savedLocally}</p>
+      <div className="border-b border-line bg-paper">
+        <div className="container-page flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 py-4">
+          <div className="flex items-baseline gap-3">
+            <p className="eyebrow text-[10px]">{t.common.brand}</p>
+            <h1 className="font-serif text-[19px] leading-none tracking-[-0.01em] text-forest-900">{t.apply.title}</h1>
+          </div>
+          <p className="text-[11.5px] text-muted">{t.apply.savedLocally}</p>
         </div>
       </div>
 

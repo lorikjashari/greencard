@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeft, Lock } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { getSession, isStaffRole } from "@/lib/auth/session";
 import { getPublicConfig } from "@/lib/config";
-import { isLocale, type Locale } from "@/lib/i18n";
+import { isLocale, pick, type Locale } from "@/lib/i18n";
 import { copy } from "@/messages/get";
 import { LoginForm } from "@/components/auth/login-form";
-import { Logo } from "@/components/brand/logo";
 import { DEMO_ACCOUNTS, ensureDemoSeed } from "@/lib/demo/seed";
 
 export const dynamic = "force-dynamic";
@@ -41,23 +40,63 @@ export default async function LoginPage({
 
   const t = copy(locale);
 
-  return (
-    <div className="container-page py-12 lg:py-20">
-      <div className="mx-auto grid max-w-4xl gap-10 lg:grid-cols-[1fr_24rem] lg:items-start">
-        <div className="order-2 lg:order-1">
-          <Link href={`/${locale}`} className="inline-flex items-center gap-1.5 text-xs font-medium text-muted hover:text-forest">
-            <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
-            {t.legal.backHome}
-          </Link>
+  const benefits = [
+    { title: pick(locale, "Statusi në çdo hap", "Status at every step"), body: pick(locale, "Shih saktësisht se ku ndodhet aplikimi: kontroll, pagesë, dorëzim.", "See exactly where the application stands: review, payment, filing.") },
+    { title: pick(locale, "Fotot dhe dokumentet", "Photos and documents"), body: pick(locale, "Fotot private të dosjes, të aksesueshme vetëm për ty dhe stafin.", "Your private file photos, accessible only to you and staff.") },
+    { title: pick(locale, "Numri i konfirmimit", "Confirmation number"), body: pick(locale, "Regjistrohet në llogari sapo dorëzimi përfundon në faqen zyrtare.", "Recorded in your account as soon as filing completes on the official site.") },
+  ];
 
-          <div className="mt-6">
-            <Logo href={`/${locale}`} />
-            <h1 className="mt-8 font-serif text-3xl tracking-[-0.02em] text-forest-900 sm:text-4xl">
-              {t.auth.loginTitle}
-            </h1>
+  return (
+    <div className="container-page py-10 lg:py-16">
+      <Link
+        href={`/${locale}`}
+        className="inline-flex items-center gap-1.5 text-xs font-medium text-muted transition-colors hover:text-forest-800"
+      >
+        <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+        {t.legal.backHome}
+      </Link>
+
+      <div className="mt-8 grid gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-20">
+        <div className="min-w-0">
+          <div className="flex items-center gap-3">
+            <span className="h-px w-8 bg-clay" aria-hidden="true" />
+            <p className="eyebrow">{t.nav.login}</p>
+          </div>
+          <h1 className="display mt-5 text-[clamp(1.95rem,4.2vw,2.75rem)]">{t.auth.loginTitle}</h1>
+          <p className="lede mt-4 max-w-md text-[14.5px]">{t.auth.loginIntro}</p>
+
+          <ol className="mt-9 border-t border-line">
+            {benefits.map((item, index) => (
+              <li key={item.title} className="grid grid-cols-[2.25rem_minmax(0,1fr)] gap-4 border-b border-line py-4">
+                <span className="font-serif text-[22px] leading-none tabular text-line-strong" aria-hidden="true">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <p className="text-[13.5px] font-semibold text-ink">{item.title}</p>
+                  <p className="mt-1 text-[12.5px] leading-6 text-muted">{item.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          <div className="mt-6 flex flex-wrap items-center gap-4">
+            <Link
+              href={`/${locale}/apply`}
+              className="inline-flex items-center gap-1 text-[13px] font-medium text-ink/70 transition-colors hover:text-forest-800"
+            >
+              {t.auth.resumeTitle}
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </Link>
+          </div>
+        </div>
+
+        <div className="border border-line-strong bg-paper p-6 sm:p-7">
+          <div className="flex items-baseline justify-between gap-3 border-b border-line pb-3">
+            <h2 className="font-serif text-[19px] leading-none text-forest-900">{t.auth.loginTitle}</h2>
+            <span className="stamp border-line-strong text-muted">Client</span>
           </div>
 
-          <div className="mt-6 max-w-md">
+          <div className="mt-5">
             <LoginForm
               locale={locale}
               t={t}
@@ -66,41 +105,21 @@ export default async function LoginPage({
               firebaseMode={!config.demo}
               initialError={error}
             />
-            <p className="mt-4 text-xs text-muted">
-              <Link href={`/${locale}/resume`} className="link">
-                {t.auth.resumeTitle}
-              </Link>
-            </p>
           </div>
-        </div>
 
-        <aside className="order-1 lg:order-2">
-          <div className="rounded-lg border border-line bg-white p-5 shadow-card">
-            <div className="flex items-center gap-2 text-forest">
-              <Lock className="h-4 w-4" aria-hidden="true" />
-              <p className="text-[11px] font-bold uppercase tracking-wide">{t.home.trust4}</p>
-            </div>
-            <ul className="mt-4 space-y-3 text-[12.5px] leading-5 text-muted">
-              <li>{t.apply.emailHelp}</li>
-              <li>{t.home.faq7A}</li>
-              <li>{t.home.footerDisclaimer}</li>
-            </ul>
+          <div className="mt-6 border-t border-line pt-4">
+            <p className="text-[11px] leading-5 text-muted">{t.home.faq7A}</p>
             <a
               href={config.dv.instructionsUrl}
               target="_blank"
               rel="noreferrer noopener"
-              className="link mt-4 inline-block text-[12px]"
+              className="mt-2 inline-block font-mono text-[10px] uppercase text-forest-700 hover:text-clay-600"
+              style={{ letterSpacing: "0.1em" }}
             >
               {t.home.officialLink} ↗
             </a>
           </div>
-
-          {config.demo && (
-            <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-[12px] leading-5 text-amber-900">
-              {t.common.demoBanner}
-            </div>
-          )}
-        </aside>
+        </div>
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { adminLocale } from "@/lib/admin/locale";
 import { copy } from "@/messages/get";
 import { listDataRequests, listEditRequests } from "@/lib/repo/requests";
 import { formatDateTime } from "@/lib/format";
-import { AdminPageHeader, AdminEmpty, AdminNotice, SectionCard, StatCard } from "@/components/admin/ui";
+import { AdminPageHeader, AdminEmpty, AdminNotice, SectionCard, StatCard, StatStrip } from "@/components/admin/ui";
 import { updateDataRequestAction, resolveEditRequestAction } from "@/app/admin/actions";
 
 export const metadata: Metadata = { title: "Data requests" };
@@ -40,12 +40,12 @@ export default async function DataRequestsPage({
 
       <AdminNotice locale={locale} notice={notice} error={error} />
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-4">
+      <StatStrip>
         <StatCard label={tx("Të hapura", "Open")} value={count("open")} tone={count("open") > 0 ? "warning" : "default"} />
         <StatCard label={tx("Në punë", "In progress")} value={count("in_progress")} />
         <StatCard label={tx("Përfunduar", "Completed")} value={count("completed")} tone="success" />
         <StatCard label={tx("Kërkesa ndryshimi", "Change requests")} value={openEdits.length} tone={openEdits.length > 0 ? "warning" : "default"} />
-      </div>
+      </StatStrip>
 
       <div className="mt-5 space-y-5">
         <SectionCard
@@ -60,7 +60,7 @@ export default async function DataRequestsPage({
           ) : (
             <ul className="space-y-3">
               {requests.map((request) => (
-                <li key={request.id} className="rounded-md border border-line p-3">
+                <li key={request.id} className="border border-line p-3">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div>
                       <p className="text-[13px] font-semibold text-ink">
@@ -128,7 +128,7 @@ export default async function DataRequestsPage({
           ) : (
             <ul className="space-y-3">
               {openEdits.map((request) => (
-                <li key={request.id} className="rounded-md border border-line p-3">
+                <li key={request.id} className="border border-line p-3">
                   <p className="text-[12.5px] leading-5 text-ink">{request.message}</p>
                   <p className="mt-1 text-2xs text-muted">
                     {request.applicationId} · {formatDateTime(request.createdAt, locale)}

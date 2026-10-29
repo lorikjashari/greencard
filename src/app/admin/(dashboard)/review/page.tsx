@@ -9,7 +9,7 @@ import { listApplications } from "@/lib/repo/applications";
 import { listUsers } from "@/lib/repo/users";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { AdminPageHeader, AdminEmpty, AdminNotice, StatCard } from "@/components/admin/ui";
+import { AdminPageHeader, AdminEmpty, AdminNotice, StatCard, StatStrip } from "@/components/admin/ui";
 import { changeStatusAction } from "@/app/admin/actions";
 import type { ApplicationStatus } from "@/lib/types";
 
@@ -68,11 +68,11 @@ export default async function ReviewPage({
 
       <AdminNotice locale={locale} notice={notice} error={error} />
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+      <StatStrip>
         <StatCard label={t.status.submitted} value={count("submitted")} detail={tx("Në pritje për marrje në punë", "Awaiting claim")} tone={count("submitted") > 0 ? "warning" : "default"} />
         <StatCard label={t.status.in_review} value={count("in_review")} detail={tx("Në kontroll aktiv", "Actively reviewed")} />
         <StatCard label={t.status.needs_information} value={count("needs_information")} detail={tx("Në pritje të klientit", "Waiting on the client")} />
-      </div>
+      </StatStrip>
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-1.5">
@@ -83,7 +83,7 @@ export default async function ReviewPage({
               className={`chip ${
                 (filteredStatus ?? "") === tab.key
                   ? "border-forest-200 bg-forest-50 text-forest-800"
-                  : "border-line bg-white text-muted hover:border-forest-200"
+                  : "border-line bg-paper text-muted hover:border-forest-200"
               }`}
             >
               {tab.label} <span className="font-semibold">{tab.count}</span>
@@ -110,7 +110,7 @@ export default async function ReviewPage({
 
       <div className="mt-3 space-y-3">
         {rows.length === 0 ? (
-          <div className="rounded-lg border border-line bg-white p-4">
+          <div className="border border-line bg-paper p-4">
             <AdminEmpty text={tx("Radha është bosh.", "The queue is empty.")} />
           </div>
         ) : (
@@ -125,13 +125,13 @@ export default async function ReviewPage({
             const paymentOk = application.paymentStatus === "paid";
 
             return (
-              <article key={application.id} className="rounded-lg border border-line bg-white p-4">
+              <article key={application.id} className="border border-line bg-paper p-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <Link
                         href={`/admin/applications/${application.id}`}
-                        className="font-mono text-xs font-semibold text-forest hover:underline"
+                        className="font-mono text-xs font-semibold text-forest-800 hover:text-clay-600 hover:underline"
                       >
                         {application.ref}
                       </Link>
@@ -153,20 +153,20 @@ export default async function ReviewPage({
                   </div>
 
                   <div className="flex flex-wrap items-center gap-1.5 text-2xs">
-                    <span className={`chip ${dataOk ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-amber-200 bg-amber-50 text-amber-800"}`}>
+                    <span className={`chip ${dataOk ? "border-forest-300 bg-forest-50 text-forest-700" : "border-warning/40 bg-warning-50 text-warning"}`}>
                       {dataOk ? <CheckCircle2 className="h-3 w-3" aria-hidden="true" /> : <AlertTriangle className="h-3 w-3" aria-hidden="true" />}
                       {tx("Të dhëna", "Data")}
                     </span>
-                    <span className={`chip ${photosOk ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-amber-200 bg-amber-50 text-amber-800"}`}>
+                    <span className={`chip ${photosOk ? "border-forest-300 bg-forest-50 text-forest-700" : "border-warning/40 bg-warning-50 text-warning"}`}>
                       {photosOk ? <CheckCircle2 className="h-3 w-3" aria-hidden="true" /> : <AlertTriangle className="h-3 w-3" aria-hidden="true" />}
                       {tx("Foto", "Photos")}
                     </span>
-                    <span className={`chip ${paymentOk ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-amber-200 bg-amber-50 text-amber-800"}`}>
+                    <span className={`chip ${paymentOk ? "border-forest-300 bg-forest-50 text-forest-700" : "border-warning/40 bg-warning-50 text-warning"}`}>
                       {paymentOk ? <CheckCircle2 className="h-3 w-3" aria-hidden="true" /> : <Clock className="h-3 w-3" aria-hidden="true" />}
                       {tx("Pagesa", "Payment")}
                     </span>
                     {application.duplicate.level !== "none" && (
-                      <span className="chip border-amber-200 bg-amber-50 text-amber-800">
+                      <span className="chip border-warning/40 bg-warning-50 text-warning">
                         <AlertTriangle className="h-3 w-3" aria-hidden="true" />
                         {tx("Duplikat", "Duplicate")}
                       </span>

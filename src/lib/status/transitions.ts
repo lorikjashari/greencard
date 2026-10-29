@@ -147,27 +147,30 @@ export const ADMIN_NAV: Array<{
   href: string;
   labelKey: string;
   permission: Permission;
+  group: "operations" | "finance" | "administration";
 }> = [
-  { href: "/admin", labelKey: "overview", permission: "applications.view" },
-  { href: "/admin/applications", labelKey: "applications", permission: "applications.view" },
-  { href: "/admin/review", labelKey: "review", permission: "applications.view" },
-  { href: "/admin/photos", labelKey: "photos", permission: "photos.review" },
-  { href: "/admin/payments", labelKey: "payments", permission: "payments.view" },
+  { href: "/admin", labelKey: "overview", permission: "applications.view", group: "operations" },
+  { href: "/admin/applications", labelKey: "applications", permission: "applications.view", group: "operations" },
+  { href: "/admin/review", labelKey: "review", permission: "applications.view", group: "operations" },
+  { href: "/admin/photos", labelKey: "photos", permission: "photos.review", group: "operations" },
+  { href: "/admin/filing", labelKey: "filing", permission: "filing.file", group: "operations" },
+  { href: "/admin/payments", labelKey: "payments", permission: "payments.view", group: "finance" },
   {
     href: "/admin/payments/reconciliation",
     labelKey: "reconciliation",
     permission: "payments.reconcile",
+    group: "finance",
   },
-  { href: "/admin/filing", labelKey: "filing", permission: "filing.file" },
-  { href: "/admin/reports", labelKey: "reports", permission: "reports.view" },
-  { href: "/admin/dv-years", labelKey: "dvYears", permission: "dv.manage" },
-  { href: "/admin/team", labelKey: "team", permission: "team.manage" },
-  { href: "/admin/audit", labelKey: "audit", permission: "audit.view" },
-  { href: "/admin/data-requests", labelKey: "dataRequests", permission: "data_requests.manage" },
-  { href: "/admin/settings", labelKey: "settings", permission: "settings.manage" },
+  { href: "/admin/reports", labelKey: "reports", permission: "reports.view", group: "finance" },
+  { href: "/admin/dv-years", labelKey: "dvYears", permission: "dv.manage", group: "finance" },
+  { href: "/admin/team", labelKey: "team", permission: "team.manage", group: "administration" },
+  { href: "/admin/audit", labelKey: "audit", permission: "audit.view", group: "administration" },
+  { href: "/admin/data-requests", labelKey: "dataRequests", permission: "data_requests.manage", group: "administration" },
+  { href: "/admin/settings", labelKey: "settings", permission: "settings.manage", group: "administration" },
   {
     href: "/admin/launch-checklist",
     labelKey: "launchChecklist",
     permission: "settings.manage",
+    group: "administration",
   },
 ];

@@ -106,7 +106,7 @@ export function FirebaseLogin({ locale, t }: { locale: Locale; t: Copy }) {
 
   if (!configured) {
     return (
-      <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-[13px] leading-6 text-amber-900">
+      <div className="border-l-2 border-warning bg-warning-50 px-4 py-3 text-[12.5px] leading-6 text-warning">
         Firebase Authentication nuk është konfiguruar. Plotëso `NEXT_PUBLIC_FIREBASE_*` për të aktivizuar hyrjen
         me email.
       </div>
@@ -171,10 +171,10 @@ export function FirebaseLogin({ locale, t }: { locale: Locale; t: Copy }) {
       </button>
       {message && (
         <p
-          className={`flex items-start gap-2 rounded-md border p-3 text-[13px] leading-5 ${
+          className={`flex items-start gap-2 border-l-2 px-3.5 py-2.5 text-[12.5px] leading-5 ${
             status === "error"
-              ? "border-red-200 bg-red-50 text-red-900"
-              : "border-forest-200 bg-forest-50 text-forest-800"
+              ? "border-danger bg-danger-50 text-danger"
+              : "border-forest-400 bg-forest-50 text-forest-800"
           }`}
           role={status === "error" ? "alert" : "status"}
         >

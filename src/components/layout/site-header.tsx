@@ -3,22 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Menu, X, Globe } from "lucide-react";
+import { Menu, X, Phone } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
+import { cn } from "@/lib/cn";
 import type { Locale } from "@/lib/i18n";
 import type { Copy } from "@/messages/get";
 
-export function SiteHeader({ locale, t }: { locale: Locale; t: Copy }) {
+export function SiteHeader({
+  locale,
+  t,
+  contact,
+}: {
+  locale: Locale;
+  t: Copy;
+  contact: { phone: string; email: string };
+}) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => {
     setOpen(false);
@@ -29,8 +30,12 @@ export function SiteHeader({ locale, t }: { locale: Locale; t: Copy }) {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen(false);
     };
+    document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
+    };
   }, [open]);
 
   const other: Locale = locale === "sq" ? "en" : "sq";
@@ -47,38 +52,88 @@ export function SiteHeader({ locale, t }: { locale: Locale; t: Copy }) {
     { href: `/${locale}/contact`, label: t.nav.contact },
   ];
 
+  // In-page anchors are never "current"; only real routes can be.
+  const isActive = (href: string) => {
+    if (href.includes("#")) return false;
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
   return (
-    <header
-      className={`sticky top-0 z-40 border-b transition-colors ${
-        scrolled ? "border-line bg-ivory/95 backdrop-blur" : "border-transparent bg-ivory"
-      }`}
-    >
-      <div className="container-page flex h-[68px] items-center justify-between gap-4">
+    <header className="sticky top-0 z-40 border-b border-line bg-ivory" data-print="hide">
+      {/* Utility strip — real information, no decorative chrome. */}
+      <div className="hidden border-b border-line/60 md:block">
+        <div className="container-page flex h-8 items-center justify-between gap-6">
+          <p className="meta text-[10px]">{t.home.disclosureTitle}</p>
+          <div className="flex items-center gap-5">
+            <a
+              href={`tel:${contact.phone.replace(/\s+/g, "")}`}
+              className="meta flex items-center gap-1.5 text-[10px] transition-colors hover:text-forest-800"
+            >
+              <Phone className="h-3 w-3" aria-hidden="true" />
+              {contact.phone}
+            </a>
+            <a
+              href={`mailto:${contact.email}`}
+              className="meta hidden text-[10px] transition-colors hover:text-forest-800 sm:inline"
+            >
+              {contact.email}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div className="container-page flex h-16 items-center justify-between gap-6">
         <Logo href={`/${locale}`} />
 
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
+        <nav className="hidden items-center gap-7 lg:flex" aria-label="Main">
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="rounded-md px-3 py-2 text-sm font-medium text-ink/80 transition-colors hover:bg-forest-50 hover:text-forest"
+              aria-current={isActive(link.href) ? "page" : undefined}
+              className={cn(
+                "relative py-1 text-[13px] font-medium transition-colors",
+                isActive(link.href) ? "text-forest-900" : "text-ink/70 hover:text-forest-800",
+                "after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-clay after:transition-transform after:duration-200 hover:after:scale-x-100",
+                isActive(link.href) && "after:scale-x-100",
+              )}
             >
               {link.label}
             </Link>
           ))}
         </nav>
 
-        <div className="hidden items-center gap-2 lg:flex">
-          <Link
-            href={switched}
-            hrefLang={other}
-            className="inline-flex min-h-9 items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted transition-colors hover:text-forest"
-            aria-label={`${t.common.language}: ${other.toUpperCase()}`}
+        <div className="hidden items-center gap-4 lg:flex">
+          <div
+            className="flex items-center gap-1 font-mono text-[10px] uppercase"
+            style={{ letterSpacing: "0.14em" }}
+            aria-label={t.common.language}
           >
-            <Globe className="h-3.5 w-3.5" aria-hidden="true" />
-            {other.toUpperCase()}
-          </Link>
-          <Link href={`/${locale}/login`} className="btn-ghost btn-sm">
+            {(["sq", "en"] as const).map((candidate, index) => (
+              <span key={candidate} className="flex items-center gap-1">
+                {index > 0 && (
+                  <span className="text-line-strong" aria-hidden="true">
+                    /
+                  </span>
+                )}
+                {candidate === locale ? (
+                  <span className="px-1 text-forest-900" aria-current="true">
+                    {candidate.toUpperCase()}
+                  </span>
+                ) : (
+                  <Link
+                    href={switched}
+                    hrefLang={candidate}
+                    className="px-1 text-muted transition-colors hover:text-clay-600"
+                  >
+                    {candidate.toUpperCase()}
+                  </Link>
+                )}
+              </span>
+            ))}
+          </div>
+          <span className="h-4 w-px bg-line" aria-hidden="true" />
+          <Link href={`/${locale}/login`} className="text-[13px] font-medium text-ink/75 transition-colors hover:text-forest-800">
             {t.nav.login}
           </Link>
           <Link href={`/${locale}/apply`} className="btn-primary btn-sm">
@@ -89,40 +144,60 @@ export function SiteHeader({ locale, t }: { locale: Locale; t: Copy }) {
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
-          className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-line bg-white text-ink lg:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-sm border border-line-strong text-ink transition-colors hover:bg-paper lg:hidden"
           aria-expanded={open}
           aria-controls="mobile-menu"
           aria-label={open ? t.common.close : "Menu"}
         >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
         </button>
       </div>
 
       {open && (
-        <div id="mobile-menu" className="border-t border-line bg-white lg:hidden">
-          <nav className="container-page flex flex-col py-3" aria-label="Mobile">
-            {links.map((link) => (
+        <div
+          id="mobile-menu"
+          className="absolute inset-x-0 top-full z-40 max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-line bg-ivory lg:hidden"
+        >
+          <nav className="container-page flex flex-col divide-y divide-line py-2" aria-label="Mobile">
+            {links.map((link, index) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-md px-2 py-3 text-[15px] font-medium text-ink hover:bg-forest-50"
+                className="flex items-baseline gap-3 py-4"
+                onClick={() => setOpen(false)}
               >
-                {link.label}
+                <span className="font-mono text-3xs text-clay-600" aria-hidden="true">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span className="font-serif text-[22px] leading-none text-forest-900">{link.label}</span>
               </Link>
             ))}
-            <Link
-              href={`/${locale}/login`}
-              className="rounded-md px-2 py-3 text-[15px] font-medium text-ink hover:bg-forest-50"
-            >
-              {t.nav.login}
-            </Link>
-            <Link href={switched} hrefLang={other} className="rounded-md px-2 py-3 text-[15px] font-medium text-muted">
-              {t.common.language}: {other.toUpperCase()}
-            </Link>
-            <Link href={`/${locale}/apply`} className="btn-primary mt-3 w-full">
-              {t.nav.apply}
+            <Link href={`/${locale}/login`} className="flex items-baseline gap-3 py-4" onClick={() => setOpen(false)}>
+              <span className="font-mono text-3xs text-clay-600" aria-hidden="true">
+                05
+              </span>
+              <span className="font-serif text-[22px] leading-none text-forest-900">{t.nav.login}</span>
             </Link>
           </nav>
+
+          <div className="container-page mt-2 flex flex-col gap-3 pb-10">
+            <Link href={`/${locale}/apply`} className="btn-primary w-full" onClick={() => setOpen(false)}>
+              {t.nav.apply}
+            </Link>
+            <div className="flex items-center justify-between border-t border-line pt-4">
+              <a href={`tel:${contact.phone.replace(/\s+/g, "")}`} className="meta text-[11px]">
+                {contact.phone}
+              </a>
+              <Link
+                href={switched}
+                hrefLang={other}
+                className="font-mono text-[11px] uppercase text-forest-800 underline decoration-clay decoration-2 underline-offset-4"
+                onClick={() => setOpen(false)}
+              >
+                {other.toUpperCase()}
+              </Link>
+            </div>
+          </div>
         </div>
       )}
     </header>

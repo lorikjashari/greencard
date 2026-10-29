@@ -33,7 +33,7 @@ export function SignOutButton({
       onClick={() => void signOut()}
       disabled={busy}
       className={cn(
-        "inline-flex min-h-9 items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-ivory hover:text-ink",
+        "inline-flex min-h-9 items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-paper hover:text-ink",
         className,
       )}
     >

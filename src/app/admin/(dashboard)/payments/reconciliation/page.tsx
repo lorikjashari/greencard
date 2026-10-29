@@ -8,7 +8,7 @@ import { listOrders } from "@/lib/repo/orders";
 import { listApplications } from "@/lib/repo/applications";
 import { formatCurrency, formatDate, formatDateTime } from "@/lib/format";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { AdminPageHeader, AdminEmpty, AdminNotice, StatCard } from "@/components/admin/ui";
+import { AdminPageHeader, AdminEmpty, AdminNotice, StatCard, StatStrip } from "@/components/admin/ui";
 import { recordCashAction, reviewPaymentMismatchAction } from "@/app/admin/actions";
 
 export const metadata: Metadata = { title: "Cash reconciliation" };
@@ -59,13 +59,13 @@ export default async function ReconciliationPage({
 
       <AdminNotice locale={locale} notice={notice} error={error} />
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+      <StatStrip>
         <StatCard label={tx("Cash në pritje", "Cash pending")} value={formatCurrency(total, locale)} detail={`${pending.length} ${tx("porosi", "orders")}`} tone={pending.length > 0 ? "warning" : "default"} />
         <StatCard label={tx("Të vonuara", "Overdue")} value={overdue.length} detail={tx("Kaluar afati i pagesës", "Past the payment deadline")} tone={overdue.length > 0 ? "danger" : "default"} />
         <StatCard label={tx("Mospërputhje", "Mismatches")} value={mismatches.length} detail={tx("Shuma e marrë ≠ porosia", "Received ≠ order amount")} />
-      </div>
+      </StatStrip>
 
-      <section className="mt-6 rounded-lg border border-line bg-white">
+      <section className="mt-5 border border-line bg-paper">
         <div className="border-b border-line px-4 py-3.5">
           <h2 className="text-[13px] font-semibold text-ink">{tx("Porositë cash të hapura", "Open cash orders")}</h2>
           <p className="mt-0.5 text-2xs text-muted">
@@ -89,7 +89,7 @@ export default async function ReconciliationPage({
                       <p className="font-mono text-xs font-semibold text-ink">{order.ref}</p>
                       <p className="mt-1 text-[13px]">
                         {application ? (
-                          <Link href={`/admin/applications/${application.id}`} className="text-forest hover:underline">
+                          <Link href={`/admin/applications/${application.id}`} className="text-forest-800 hover:text-clay-600 hover:underline">
                             {application.ref} · {application.applicant.firstName} {application.applicant.lastName}
                           </Link>
                         ) : (
@@ -100,7 +100,7 @@ export default async function ReconciliationPage({
                         <Clock className="h-3 w-3" aria-hidden="true" />
                         {t.complete.deadline}: {formatDate(order.expiresAt, locale)}
                         {isOverdue && (
-                          <span className="ml-1 rounded bg-red-50 px-1.5 py-0.5 font-semibold text-red-700">
+                          <span className="ml-1 rounded bg-danger-50 px-1.5 py-0.5 font-semibold text-danger">
                             {tx("Vonuar", "Overdue")}
                           </span>
                         )}
@@ -112,7 +112,7 @@ export default async function ReconciliationPage({
                     </div>
                   </div>
 
-                  <form action={recordCashAction} className="mt-3 grid gap-2 rounded-md bg-ivory/60 p-3 sm:grid-cols-2 lg:grid-cols-[8rem_9rem_9rem_minmax(0,1fr)_auto] lg:items-end">
+                  <form action={recordCashAction} className="mt-3 grid gap-2 bg-ivory/50 p-3 sm:grid-cols-2 lg:grid-cols-[8rem_9rem_9rem_minmax(0,1fr)_auto] lg:items-end">
                     <input type="hidden" name="orderId" value={order.id} />
                     <input type="hidden" name="redirectTo" value="/admin/payments/reconciliation" />
                     <div>
@@ -170,7 +170,7 @@ export default async function ReconciliationPage({
         )}
       </section>
 
-      <section className="mt-6 rounded-lg border border-line bg-white">
+      <section className="mt-6 border border-line bg-paper">
         <div className="border-b border-line px-4 py-3.5">
           <h2 className="text-[13px] font-semibold text-ink">
             {tx("Mospërputhjet që presin shqyrtim", "Mismatches awaiting review")}
@@ -197,7 +197,7 @@ export default async function ReconciliationPage({
                       <p className="font-mono text-xs font-semibold text-ink">{order.ref}</p>
                       <p className="mt-1 text-[13px]">
                         {application ? (
-                          <Link href={`/admin/applications/${application.id}`} className="text-forest hover:underline">
+                          <Link href={`/admin/applications/${application.id}`} className="text-forest-800 hover:text-clay-600 hover:underline">
                             {application.ref} · {application.applicant.firstName} {application.applicant.lastName}
                           </Link>
                         ) : (
@@ -215,7 +215,7 @@ export default async function ReconciliationPage({
                     </div>
                     <StatusBadge kind="payment" value={order.status} t={t} />
                   </div>
-                  <form action={reviewPaymentMismatchAction} className="mt-3 flex flex-col gap-2 rounded-md bg-amber-50/60 p-3 sm:flex-row sm:items-end">
+                  <form action={reviewPaymentMismatchAction} className="mt-3 flex flex-col gap-2 bg-warning-50/60 p-3 sm:flex-row sm:items-end">
                     <input type="hidden" name="orderId" value={order.id} />
                     <input type="hidden" name="redirectTo" value="/admin/payments/reconciliation" />
                     <div className="min-w-0 flex-1">
@@ -243,7 +243,7 @@ export default async function ReconciliationPage({
         )}
       </section>
 
-      <section className="mt-6 rounded-lg border border-line bg-white">
+      <section className="mt-6 border border-line bg-paper">
         <div className="border-b border-line px-4 py-3.5">
           <h2 className="text-[13px] font-semibold text-ink">{tx("Arkëtimet e fundit", "Recent receipts")}</h2>
         </div>
@@ -263,12 +263,12 @@ export default async function ReconciliationPage({
                 </div>
                 <div className="flex items-center gap-2">
                   {order.amountMismatch ? (
-                    <span className="flex items-center gap-1 text-2xs text-amber-700">
+                    <span className="flex items-center gap-1 text-2xs text-warning">
                       <AlertTriangle className="h-3 w-3" aria-hidden="true" />
                       {formatCurrency(order.receivedAmountCents ?? 0, locale)} / {formatCurrency(order.amountCents, locale)}
                     </span>
                   ) : (
-                    <span className="flex items-center gap-1 text-2xs text-emerald-700">
+                    <span className="flex items-center gap-1 text-2xs text-forest-700">
                       <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
                       {formatCurrency(order.receivedAmountCents ?? order.amountCents, locale)}
                     </span>

@@ -128,8 +128,8 @@ export default async function LaunchChecklistPage() {
       />
 
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-lg border border-line bg-white p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">{tx("Modaliteti", "Mode")}</p>
+        <div className="border border-line bg-paper p-4">
+          <p className="eyebrow-muted text-[10px]">{tx("Modaliteti", "Mode")}</p>
           <p className="mt-1.5 font-serif text-2xl text-forest-900">{mode}</p>
           <p className="mt-1 text-2xs text-muted">
             {mode === "demo"
@@ -137,15 +137,15 @@ export default async function LaunchChecklistPage() {
               : tx("Backend Firebase i konfiguruar.", "Firebase backend configured.")}
           </p>
         </div>
-        <div className={`rounded-lg border p-4 ${failedChecks > 0 ? "border-amber-300 bg-amber-50/50" : "border-emerald-200 bg-emerald-50/50"}`}>
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">{tx("Kontrollat teknike", "Technical checks")}</p>
+        <div className={`border p-4 ${failedChecks > 0 ? "border-l-2 border-warning bg-warning-50/40" : "border-l-2 border-forest-400 bg-forest-50/60"}`}>
+          <p className="eyebrow-muted text-[10px]">{tx("Kontrollat teknike", "Technical checks")}</p>
           <p className="mt-1.5 font-serif text-2xl text-forest-900">
             {checks.length - failedChecks}/{checks.length}
           </p>
           <p className="mt-1 text-2xs text-muted">{tx("Konfigurim i verifikuar automatikisht", "Automatically verified configuration")}</p>
         </div>
-        <div className={`rounded-lg border p-4 ${openBusiness > 0 ? "border-amber-300 bg-amber-50/50" : "border-emerald-200 bg-emerald-50/50"}`}>
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">{tx("Vendime biznesi", "Business decisions")}</p>
+        <div className={`border p-4 ${openBusiness > 0 ? "border-l-2 border-warning bg-warning-50/40" : "border-l-2 border-forest-400 bg-forest-50/60"}`}>
+          <p className="eyebrow-muted text-[10px]">{tx("Vendime biznesi", "Business decisions")}</p>
           <p className="mt-1.5 font-serif text-2xl text-forest-900">{openBusiness}</p>
           <p className="mt-1 text-2xs text-muted">{tx("Të pazgjidhura / pa miratim", "Unresolved / unapproved")}</p>
         </div>
@@ -160,13 +160,13 @@ export default async function LaunchChecklistPage() {
             {checks.map((check) => (
               <li key={check.key} className="flex items-start gap-2 text-[12.5px]">
                 {check.ok ? (
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden="true" />
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-forest-600" aria-hidden="true" />
                 ) : (
-                  <MinusCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" aria-hidden="true" />
+                  <MinusCircle className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden="true" />
                 )}
                 <span>
                   <span className="font-medium text-ink">{check.key}</span>
-                  <span className={`ml-1.5 rounded px-1.5 py-0.5 text-2xs ${check.ok ? "bg-emerald-50 text-emerald-800" : "bg-amber-50 text-amber-800"}`}>
+                  <span className={`ml-1.5 rounded px-1.5 py-0.5 text-2xs ${check.ok ? "bg-forest-50 text-forest-700" : "bg-warning-50 text-warning"}`}>
                     {check.ok ? tx("konfiguruar", "configured") : tx("mungon", "missing")}
                   </span>
                   <span className="mt-0.5 block text-2xs leading-5 text-muted">
@@ -192,13 +192,13 @@ export default async function LaunchChecklistPage() {
             {businessDecisions.map((decision) => (
               <li key={decision.key} className="flex items-start gap-2">
                 {decision.done ? (
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden="true" />
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-forest-600" aria-hidden="true" />
                 ) : (
-                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" aria-hidden="true" />
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden="true" />
                 )}
                 <span>
                   <span className="text-[12.5px] font-medium text-ink">{decision.title}</span>
-                  <span className={`ml-1.5 rounded px-1.5 py-0.5 text-2xs ${decision.done ? "bg-emerald-50 text-emerald-800" : "bg-amber-50 text-amber-800"}`}>
+                  <span className={`ml-1.5 rounded px-1.5 py-0.5 text-2xs ${decision.done ? "bg-forest-50 text-forest-700" : "bg-warning-50 text-warning"}`}>
                     {decision.done ? tx("miratuar", "approved") : tx("bllokues", "blocker")}
                   </span>
                   <span className="mt-0.5 block text-2xs leading-5 text-muted">{decision.detail}</span>
@@ -209,7 +209,7 @@ export default async function LaunchChecklistPage() {
         </SectionCard>
       </div>
 
-      <div className="mt-5 flex items-start gap-2 rounded-md border border-amber-300 bg-amber-50 p-4 text-[13px] leading-6 text-amber-900">
+      <div className="mt-5 flex items-start gap-2 border border-warning/50 bg-warning-50 p-4 text-[13px] leading-6 text-warning">
         <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
         <span>
           {tx(

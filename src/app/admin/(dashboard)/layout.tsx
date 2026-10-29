@@ -5,7 +5,7 @@ import { isDemoMode } from "@/lib/config";
 import { ensureDemoSeed } from "@/lib/demo/seed";
 import { copy, type Copy } from "@/messages/get";
 import { adminLocale } from "@/lib/admin/locale";
-import { AdminShell } from "@/components/admin/admin-shell";
+import { AdminShell, type AdminNavGroup } from "@/components/admin/admin-shell";
 
 export const metadata: Metadata = {
   title: {
@@ -25,13 +25,31 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const locale = await adminLocale();
   const t = copy(locale);
 
-  const nav = ADMIN_NAV.filter((item) => hasPermission(session.role, item.permission)).map((item) => ({
-    href: item.href,
-    label: t.admin.nav[item.labelKey as keyof Copy["admin"]["nav"]],
-  }));
+  const permitted = ADMIN_NAV.filter((item) => hasPermission(session.role, item.permission));
+
+  const groupLabels: Record<string, string> = {
+    operations: t.admin.navGroups.operations,
+    finance: t.admin.navGroups.finance,
+    administration: t.admin.navGroups.administration,
+  };
+
+  const groups: AdminNavGroup[] = (["operations", "finance", "administration"] as const)
+    .map((key) => ({
+      key,
+      label: groupLabels[key],
+      items: permitted
+        .filter((item) => item.group === key)
+        .map((item) => ({
+          href: item.href,
+          label: t.admin.nav[item.labelKey as keyof Copy["admin"]["nav"]],
+        })),
+    }))
+    .filter((group) => group.items.length > 0);
 
   if (hasPermission(session.role, "settings.manage")) {
-    nav.push({ href: "/admin/outbox", label: t.admin.nav.outbox });
+    groups
+      .find((group) => group.key === "administration")
+      ?.items.push({ href: "/admin/outbox", label: t.admin.nav.outbox });
   }
 
   const roleLabel =
@@ -45,7 +63,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <AdminShell
-      nav={nav}
+      groups={groups}
       user={{ name: session.name, email: session.email }}
       roleLabel={roleLabel}
       signOutLabel={t.admin.signOut}

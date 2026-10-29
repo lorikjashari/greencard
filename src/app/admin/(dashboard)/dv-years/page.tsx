@@ -39,7 +39,7 @@ export default async function DvYearsPage({
 
       <AdminNotice locale={locale} notice={notice} error={error} />
 
-      <div className="mt-4 flex items-start gap-2 rounded-md border border-amber-300 bg-amber-50 p-3.5 text-[13px] leading-6 text-amber-900">
+      <div className="mt-4 flex items-start gap-2 border border-warning/50 bg-warning-50 p-3.5 text-[13px] leading-6 text-warning">
         <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
         <span>
           {tx(
@@ -53,12 +53,12 @@ export default async function DvYearsPage({
         <SectionCard title={tx("Vitet e konfiguruara", "Configured years")}>
           <ul className="space-y-3">
             {years.map((row) => (
-              <li key={row.id} className="rounded-md border border-line p-3">
+              <li key={row.id} className="border border-line p-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <p className="font-serif text-lg text-forest-900">DV {row.year}</p>
                     {row.active ? (
-                      <span className="chip border-emerald-200 bg-emerald-50 text-emerald-800">
+                      <span className="chip border-forest-300 bg-forest-50 text-forest-700">
                         <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
                         {tx("Aktiv", "Active")}
                       </span>
@@ -67,7 +67,7 @@ export default async function DvYearsPage({
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <Link href={`/admin/dv-years?year=${row.year}`} className="text-2xs font-semibold text-forest hover:underline">
+                    <Link href={`/admin/dv-years?year=${row.year}`} className="text-2xs font-semibold text-forest-800 hover:text-clay-600 hover:underline">
                       {t.common.edit}
                     </Link>
                     {!row.active && (
@@ -104,7 +104,7 @@ export default async function DvYearsPage({
                   href={row.instructionsUrl}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="mt-2 inline-flex items-center gap-1 text-2xs text-forest hover:underline"
+                  className="mt-2 inline-flex items-center gap-1 text-2xs text-forest-800 hover:text-clay-600 hover:underline"
                 >
                   {tx("Udhëzimet zyrtare", "Official instructions")}
                   <ExternalLink className="h-3 w-3" aria-hidden="true" />

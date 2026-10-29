@@ -38,7 +38,7 @@ export default async function AuditPage({
         )}
       />
 
-      <form method="get" className="mt-5 grid gap-2 rounded-lg border border-line bg-white p-4 sm:grid-cols-[minmax(0,1fr)_12rem_12rem_auto] sm:items-end">
+      <form method="get" className="mt-5 grid gap-2 border border-line bg-paper p-4 sm:grid-cols-[minmax(0,1fr)_12rem_12rem_auto] sm:items-end">
         <div>
           <label className="label" htmlFor="q">
             {t.common.search}
@@ -88,7 +88,7 @@ export default async function AuditPage({
           <div className="overflow-x-auto">
             <table className="w-full min-w-[820px] text-left text-[12.5px]">
               <thead>
-                <tr className="border-b border-line text-2xs uppercase tracking-wide text-muted">
+                <tr className="border-b border-line font-mono text-2xs uppercase text-muted">
                   <th className="py-2 pr-3 font-semibold">{tx("Koha", "Time")}</th>
                   <th className="py-2 pr-3 font-semibold">{tx("Aktori", "Actor")}</th>
                   <th className="py-2 pr-3 font-semibold">{tx("Veprimi", "Action")}</th>
@@ -104,7 +104,7 @@ export default async function AuditPage({
                       <span className="block text-2xs font-medium text-ink">{row.actorEmail}</span>
                       <span className="block font-mono text-2xs text-muted">{row.actorId.slice(0, 8)}</span>
                     </td>
-                    <td className="py-2.5 pr-3 font-mono text-2xs text-forest">{row.action}</td>
+                    <td className="py-2.5 pr-3 font-mono text-2xs text-forest-800">{row.action}</td>
                     <td className="py-2.5 pr-3 text-2xs">
                       <span className="block">{row.entityType}</span>
                       <span className="block break-all font-mono text-muted">{row.entityId.slice(0, 18)}</span>

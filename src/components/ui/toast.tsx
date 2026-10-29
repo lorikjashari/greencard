@@ -41,10 +41,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               key={item.id}
               role={item.tone === "error" ? "alert" : "status"}
               className={cn(
-                "pointer-events-auto flex w-full max-w-sm items-start gap-2.5 rounded-lg border px-3.5 py-3 text-sm shadow-lift",
-                item.tone === "success" && "border-emerald-200 bg-white text-emerald-900",
-                item.tone === "error" && "border-red-200 bg-white text-red-900",
-                item.tone === "info" && "border-line bg-white text-ink",
+                "pointer-events-auto flex w-full max-w-sm items-start gap-2.5 border border-l-2 border-line-strong px-3.5 py-3 text-[13px] shadow-lift",
+                item.tone === "success" && "border-l-forest-400 bg-paper text-forest-900",
+                item.tone === "error" && "border-l-danger bg-paper text-danger",
+                item.tone === "info" && "border-l-forest-300 bg-paper text-ink",
               )}
             >
               <Icon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
@@ -52,7 +52,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               <button
                 type="button"
                 onClick={() => setItems((current) => current.filter((entry) => entry.id !== item.id))}
-                className="rounded p-0.5 text-muted hover:text-ink"
+                className="rounded-sm p-0.5 text-muted hover:text-ink"
                 aria-label="Close"
               >
                 <X className="h-3.5 w-3.5" />

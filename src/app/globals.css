@@ -4,9 +4,18 @@
 
 @layer base {
   :root {
-    --font-sans: "Manrope", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
-    --font-serif: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-    --focus: 0 0 0 3px rgba(21, 61, 50, 0.22);
+    --font-sans: "Instrument Sans Variable", ui-sans-serif, system-ui, sans-serif;
+    --font-serif: "Newsreader Variable", "Iowan Old Style", Georgia, serif;
+    --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, monospace;
+
+    --paper: #f4f0e5;
+    --paper-raised: #fbf8f0;
+    --ink: #191b16;
+    --spruce: #18372e;
+    --clay: #a64b2a;
+    --hairline: #dcd6c6;
+
+    --focus-ring: 0 0 0 2px var(--paper-raised), 0 0 0 4px rgba(24, 55, 46, 0.55);
   }
 
   * {
@@ -32,13 +41,14 @@
   }
 
   body {
-    @apply bg-ivory text-ink antialiased;
-    font-feature-settings: "ss01" on, "cv11" on;
+    @apply bg-ivory text-ink;
+    font-feature-settings: "ss01" on;
+    text-rendering: optimizeLegibility;
   }
 
   ::selection {
-    background: #cfe0d6;
-    color: #102e26;
+    background: #e2d9c4;
+    color: #0f2a22;
   }
 
   h1,
@@ -46,14 +56,12 @@
   h3,
   h4 {
     @apply text-balance;
-    font-weight: 600;
-    letter-spacing: -0.015em;
+    font-weight: 500;
   }
 
   :focus-visible {
     outline: none;
-    box-shadow: var(--focus);
-    border-radius: 2px;
+    box-shadow: var(--focus-ring);
   }
 
   input,
@@ -61,19 +69,79 @@
   textarea {
     font-size: 16px; /* prevents iOS zoom on focus */
   }
+
+  /* Monospaced figures wherever numbers align in columns. */
+  .tabular,
+  table,
+  input[type="number"],
+  input[type="date"] {
+    font-variant-numeric: tabular-nums;
+  }
 }
 
 @layer components {
   .container-page {
-    @apply mx-auto w-full max-w-content px-5 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-content px-5 sm:px-7 lg:px-10;
   }
+
+  /* ── Type ───────────────────────────────────────────────── */
+
+  .display {
+    @apply font-serif text-forest-900;
+    font-weight: 400;
+    letter-spacing: -0.021em;
+    line-height: 1.04;
+    text-wrap: balance;
+  }
+
+  .display-italic {
+    @apply font-serif italic;
+    font-weight: 300;
+  }
+
+  .eyebrow {
+    @apply font-mono text-3xs font-medium uppercase text-forest-600;
+    letter-spacing: 0.2em;
+  }
+
+  .eyebrow-muted {
+    @apply font-mono text-3xs font-medium uppercase text-muted;
+    letter-spacing: 0.2em;
+  }
+
+  .meta {
+    @apply font-mono text-2xs uppercase tabular-nums text-muted;
+    letter-spacing: 0.1em;
+  }
+
+  .lede {
+    @apply text-[16.5px] leading-[1.65] text-muted;
+    text-wrap: pretty;
+  }
+
+  /* ── Surfaces ───────────────────────────────────────────── */
 
   .surface {
-    @apply rounded-lg border border-line bg-white shadow-card;
+    @apply rounded-sm border border-line bg-paper;
   }
 
+  .surface-flat {
+    @apply border border-line bg-paper;
+  }
+
+  .hairline {
+    @apply border-t border-line;
+  }
+
+  /* Tactile paper grain for editorial bands. Extremely low contrast. */
+  .paper-grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  }
+
+  /* ── Forms ──────────────────────────────────────────────── */
+
   .label {
-    @apply mb-1.5 block text-sm font-medium text-ink;
+    @apply mb-1.5 block text-[13px] font-medium leading-5 text-ink;
   }
 
   .hint {
@@ -81,7 +149,7 @@
   }
 
   .field {
-    @apply block w-full rounded-md border border-line bg-white px-3.5 py-2.5 text-[15px] text-ink shadow-sm transition-colors placeholder:text-muted/70 hover:border-forest-300 focus:border-forest focus:outline-none focus:ring-2 focus:ring-forest/15 disabled:cursor-not-allowed disabled:bg-ivory;
+    @apply block w-full rounded-sm border border-line-strong bg-sheet px-3 py-2.5 text-[15px] text-ink transition-colors placeholder:text-muted/60 hover:border-forest-400 focus:border-forest focus:outline-none focus:ring-2 focus:ring-forest/15 disabled:cursor-not-allowed disabled:bg-ivory/70 disabled:text-muted;
   }
 
   .field-error {
@@ -92,77 +160,98 @@
     @apply mt-1.5 flex items-start gap-1.5 text-xs font-medium text-danger;
   }
 
+  /* ── Buttons ────────────────────────────────────────────── */
+
   .btn {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold transition-all focus-visible:ring-2 focus-visible:ring-forest/30 disabled:pointer-events-none disabled:opacity-55;
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-sm border border-transparent px-5 text-[13.5px] font-semibold tracking-[0.005em] transition-colors duration-150 ease-out disabled:pointer-events-none disabled:opacity-50;
   }
 
   .btn-primary {
-    @apply btn bg-forest text-white hover:bg-forest-700 active:bg-forest-900;
+    @apply btn bg-forest-800 text-paper hover:bg-forest-700 active:bg-forest-900;
   }
 
   .btn-secondary {
-    @apply btn border border-line bg-white text-ink hover:border-forest-300 hover:bg-forest-50;
+    @apply btn border-line-strong bg-transparent text-ink hover:border-forest hover:bg-sheet;
   }
 
   .btn-ghost {
-    @apply btn text-forest hover:bg-forest-50;
+    @apply btn text-forest-800 hover:bg-forest-50;
   }
 
   .btn-danger {
-    @apply btn bg-danger text-white hover:bg-red-800;
+    @apply btn bg-danger text-white hover:bg-[#8C2019];
+  }
+
+  .btn-inverse {
+    @apply btn bg-paper text-forest-900 hover:bg-sheet;
   }
 
   .btn-sm {
-    @apply min-h-9 px-3 py-1.5 text-xs;
+    @apply min-h-9 px-3.5 text-xs;
   }
 
+  /* ── Labels & markers ───────────────────────────────────── */
+
   .chip {
-    @apply inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-2xs font-semibold uppercase tracking-wide;
+    @apply inline-flex items-center gap-1.5 rounded-sm border px-1.5 py-[3px] font-mono text-2xs font-medium uppercase tabular-nums;
+    letter-spacing: 0.09em;
+  }
+
+  .stamp {
+    @apply inline-flex items-center justify-center rounded-sm border-[1.5px] px-2.5 py-1 font-mono text-3xs font-bold uppercase;
+    letter-spacing: 0.22em;
   }
 
   .link {
-    @apply rounded-sm font-medium text-forest underline decoration-forest/30 underline-offset-2 hover:decoration-forest;
+    @apply rounded-sm font-medium text-forest-700 underline decoration-forest-700/30 decoration-1 underline-offset-[3px] transition-colors hover:text-clay-600 hover:decoration-clay-600/50;
   }
 
+  /* ── Tables ─────────────────────────────────────────────── */
+
   .table-base {
-    @apply w-full border-collapse text-left text-sm;
+    @apply w-full border-collapse text-left text-[13px];
   }
 
   .table-base th {
-    @apply border-b border-line bg-ivory/60 px-3 py-2.5 text-2xs font-semibold uppercase tracking-wider text-muted;
+    @apply border-b border-line bg-ivory/80 px-3 py-2.5 font-mono text-3xs font-medium uppercase text-muted;
+    letter-spacing: 0.12em;
   }
 
   .table-base td {
     @apply border-b border-line/70 px-3 py-3 align-middle;
   }
 
-  .table-base tbody tr:hover {
-    @apply bg-forest-50/40;
+  .table-base tbody tr {
+    @apply transition-colors;
   }
 
+  .table-base tbody tr:hover {
+    @apply bg-sheet/70;
+  }
+
+  /* ── Feedback ───────────────────────────────────────────── */
+
   .skeleton {
-    @apply relative overflow-hidden rounded bg-line/60;
+    @apply relative overflow-hidden rounded-sm bg-line/50;
   }
 
   .skeleton::after {
     content: "";
-    @apply absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/60 to-transparent;
+    @apply absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-sheet/50 to-transparent;
   }
 
-  .eyebrow {
-    @apply text-2xs font-bold uppercase tracking-[0.16em] text-forest-500;
-  }
+  /* ── Long-form legal text ───────────────────────────────── */
 
   .prose-gck {
-    @apply max-w-prose text-[15px] leading-7 text-ink/90;
+    @apply max-w-prose text-[15px] leading-[1.75] text-ink/85;
   }
 
   .prose-gck h2 {
-    @apply mt-10 mb-3 text-xl font-semibold text-ink;
+    @apply mt-11 mb-3 font-serif text-[26px] font-medium leading-tight tracking-[-0.015em] text-forest-900;
   }
 
   .prose-gck h3 {
-    @apply mt-7 mb-2 text-base font-semibold text-ink;
+    @apply mt-8 mb-2 text-[15px] font-semibold text-ink;
   }
 
   .prose-gck p {
@@ -170,11 +259,23 @@
   }
 
   .prose-gck ul {
-    @apply mb-4 list-disc space-y-2 pl-5;
+    @apply mb-4 list-disc space-y-2 pl-5 marker:text-line-strong;
+  }
+
+  .prose-gck ol {
+    @apply mb-4 list-decimal space-y-2 pl-5 marker:text-muted;
   }
 
   .prose-gck a {
     @apply link;
+  }
+
+  .prose-gck strong {
+    @apply font-semibold text-ink;
+  }
+
+  .prose-gck hr {
+    @apply my-8 border-line;
   }
 }
 
@@ -191,16 +292,66 @@
     scrollbar-width: thin;
   }
 
+  /* Hairline column rules for editorial grids. */
+  .rule-x > * {
+    @apply border-line lg:border-l lg:first:border-l-0;
+  }
+
   .admin-grid {
     background-image:
-      linear-gradient(to right, rgba(21, 61, 50, 0.04) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(21, 61, 50, 0.04) 1px, transparent 1px);
-    background-size: 32px 32px;
+      linear-gradient(to right, rgba(24, 55, 46, 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(24, 55, 46, 0.035) 1px, transparent 1px);
+    background-size: 28px 28px;
   }
 }
 
+/* ── Print ───────────────────────────────────────────────────
+   Staff print case files and payment receipts from the browser.
+   The chrome disappears, paper surfaces flatten, and long panels are
+   allowed to break across pages only where it keeps a table intact. */
 @media print {
-  .no-print {
+  .no-print,
+  nav,
+  [data-print="hide"] {
     display: none !important;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .paper-grain,
+  .admin-grid {
+    background-image: none !important;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  [data-admin-shell] {
+    display: block !important;
+  }
+
+  main,
+  .container-page {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    max-width: none !important;
+  }
+
+  .print-avoid,
+  table,
+  tr,
+  li {
+    break-inside: avoid;
+  }
+
+  @page {
+    margin: 14mm;
   }
 }

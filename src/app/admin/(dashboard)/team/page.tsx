@@ -51,7 +51,7 @@ export default async function TeamPage({
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="flex items-center gap-1.5 text-[13px] font-semibold text-ink">
-                      <ShieldCheck className="h-3.5 w-3.5 text-forest" aria-hidden="true" />
+                      <ShieldCheck className="h-3.5 w-3.5 text-forest-800" aria-hidden="true" />
                       {user.name}
                       {user.id === staff.uid && (
                         <span className="chip border-forest-200 bg-forest-50 text-forest-700">{tx("Ti", "You")}</span>

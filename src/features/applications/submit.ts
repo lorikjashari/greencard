@@ -263,22 +263,26 @@ async function submitApplicationInner(
 
   // Photo metadata comes from the server-side draft, never from the browser.
   // Client-supplied "approved" states are ignored.
+  // Draft data is browser-authored, so every optional field is coerced here.
+  // A trimmed record used to persist `issues: undefined` and crash the staff
+  // case file, which is exactly the kind of input the server cannot trust.
   const photos: PhotoRecord[] = input.photos.map((photo) => {
     const stored = draft.data.photos[photo.memberKey];
+    const number = (value: unknown) => (typeof value === "number" && Number.isFinite(value) ? value : 0);
     return {
-      id: stored.id,
+      id: stored.id ?? photo.id,
       memberKey: photo.memberKey,
       memberName: memberNameFor(input, photo.memberKey),
-      storageKey: stored.storageKey,
-      originalName: stored.originalName,
-      contentType: stored.contentType,
-      bytes: stored.bytes,
-      width: stored.width,
-      height: stored.height,
+      storageKey: stored.storageKey ?? photo.storageKey,
+      originalName: typeof stored.originalName === "string" ? stored.originalName : "",
+      contentType: stored.contentType ?? photo.contentType,
+      bytes: number(stored.bytes),
+      width: number(stored.width),
+      height: number(stored.height),
       status: stored.status === "invalid" ? "invalid" : "valid",
-      issues: stored.issues,
-      rulesVersion: stored.rulesVersion,
-      uploadedAt: stored.uploadedAt,
+      issues: Array.isArray(stored.issues) ? stored.issues : [],
+      rulesVersion: typeof stored.rulesVersion === "string" ? stored.rulesVersion : dvYear.photoRulesVersion,
+      uploadedAt: typeof stored.uploadedAt === "string" ? stored.uploadedAt : nowIso(),
     };
   });
 

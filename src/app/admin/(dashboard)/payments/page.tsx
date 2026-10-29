@@ -9,7 +9,7 @@ import { listOrders } from "@/lib/repo/orders";
 import { listApplications } from "@/lib/repo/applications";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { AdminPageHeader, AdminEmpty, StatCard } from "@/components/admin/ui";
+import { AdminPageHeader, AdminEmpty, StatCard, StatStrip } from "@/components/admin/ui";
 import type { PaymentStatus } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Payments" };
@@ -80,23 +80,23 @@ export default async function PaymentsPage({
         }
       />
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <StatStrip>
         <StatCard label={tx("Arkëtuar", "Collected")} value={formatCurrency(collected, locale)} detail={`${paid.length} ${tx("pagesa", "payments")}`} tone="success" />
         <StatCard label={tx("Në pritje", "Outstanding")} value={formatCurrency(outstanding, locale)} detail={`${pending.length} ${tx("porosi cash", "cash orders")}`} tone={pending.length > 0 ? "warning" : "default"} href="/admin/payments/reconciliation" />
         <StatCard label={tx("Rimbursuar", "Refunded")} value={formatCurrency(refundedTotal, locale)} detail={`${refunded.length} ${tx("raste", "cases")}`} />
         <StatCard label={tx("Mospërputhje", "Mismatches")} value={mismatch.length} detail={tx("Kërkojnë shpjegim", "Need explanation")} tone={mismatch.length > 0 ? "danger" : "default"} />
-      </div>
+      </StatStrip>
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-1.5">
-          <Link href="/admin/payments" className={`chip ${!status ? "border-forest-200 bg-forest-50 text-forest-800" : "border-line bg-white text-muted"}`}>
+          <Link href="/admin/payments" className={`chip ${!status ? "border-forest-200 bg-forest-50 text-forest-800" : "border-line bg-paper text-muted"}`}>
             {t.common.all}
           </Link>
           {(["pending_cash", "paid", "refunded", "failed"] as PaymentStatus[]).map((value) => (
             <Link
               key={value}
               href={`/admin/payments?status=${value}`}
-              className={`chip ${status === value ? "border-forest-200 bg-forest-50 text-forest-800" : "border-line bg-white text-muted"}`}
+              className={`chip ${status === value ? "border-forest-200 bg-forest-50 text-forest-800" : "border-line bg-paper text-muted"}`}
             >
               {t.status[value]}
             </Link>
@@ -126,7 +126,7 @@ export default async function PaymentsPage({
         </form>
       </div>
 
-      <div className="mt-3 rounded-lg border border-line bg-white">
+      <div className="mt-3 border border-line bg-paper">
         {filtered.length === 0 ? (
           <div className="p-4">
             <AdminEmpty text={tx("Nuk ka porosi në këtë filtër.", "No orders in this filter.")} />
@@ -135,7 +135,7 @@ export default async function PaymentsPage({
           <div className="overflow-x-auto">
             <table className="w-full min-w-[920px] text-left text-[12.5px]">
               <thead>
-                <tr className="border-b border-line text-2xs uppercase tracking-wide text-muted">
+                <tr className="border-b border-line font-mono text-2xs uppercase text-muted">
                   <th className="px-4 py-2.5 font-semibold">{tx("Porosia", "Order")}</th>
                   <th className="px-3 py-2.5 font-semibold">{tx("Aplikimi", "Application")}</th>
                   <th className="px-3 py-2.5 font-semibold">{t.common.amount}</th>
@@ -150,11 +150,11 @@ export default async function PaymentsPage({
                 {filtered.map((order) => {
                   const application = apps.get(order.applicationId);
                   return (
-                    <tr key={order.id} className="border-b border-line/70 last:border-0 hover:bg-ivory/60">
+                    <tr key={order.id} className="border-b border-line/70 last:border-0 hover:bg-paper">
                       <td className="px-4 py-3 align-top">
                         <span className="font-mono text-xs font-semibold text-ink">{order.ref}</span>
                         {order.amountMismatch && (
-                          <span className="mt-1 flex items-center gap-1 text-2xs text-amber-700">
+                          <span className="mt-1 flex items-center gap-1 text-2xs text-warning">
                             <AlertTriangle className="h-3 w-3" aria-hidden="true" />
                             {tx("Mospërputhje", "Mismatch")}
                           </span>
@@ -162,7 +162,7 @@ export default async function PaymentsPage({
                       </td>
                       <td className="px-3 py-3 align-top">
                         {application ? (
-                          <Link href={`/admin/applications/${application.id}`} className="text-forest hover:underline">
+                          <Link href={`/admin/applications/${application.id}`} className="text-forest-800 hover:text-clay-600 hover:underline">
                             <span className="font-mono text-2xs font-semibold">{application.ref}</span>
                             <span className="mt-0.5 block text-2xs text-muted">
                               {application.applicant.firstName} {application.applicant.lastName}
@@ -192,7 +192,7 @@ export default async function PaymentsPage({
                       </td>
                       <td className="px-4 py-3 align-top">
                         {application && (
-                          <Link href={`/admin/applications/${application.id}`} className="text-2xs font-semibold text-forest hover:underline">
+                          <Link href={`/admin/applications/${application.id}`} className="text-2xs font-semibold text-forest-800 hover:text-clay-600 hover:underline">
                             {hasPermission(staff.role, "payments.reconcile") && order.status === "pending_cash"
                               ? tx("Regjistro", "Record")
                               : t.common.details}
@@ -209,7 +209,7 @@ export default async function PaymentsPage({
       </div>
 
       {orders.some((order) => order.status === "pending_card") && (
-        <p className="mt-4 rounded-md border border-amber-200 bg-amber-50 p-3 text-2xs leading-5 text-amber-900">
+        <p className="mt-4 border border-warning/40 bg-warning-50 p-3 text-2xs leading-5 text-warning">
           {tx(
             "Ka porosi me kartë në pritje. Mos i shëno si të paguara manualisht: konfirmimi vjen vetëm nga webhook-u i ofruesit.",
             "There are pending card orders. Do not mark them paid manually: confirmation comes only from the provider webhook.",

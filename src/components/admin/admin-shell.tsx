@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, ExternalLink, ShieldAlert } from "lucide-react";
+import { Menu, X, ArrowUpRight } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { cn } from "@/lib/cn";
@@ -13,9 +13,15 @@ export interface AdminNavItem {
   label: string;
 }
 
+export interface AdminNavGroup {
+  key: string;
+  label: string;
+  items: AdminNavItem[];
+}
+
 export function AdminShell({
   children,
-  nav,
+  groups,
   user,
   roleLabel,
   signOutLabel,
@@ -26,7 +32,7 @@ export function AdminShell({
   title,
 }: {
   children: React.ReactNode;
-  nav: AdminNavItem[];
+  groups: AdminNavGroup[];
   user: { name: string; email: string };
   roleLabel: string;
   signOutLabel: string;
@@ -53,33 +59,94 @@ export function AdminShell({
   const isActive = (href: string) =>
     href === "/admin" ? pathname === "/admin" : pathname === href || pathname.startsWith(`${href}/`);
 
+  const initials = user.name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0))
+    .join("")
+    .toUpperCase();
+
   const navList = (
-    <nav className="flex flex-col gap-0.5" aria-label={title}>
-      {nav.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className={cn(
-            "rounded-md px-3 py-2 text-[13px] font-medium transition-colors",
-            isActive(item.href)
-              ? "bg-forest text-white"
-              : "text-ink/70 hover:bg-forest-50 hover:text-forest-900",
-          )}
-          aria-current={isActive(item.href) ? "page" : undefined}
-        >
-          {item.label}
-        </Link>
+    <nav className="flex flex-col" aria-label={title}>
+      {groups.map((group) => (
+        <div key={group.key} className="mb-5">
+          <p className="px-2.5 pb-2 font-mono text-3xs uppercase text-paper/35" style={{ letterSpacing: "0.18em" }}>
+            {group.label}
+          </p>
+          <ul>
+            {group.items.map((item, index) => {
+              const active = isActive(item.href);
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "group flex items-center gap-2.5 border-l-2 py-1.5 pl-2.5 pr-2 text-[12.5px] leading-5 transition-colors",
+                      active
+                        ? "border-clay bg-paper/[0.09] font-medium text-paper"
+                        : "border-transparent text-paper/60 hover:border-paper/20 hover:bg-white/[0.04] hover:text-paper/90",
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "w-3 font-mono text-3xs tabular",
+                        active ? "text-clay-200" : "text-paper/25 group-hover:text-paper/40",
+                      )}
+                      aria-hidden="true"
+                    >
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span className="truncate">{item.label}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       ))}
     </nav>
   );
 
+  const userBlock = (
+    <div className="border-t border-white/10 p-3">
+      <div className="flex items-center gap-2.5">
+        <span className="grid h-7 w-7 shrink-0 place-items-center bg-paper/10 font-mono text-3xs text-paper" aria-hidden="true">
+          {initials || "—"}
+        </span>
+        <div className="min-w-0">
+          <p className="truncate text-[12px] font-medium text-paper">{user.name}</p>
+          <p className="truncate font-mono text-3xs text-paper/45">{user.email}</p>
+        </div>
+      </div>
+      <p className="mt-2 font-mono text-3xs uppercase text-clay-200/90" style={{ letterSpacing: "0.14em" }}>
+        {roleLabel}
+      </p>
+      <div className="mt-2 flex items-center justify-between">
+        <SignOutButton
+          label={signOutLabel}
+          redirectTo="/admin/login"
+          className="text-paper/55 hover:bg-white/10 hover:text-paper"
+        />
+        <Link
+          href="/sq"
+          className="inline-flex items-center gap-1 rounded-sm px-2 py-1 font-mono text-3xs uppercase text-paper/45 transition-colors hover:text-paper"
+          style={{ letterSpacing: "0.1em" }}
+        >
+          {viewSiteLabel}
+          <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
+        </Link>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-dvh bg-ivory">
-      <header className="flex h-14 items-center justify-between gap-3 border-b border-line bg-white px-4 lg:hidden">
+      <header className="flex h-14 items-center justify-between gap-3 border-b border-line bg-paper px-4 lg:hidden" data-print="hide">
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-line text-ink"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-sm border border-line-strong text-ink"
           aria-label={title}
           aria-expanded={open}
         >
@@ -93,74 +160,45 @@ export function AdminShell({
         <div className="fixed inset-0 z-50 lg:hidden">
           <button
             type="button"
-            className="absolute inset-0 bg-forest-950/40"
+            className="absolute inset-0 bg-forest-950/50"
             onClick={() => setOpen(false)}
             aria-label="Close"
           />
-          <div className="absolute left-0 top-0 flex h-full w-[280px] flex-col overflow-y-auto bg-white p-4 shadow-xl">
-            <div className="flex items-center justify-between">
-              <Logo href="/admin" compact />
+          <div className="absolute left-0 top-0 flex h-full w-[19rem] flex-col overflow-y-auto bg-forest-950">
+            <div className="flex items-center justify-between border-b border-white/10 px-3 py-3">
+              <Logo href="/admin" compact inverted />
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-sm text-paper/60 hover:text-paper"
                 aria-label="Close"
               >
                 <X className="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
-            <div className="mt-5 flex-1">{navList}</div>
-            <div className="mt-4 border-t border-line pt-3">
-              <p className="truncate text-xs font-medium text-ink">{user.name}</p>
-              <p className="truncate text-2xs text-muted">{user.email}</p>
-              <div className="mt-2 flex items-center gap-2">
-                <SignOutButton label={signOutLabel} redirectTo="/admin/login" />
-                <Link href="/sq" className="inline-flex items-center gap-1 px-2 text-2xs text-muted">
-                  {viewSiteLabel}
-                  <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                </Link>
-              </div>
-            </div>
+            <div className="flex-1 px-3 py-4">{navList}</div>
+            {userBlock}
           </div>
         </div>
       )}
 
-      <div className="lg:grid lg:grid-cols-[15rem_minmax(0,1fr)]">
-        <aside className="sticky top-0 hidden h-dvh flex-col border-r border-line bg-white p-4 lg:flex">
-          <Logo href="/admin" compact />
-          <div className="mt-2 px-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted">{title}</p>
+      <div className="lg:grid lg:grid-cols-[16rem_minmax(0,1fr)]" data-admin-shell>
+        <aside className="sticky top-0 hidden h-dvh flex-col border-r border-forest-950 bg-forest-950 lg:flex" data-print="hide">
+          <div className="flex h-16 shrink-0 items-center gap-2.5 border-b border-white/10 px-4">
+            <Logo href="/admin" inverted />
           </div>
-          <div className="mt-5 flex-1 overflow-y-auto">{navList}</div>
-
-          <div className="mt-4 space-y-2 border-t border-line pt-3">
-            <div className="rounded-md bg-ivory px-2.5 py-2">
-              <p className="truncate text-xs font-semibold text-ink">{user.name}</p>
-              <p className="truncate text-2xs text-muted">{user.email}</p>
-              <p className="mt-1 text-2xs font-medium text-forest">{roleLabel}</p>
-            </div>
-            <div className="flex items-center justify-between gap-1">
-              <SignOutButton label={signOutLabel} redirectTo="/admin/login" />
-              <Link
-                href="/sq"
-                className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-muted hover:text-forest"
-              >
-                {viewSiteLabel}
-                <ExternalLink className="h-3 w-3" aria-hidden="true" />
-              </Link>
-            </div>
-          </div>
+          <div className="flex-1 overflow-y-auto px-2.5 py-4 scrollbar-thin">{navList}</div>
+          {userBlock}
         </aside>
 
         <div className="min-w-0">
           {demo && (
-            <div className="flex items-center gap-2 border-b border-amber-200 bg-amber-50 px-4 py-2 text-2xs text-amber-900">
-              <ShieldAlert className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-              <span className="font-semibold uppercase tracking-wide">{demoLabel}</span>
-              <span className="truncate">{demoNote}</span>
+            <div className="flex items-center gap-2 border-b border-clay-200 bg-clay-50 px-4 py-1.5 lg:px-10" data-print="hide">
+              <span className="stamp shrink-0 border-clay-400 text-clay-700">{demoLabel}</span>
+              <span className="truncate text-[11px] text-clay-700">{demoNote}</span>
             </div>
           )}
-          <main id="admin-main" className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8">
+          <main id="admin-main" className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:px-10 lg:py-8">
             {children}
           </main>
         </div>

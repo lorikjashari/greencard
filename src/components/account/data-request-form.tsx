@@ -12,28 +12,26 @@ export function DataRequestForm({
   applicationId?: string;
 }) {
   return (
-    <form action={requestDataAction} className="space-y-3">
+    <form action={requestDataAction} className="space-y-2.5">
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="type" value="access" />
       {applicationId && <input type="hidden" name="applicationId" value={applicationId} />}
-      <div>
-        <label className="label" htmlFor={`data-message-${applicationId ?? "account"}`}>
-          {t.account.requestData}
-        </label>
-        <textarea
-          id={`data-message-${applicationId ?? "account"}`}
-          name="message"
-          rows={3}
-          maxLength={2000}
-          className="field"
-          placeholder={
-            locale === "sq"
-              ? "Përshkruaj çfarë të dhënash kërkon (opsionale)."
-              : "Describe which data you are requesting (optional)."
-          }
-        />
-      </div>
-      <button type="submit" className="btn-secondary btn-sm">
+      <label className="sr-only" htmlFor={`data-message-${applicationId ?? "account"}`}>
+        {t.account.requestData}
+      </label>
+      <textarea
+        id={`data-message-${applicationId ?? "account"}`}
+        name="message"
+        rows={2}
+        maxLength={2000}
+        className="field text-[13px]"
+        placeholder={
+          locale === "sq"
+            ? "Përshkruaj çfarë të dhënash kërkon (opsionale)."
+            : "Describe which data you are requesting (optional)."
+        }
+      />
+      <button type="submit" className="btn-secondary btn-sm w-full">
         {t.account.requestData}
       </button>
     </form>

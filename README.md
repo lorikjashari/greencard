@@ -4,6 +4,8 @@ A production-minded, bilingual (Albanian/English) DV lottery application service
 
 Built with Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS, Zod, Firebase (Auth/Firestore/Storage) and Vitest. All prices are derived server-side from household answers; the browser only shows a preview.
 
+Fonts are self-hosted from npm (`@fontsource-variable/*`), so builds never depend on reaching `fonts.googleapis.com`.
+
 > **This repository is not ready for public launch.** Legal copy, data-retention policy, cash handling rules and several commercial rules are unapproved. Firebase, email, payment and bot-protection credentials are not configured. See [Launch blockers](#launch-blockers).
 
 ---
@@ -26,8 +28,8 @@ Built with Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS, Zod, Fir
 | Firebase Auth email-link, magic links, signed session cookies | Implemented, credentials required |
 | Resend email delivery | Implemented, credentials required |
 | Stripe adapter + authoritative webhook | Implemented, **not usable for Kosovo merchants** |
-| Unit tests (pricing, state machines, permissions, photos, validation, filing readiness) | 61 passing |
-| TypeScript, lint, production build | Passing (lint has no errors) |
+| Unit tests (pricing, state machines, permissions, photos, validation, filing readiness, next-action) | 67 passing |
+| TypeScript, lint, production build | Passing (lint has zero warnings) |
 
 Not implemented: staff MFA, Turnstile challenge (env placeholders only), PDF generation, automated DV filing (deliberately manual — the official site must be used by a human), multi-instance rate limiting, backup/restore automation.
 
@@ -185,10 +187,10 @@ npm run test:e2e   # requires Playwright browsers: npx playwright install chromi
 Latest verified results in this workspace:
 
 - `npm run typecheck` — passed
-- `npm run lint` — passed with no errors
-- `npm test` — 5 files, 61 tests passed
+- `npm run lint` — passed with no errors and no warnings
+- `npm test` — 6 files, 67 tests passed
 - `npm run build` — passed
-- `npm run test:e2e` — not executed here; Playwright browser binaries were not installed in this environment
+- `npm run test:e2e` — not executed here; Playwright browser binaries cannot be downloaded in this sandbox
 
 The Playwright smoke suite covers the SQ/EN landing pages, no horizontal overflow, wizard start, admin demo login and `/api/health`.
 
@@ -227,6 +229,37 @@ No launch date should be set until these are closed. The live list is also at `/
 16. Data-processing agreements with providers, incident-response contact and a documented deletion procedure.
 
 See [docs/launch-blockers.md](docs/launch-blockers.md) for acceptance criteria.
+
+---
+
+## Design system
+
+The interface is built around one idea: this is a legal document with a person behind it. The visual language is deliberately closer to a consular dossier than to a SaaS dashboard.
+
+| Decision | Value | Why |
+|---|---|---|
+| Paper | Warm stone `#F4F0E5`, surfaces `#FBF8F0` | Printed-document calm, far less sterile than pure white |
+| Ink | `#191B16` on paper, `#65675D` for secondary text | Warm near-black keeps long forms readable |
+| Brand | Spruce `#18372E` ramp | Serious, regional, not the default "startup blue" |
+| Accent | Clay `#A64B2A`, used only for stamps, active rules and emphasis | One accent, used sparingly, carries all the emphasis |
+| Corners | 2–4 px, hairline 1 px rules | Flat panels, no floating rounded cards |
+| Elevation | One shadow token, used only for dialogs and toasts | Hierarchy comes from rules and spacing, not glow |
+| Type | Newsreader (display) · Instrument Sans (UI) · JetBrains Mono (references, money, timestamps) | Editorial serif for authority, a grotesque built for dense UI, and tabular figures where columns must align |
+| Motion | 150–520 ms, `cubic-bezier(.22,1,.36,1)`, all disabled under `prefers-reduced-motion` | Feedback, never decoration |
+
+Tokens live in `tailwind.config.ts`; the primitive layer (`.display`, `.eyebrow`, `.meta`, `.btn`, `.field`, `.chip`, `.stamp`, `.table-base`, `.prose-gck`) lives in `src/app/globals.css`. Components compose those primitives instead of inventing one-off styles, which is why the public site, the wizard, the portal and the staff console share one language.
+
+Tone tokens (`warning`, `danger`, `info`, `success` and their `-50` tints) exist so callouts never reach for raw Tailwind palettes; every alert is a left-rule callout, never a rounded banner.
+
+Notable UI decisions:
+
+- Counters are rendered as a **ledger strip** (`StatStrip` + `StatCard` in `src/components/admin/ui.tsx`): one bordered band divided by hairlines, serif figures, mono labels. Dashboards therefore look like a case ledger, not a deck of cards.
+- Case files and filing worksheets are genuinely printable: `PrintButton` calls the browser print dialog and `@media print` in `globals.css` strips the app chrome, flattens paper textures, adds a paper masthead with the reference and print timestamp, and keeps tables from breaking across pages.
+- The wizard keeps an eight-step ledger in a sticky rail on desktop and a single progress line on mobile; any completed step is one click away.
+- Prices are shown as a real comparison table driven by the same server-side tier engine that charges the applicant, plus a small diagram of the household rules that decide the tier.
+- The applicant portal leads with the next action, then photos, timeline, payment and confirmation — the order in which people actually ask.
+- The staff console is a dark spruce rail with grouped navigation (operations / finance / administration), so it reads as an operational tool rather than a marketing page.
+- Every route has branded loading and error states; `/admin` and `/account` never render applicant data inside an error boundary.
 
 ---
 

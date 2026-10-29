@@ -7,7 +7,8 @@ import { copy } from "@/messages/get";
 import { listApplications } from "@/lib/repo/applications";
 import { formatDateTime } from "@/lib/format";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { AdminPageHeader, AdminEmpty, AdminNotice, StatCard } from "@/components/admin/ui";
+import { AdminPageHeader, AdminEmpty, AdminNotice, StatCard, StatStrip } from "@/components/admin/ui";
+import { photoIssues } from "@/lib/photos";
 import { reviewPhotoAction } from "@/app/admin/actions";
 import type { PhotoStatus } from "@/lib/types";
 
@@ -65,23 +66,23 @@ export default async function PhotosPage({
 
       <AdminNotice locale={locale} notice={notice} error={error} />
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <StatStrip>
         <StatCard label={tx("Në pritje", "Pending")} value={counts("pending") + counts("valid")} detail={tx("Të pakontrolluara", "Not yet reviewed")} tone="warning" />
         <StatCard label={tx("Të pavlefshme", "Invalid")} value={counts("invalid")} detail={tx("Gabime teknike", "Technical errors")} tone={counts("invalid") > 0 ? "danger" : "default"} />
         <StatCard label={t.apply.photoRejected} value={counts("rejected")} detail={tx("Refuzuar nga stafi", "Rejected by staff")} />
         <StatCard label={t.apply.photoApproved} value={counts("approved")} detail={tx("Gati për dorëzim", "Ready for filing")} tone="success" />
-      </div>
+      </StatStrip>
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-1.5">
-          <Link href="/admin/photos" className={`chip ${!filter ? "border-forest-200 bg-forest-50 text-forest-800" : "border-line bg-white text-muted"}`}>
+          <Link href="/admin/photos" className={`chip ${!filter ? "border-forest-200 bg-forest-50 text-forest-800" : "border-line bg-paper text-muted"}`}>
             {tx("Në pritje", "Pending")}
           </Link>
           {(["invalid", "rejected", "approved"] as PhotoStatus[]).map((value) => (
             <Link
               key={value}
               href={`/admin/photos?status=${value}`}
-              className={`chip ${filter === value ? "border-forest-200 bg-forest-50 text-forest-800" : "border-line bg-white text-muted"}`}
+              className={`chip ${filter === value ? "border-forest-200 bg-forest-50 text-forest-800" : "border-line bg-paper text-muted"}`}
             >
               {photoLabel(value)}
             </Link>
@@ -107,18 +108,18 @@ export default async function PhotosPage({
       </div>
 
       {rows.length === 0 ? (
-        <div className="mt-3 rounded-lg border border-line bg-white p-4">
+        <div className="mt-3 border border-line bg-paper p-4">
           <AdminEmpty text={tx("Nuk ka foto në këtë filtër.", "No photos in this filter.")} />
         </div>
       ) : (
         <ul className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {rows.map(({ application, photo }) => (
-            <li key={photo.id} className="rounded-lg border border-line bg-white p-3">
+            <li key={photo.id} className="border border-line bg-paper p-3">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <Link
                     href={`/admin/applications/${application.id}`}
-                    className="font-mono text-2xs font-semibold text-forest hover:underline"
+                    className="font-mono text-2xs font-semibold text-forest-800 hover:text-clay-600 hover:underline"
                   >
                     {application.ref}
                   </Link>
@@ -140,13 +141,13 @@ export default async function PhotosPage({
                 />
               </div>
 
-              {photo.issues.length > 0 && (
+              {photoIssues(photo).length > 0 && (
                 <ul className="mt-2 space-y-0.5">
-                  {photo.issues.map((issue) => (
+                  {photoIssues(photo).map((issue) => (
                     <li
                       key={issue.code}
                       className={`flex items-start gap-1 text-2xs leading-4 ${
-                        issue.severity === "error" ? "text-red-700" : "text-amber-700"
+                        issue.severity === "error" ? "text-danger" : "text-warning"
                       }`}
                     >
                       <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />

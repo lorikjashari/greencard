@@ -29,7 +29,6 @@ export async function ensureUser(input: {
   email: string;
   name?: string;
   role?: Role;
-  firebaseUid?: string | null;
   invitedBy?: string | null;
 }): Promise<UserRecord> {
   const email = input.email.trim().toLowerCase();
@@ -38,7 +37,6 @@ export async function ensureUser(input: {
 
   if (existing) {
     const patch: Partial<UserRecord> = { lastSignInAt: now };
-    if (input.firebaseUid && !existing.firebaseUid) patch.firebaseUid = input.firebaseUid;
     await getStore().merge<UserRecord>(COLLECTION, existing.id, patch);
     return { ...existing, ...patch };
   }
@@ -52,7 +50,6 @@ export async function ensureUser(input: {
     createdAt: now,
     lastSignInAt: now,
     invitedBy: input.invitedBy ?? null,
-    firebaseUid: input.firebaseUid ?? null,
   };
   await getStore().set(COLLECTION, record.id, record);
   return record;
@@ -112,7 +109,6 @@ export async function upsertTeamMember(input: {
     createdAt: nowIso(),
     lastSignInAt: null,
     invitedBy: input.actorEmail,
-    firebaseUid: null,
   };
   await getStore().set(COLLECTION, record.id, record);
   return record;

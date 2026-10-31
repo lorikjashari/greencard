@@ -102,7 +102,6 @@ export default async function LoginPage({
               t={t}
               demo={config.demo}
               demoAccounts={config.demo ? DEMO_ACCOUNTS : []}
-              firebaseMode={!config.demo}
               initialError={error}
             />
           </div>

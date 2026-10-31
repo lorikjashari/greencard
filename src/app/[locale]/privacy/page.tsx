@@ -76,8 +76,8 @@ const SECTIONS: LegalSection[] = [
     title: { sq: "Ofruesit dhe transferimet", en: "Processors and transfers" },
     paragraphs: [
       {
-        sq: "Kur konfigurohet, shërbimi përdor ofrues infrastrukture (Firebase/Google Cloud) për autentikim, bazë të dhënash dhe ruajtje skedarësh, ofrues emaili për njoftime dhe, nëse aktivizohet, ofrues pagesash për kartat. Këta ofrues përpunojnë të dhëna vetëm sipas udhëzimeve dhe marrëveshjeve përkatëse.",
-        en: "When configured, the service uses infrastructure providers (Firebase/Google Cloud) for authentication, database and file storage, an email provider for notifications and, if enabled, a payment provider for cards. These providers process data only under the relevant instructions and agreements.",
+        sq: "Shërbimi përdor Neon (PostgreSQL) për bazën e të dhënave, ruajtjen e fotove dhe tokenat e hyrjes, ofrues emaili për lidhjet e hyrjes dhe njoftimet dhe, nëse aktivizohet, ofrues pagesash për kartat. Këta ofrues përpunojnë të dhëna vetëm sipas udhëzimeve dhe marrëveshjeve përkatëse.",
+        en: "The service uses Neon (PostgreSQL) for the database, photo storage and sign-in tokens, an email provider for sign-in links and notifications and, if enabled, a payment provider for cards. These providers process data only under the relevant instructions and agreements.",
       },
       {
         sq: "Disa ofrues mund të përpunojnë të dhëna jashtë Kosovës. Transferimet ndërkombëtare dhe garancitë e nevojshme (p.sh. klauzola kontraktuale standarde) duhet të konfirmohen në marrëveshjet me ofruesit para nisjes; kjo çështje është ende në shqyrtim.",

@@ -4,13 +4,13 @@
  *
  * The demo seed is idempotent and is recreated automatically the next time a
  * demo page is opened (or a demo account signs in). This script never touches
- * Firebase; it refuses to run when APP_MODE=firebase.
+ * Postgres; it refuses to run when APP_MODE=postgres.
  */
 import { rmSync } from "node:fs";
 import { resolve } from "node:path";
 
-if (process.env.APP_MODE === "firebase") {
-  console.error("Refusing to reset: APP_MODE=firebase. This script only resets the local demo store.");
+if (process.env.APP_MODE === "postgres") {
+  console.error("Refusing to reset: APP_MODE=postgres. This script only resets the local demo store.");
   process.exit(1);
 }
 

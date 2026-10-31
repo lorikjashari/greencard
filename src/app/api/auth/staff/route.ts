@@ -10,8 +10,8 @@ import { rateLimit } from "@/lib/rate-limit";
 export const runtime = "nodejs";
 
 /**
- * Demo-only staff sign-in. Disabled whenever the app runs in Firebase mode;
- * production authentication goes through Firebase Authentication instead.
+ * Demo-only staff sign-in. Disabled whenever the app runs against Postgres;
+ * production authentication goes through email magic links instead.
  */
 export async function POST(request: NextRequest) {
   if (!isSameOrigin(request)) return fail("Origjina nuk lejohet.", 403);

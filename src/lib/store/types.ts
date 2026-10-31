@@ -16,12 +16,12 @@ export type StoredDoc<T> = T & { id: string };
 /**
  * Minimal document-store interface.
  *
- * Both the file-backed demo store and Firestore implement this. Domain
+ * Both the file-backed demo store and Neon Postgres implement this. Domain
  * repositories depend only on this interface, so business rules are
  * identical in demo and production.
  */
 export interface DataStore {
-  readonly kind: "file" | "runtime-cache" | "firestore";
+  readonly kind: "file" | "postgres";
   get<T>(collection: string, id: string): Promise<StoredDoc<T> | null>;
   set<T>(collection: string, id: string, data: T): Promise<void>;
   merge<T>(collection: string, id: string, data: Partial<T>): Promise<void>;
@@ -32,7 +32,7 @@ export interface DataStore {
 }
 
 export interface BlobStore {
-  readonly kind: "file" | "runtime-cache" | "firebase";
+  readonly kind: "file" | "postgres";
   put(key: string, data: Buffer, contentType: string): Promise<void>;
   get(key: string): Promise<{ data: Buffer; contentType: string } | null>;
   delete(key: string): Promise<void>;

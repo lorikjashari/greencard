@@ -141,8 +141,8 @@ export default async function TeamPage({
               </button>
               <p className="text-2xs leading-5 text-muted">
                 {tx(
-                  "Anëtari identifikohet me emailin e tij përmes Firebase ose lidhjes magjike. Nuk dërgohet fjalëkalim. Në demo, vetëm llogaritë e seed-uar mund të hyjnë.",
-                  "The member identifies with their email through Firebase or a magic link. No password is sent. In demo, only seeded accounts can sign in.",
+                  "Anëtari identifikohet me një lidhje magjike në email. Nuk ruhet fjalëkalim. Në demo, vetëm llogaritë e seed-uar mund të hyjnë.",
+                  "The member signs in with a magic link sent to their email. No password is stored. In demo, only seeded accounts can sign in.",
                 )}
               </p>
             </form>

@@ -2,18 +2,18 @@
 
 This is the authoritative checklist for leaving demo/evaluation mode. A box is only checked when there is evidence, not intent. The same list is rendered at `/admin/launch-checklist`; technical checks are computed from the environment at request time.
 
-A Vercel demo deployment runs on regional, non-durable Vercel Runtime Cache with a public demo session key and no real email or payments. Cache entries can be evicted and reset on deployment. The demo is suitable only for reviewing screens and workflows; it does not satisfy any production item below and must not receive real applicant data.
+A demo deployment runs on the local file store with a public demo session key and no real email or payments. The demo is suitable only for reviewing screens and workflows; it does not satisfy any production item below and must not receive real applicant data.
 
 ## A. Credentials and infrastructure
 
 | # | Blocker | Acceptance criteria |
 |---|---|---|
-| A1 | Firebase not configured | Project created; Email-link auth enabled; Firestore + Storage provisioned; client and admin env vars set; `firebase deploy --only firestore:rules,storage` succeeds; `/admin/launch-checklist` shows Firebase checks green. |
+| A1 | Neon not configured | Neon project + branch created; `npm run db:migrate` applied; first admin created with `npm run db:bootstrap`; `DATABASE_URL` and `SESSION_SECRET` set in the deployment; `/api/health` reports `ready` with the database check green. |
 | A2 | Session secret missing/default | `SESSION_SECRET` is ≥32 random bytes, stored in secret manager, rotated with a documented plan. |
 | A3 | Email not configured | Verified sending domain; `EMAIL_PROVIDER=resend`, `RESEND_API_KEY`, `EMAIL_FROM` set; a test message reaches an external inbox; outbox empty for that message. |
-| A4 | No backups/restore | Automated Firestore + Storage exports; retention defined; restore rehearsed and timed; owner named. |
+| A4 | No backups/restore | Neon point-in-time restore / branch backups configured; retention defined; restore rehearsed and timed; owner named. |
 | A5 | No monitoring | Error tracking, uptime check, failed-webhook alert, email-failure alert, payment-mismatch alert; on-call contact documented. |
-| A6 | Rate limiting is in-process | Shared store (e.g. Redis/Firestore) or edge rate limiting verified across multiple instances. |
+| A6 | Rate limiting is in-process | Shared store (e.g. Redis) or edge rate limiting verified across multiple instances. |
 | A7 | Staff MFA missing | MFA enforced for admin/operator/accountant accounts before any production personal data is loaded. |
 | A8 | Idle lock is cookie-only | Server-side idle/session revocation implemented and tested, or accepted as a documented residual risk with compensating controls. |
 
@@ -43,7 +43,7 @@ A Vercel demo deployment runs on regional, non-durable Vercel Runtime Cache with
 | # | Blocker | Acceptance criteria |
 |---|---|---|
 | D1 | Manual filing | Named staff, trained on the official site, files each entry, records the confirmation number, and sends the confirmation notice. No automated filing claim anywhere in the UI or emails. |
-| D2 | Data processing agreements | DPAs with Firebase/Google, email and payment providers; incident response and breach notification procedure documented. |
+| D2 | Data processing agreements | DPAs with Neon, email and payment providers; incident response and breach notification procedure documented. |
 | D3 | Support process | Published hours, response expectations, escalation path, and a process for payment/photo disputes. |
 | D4 | Accessibility and content review | Keyboard/AT pass on all shipped screens, both locales; no untranslated strings; no invented reviews/statistics; independence disclosure prominent. |
 | D5 | Independent testing | End-to-end test of a real application, cash receipt, filing, confirmation and portal access in a staging environment with production-like credentials. |

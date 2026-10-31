@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AlertCircle, ArrowRight, Loader2, Mail, ShieldCheck } from "lucide-react";
-import { FirebaseLogin } from "./firebase-login";
 import type { Copy } from "@/messages/get";
 import type { Locale } from "@/lib/i18n";
 import type { Role } from "@/lib/types";
@@ -19,7 +18,6 @@ export function LoginForm({
   t,
   demo,
   demoAccounts,
-  firebaseMode,
   initialError,
   intro,
 }: {
@@ -27,7 +25,6 @@ export function LoginForm({
   t: Copy;
   demo: boolean;
   demoAccounts: DemoAccount[];
-  firebaseMode: boolean;
   initialError?: string;
   intro?: string;
 }) {
@@ -100,10 +97,6 @@ export function LoginForm({
         : role === "accountant"
           ? t.admin.roleAccountant
           : t.admin.roleViewer;
-
-  if (firebaseMode) {
-    return <FirebaseLogin locale={locale} t={t} />;
-  }
 
   return (
     <div className="space-y-6">

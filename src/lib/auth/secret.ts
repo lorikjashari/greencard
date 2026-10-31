@@ -5,7 +5,7 @@ import { getAppMode } from "@/lib/config";
 /**
  * Single source for the signing key. Demo deployments may use the public demo
  * key so a Vercel preview works without secrets; that mode is explicitly
- * labelled and must never hold real data. Firebase mode refuses to start
+ * labelled and must never hold real data. Postgres mode refuses to start
  * without a strong key.
  */
 export function sessionSecret(): string {

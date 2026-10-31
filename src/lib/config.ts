@@ -1,15 +1,12 @@
 import "server-only";
 
-import { isFirebaseConfigured } from "@/lib/firebase/admin";
-
-export type AppMode = "demo" | "firebase";
+export type AppMode = "demo" | "postgres";
 
 export interface PublicConfig {
   appUrl: string;
   defaultLocale: "sq" | "en";
   mode: AppMode;
   demo: boolean;
-  firebaseConfigured: boolean;
   cardPaymentsEnabled: boolean;
   emailConfigured: boolean;
   contact: {
@@ -28,9 +25,9 @@ export interface PublicConfig {
 
 export function getAppMode(): AppMode {
   const explicit = process.env.APP_MODE?.trim().toLowerCase();
-  if (explicit === "firebase") return "firebase";
   if (explicit === "demo") return "demo";
-  return isFirebaseConfigured() ? "firebase" : "demo";
+  if (explicit === "postgres") return "postgres";
+  return process.env.DATABASE_URL ? "postgres" : "demo";
 }
 
 export function isDemoMode(): boolean {
@@ -72,7 +69,6 @@ export function getPublicConfig(): PublicConfig {
     defaultLocale: process.env.NEXT_PUBLIC_DEFAULT_LOCALE === "en" ? "en" : "sq",
     mode,
     demo: mode === "demo",
-    firebaseConfigured: isFirebaseConfigured(),
     cardPaymentsEnabled: cardPaymentsEnabled(),
     emailConfigured: emailConfigured(),
     contact: {
@@ -104,21 +100,21 @@ export function auditProductionReadiness(): Array<{ key: string; ok: boolean; de
     },
     {
       key: "app_mode",
-      ok: mode === "firebase",
+      ok: mode !== "demo",
       detail:
-        mode === "firebase"
-          ? "Firebase backend selected."
+        mode === "postgres"
+          ? "Neon Postgres backend selected."
           : "Demo backend is active; data is local and emails are not delivered.",
     },
     {
-      key: "firebase_admin",
-      ok: isFirebaseConfigured(),
-      detail: "FIREBASE_ADMIN_PROJECT_ID, FIREBASE_ADMIN_CLIENT_EMAIL and FIREBASE_ADMIN_PRIVATE_KEY.",
+      key: "database",
+      ok: mode !== "postgres" || Boolean(process.env.DATABASE_URL),
+      detail: "DATABASE_URL is required when APP_MODE=postgres.",
     },
     {
       key: "storage",
-      ok: Boolean(process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET),
-      detail: "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET is required for private photo storage.",
+      ok: mode !== "postgres" || Boolean(process.env.DATABASE_URL),
+      detail: "Photos are stored in Neon Postgres; DATABASE_URL is required.",
     },
     {
       key: "email",

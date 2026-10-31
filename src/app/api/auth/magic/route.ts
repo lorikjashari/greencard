@@ -4,7 +4,7 @@ import { findDraftByEmail } from "@/lib/repo/drafts";
 import { createMagicToken } from "@/lib/repo/tokens";
 import { findUserByEmail } from "@/lib/repo/users";
 import { queueEmail } from "@/lib/notifications/service";
-import { getPublicConfig, isDemoMode } from "@/lib/config";
+import { emailConfigured, getPublicConfig } from "@/lib/config";
 import { getClientIp, isSameOrigin, json, fail, readJson, tooMany } from "@/lib/http";
 import { rateLimit } from "@/lib/rate-limit";
 
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
         link,
       },
     });
-    if (isDemoMode()) console.info(`[demo] Portal sign-in link for ${email}: ${link}`);
+    if (!emailConfigured()) console.info(`[outbox] Portal sign-in link for ${email}: ${link}`);
     return generic;
   }
 
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
         link,
       },
     });
-    if (isDemoMode()) console.info(`[demo] Draft resume link for ${email}: ${link}`);
+    if (!emailConfigured()) console.info(`[outbox] Draft resume link for ${email}: ${link}`);
     return generic;
   }
 
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
       dedupeKey: `staff-link:${token}`,
       context: { name: user.name, reference: "—", link },
     });
-    if (isDemoMode()) console.info(`[demo] Staff sign-in link for ${email}: ${link}`);
+    if (!emailConfigured()) console.info(`[outbox] Staff sign-in link for ${email}: ${link}`);
   }
 
   return generic;

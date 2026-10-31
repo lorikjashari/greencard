@@ -21,6 +21,9 @@ export default defineConfig({
         url: baseURL,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
+        // The smoke suite exercises the seeded demo accounts, so pin demo mode
+        // even when the developer's .env.local points at Neon.
+        env: { APP_MODE: "demo" },
       },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 });

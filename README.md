@@ -2,11 +2,11 @@
 
 A production-minded, bilingual (Albanian/English) DV lottery application service for Kosovo. It covers the public site, an 8-step application wizard, an applicant portal, payments, filing records, and a role-protected staff dashboard.
 
-Built with Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS, Zod, Firebase (Auth/Firestore/Storage) and Vitest. All prices are derived server-side from household answers; the browser only shows a preview.
+Built with Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS, Zod, Neon Postgres and Vitest. All prices are derived server-side from household answers; the browser only shows a preview.
 
 Fonts are self-hosted from npm (`@fontsource-variable/*`), so builds never depend on reaching `fonts.googleapis.com`.
 
-> **This repository is not ready for public launch.** Legal copy, data-retention policy, cash handling rules and several commercial rules are unapproved. Firebase, email, payment and bot-protection credentials are not configured. See [Launch blockers](#launch-blockers).
+> **This repository is not ready for public launch.** Legal copy, data-retention policy, cash handling rules and several commercial rules are unapproved. Email, payment and bot-protection credentials are not configured. See [Launch blockers](#launch-blockers).
 
 ---
 
@@ -24,30 +24,37 @@ Fonts are self-hosted from npm (`@fontsource-variable/*`), so builds never depen
 | Reports and permission-checked CSV exports | Working |
 | Role matrix (admin/operator/accountant/viewer/client) + audit log | Working |
 | Demo mode with explicitly labelled seeded data | Working |
-| Firestore/Storage adapters and deny-by-default rules | Implemented, not deployed |
-| Firebase Auth email-link, magic links, signed session cookies | Implemented, credentials required |
+| Neon Postgres data store + private blob storage (photos) | Working |
+| Magic-link auth, signed session cookies, staff roles | Working (email delivery needs Resend) |
 | Resend email delivery | Implemented, credentials required |
 | Stripe adapter + authoritative webhook | Implemented, **not usable for Kosovo merchants** |
-| Unit tests (pricing, state machines, permissions, photos, validation, filing readiness, next-action) | 67 passing |
+| Unit tests (pricing, state machines, permissions, photos, validation, filing readiness, next-action) | 70 passing |
 | TypeScript, lint, production build | Passing (lint has zero warnings) |
 
 Not implemented: staff MFA, Turnstile challenge (env placeholders only), PDF generation, automated DV filing (deliberately manual — the official site must be used by a human), multi-instance rate limiting, backup/restore automation.
 
 ---
 
-## Quick start (demo mode)
+## Quick start
 
-Requirements: Node.js 20+ (tested on Node 24), npm.
+Requirements: Node.js 20+ (tested on Node 26), npm, and a Neon Postgres database.
 
 ```bash
 npm install
-cp .env.example .env.local       # Windows: Copy-Item .env.example .env.local
+neon login                     # if the Neon CLI is not linked yet
+neon env pull                  # writes DATABASE_URL into .env.local
+npm run db:migrate             # creates app_documents + app_blobs
+npm run db:bootstrap -- you@example.com "Your Name" admin
+cp .env.example .env.local     # then keep the Neon values, set SESSION_SECRET
 npm run dev
 ```
 
 Open <http://localhost:3000> — it redirects to `/sq`.
 
-Demo mode is selected automatically when Firebase is not configured. It is clearly labelled with a banner, stores data under `.data/` locally (Vercel uses Runtime Cache), never sends email (messages go to `/admin/outbox`) and never accepts card payments.
+With `DATABASE_URL` present the app runs in `postgres` mode: documents live in
+`app_documents`, photos in `app_blobs`, and sessions are signed with
+`SESSION_SECRET`. Without `DATABASE_URL` (or with `APP_MODE=demo`) it falls back
+to the local demo store under `.data/`.
 
 ### Seeded demo accounts
 
@@ -63,7 +70,7 @@ Staff sign-in: <http://localhost:3000/admin/login>. Client sign-in: <http://loca
 
 The client owns seeded application `GCK-4KT9M`. Other seeded references include `GCK-8QW2N`, `GCK-2MX7P`, `GCK-9RB4T`, `GCK-5CN8K`, `GCK-7HD3V`, `GCK-3PL6W`, `GCK-6TJ9S`, `GCK-1VK5D`.
 
-Demo authentication buttons are only available in demo mode; the demo auth routes are hard-disabled outside it.
+Demo authentication buttons are only available in demo mode; the demo auth routes are hard-disabled outside it. In Postgres mode, sign in with a magic link sent to the address. When email is not configured yet, the link is also printed to the server log and stored in `/admin/outbox`.
 
 ### Reset demo data
 
@@ -71,18 +78,16 @@ Demo authentication buttons are only available in demo mode; the demo auth route
 npm run demo:reset
 ```
 
-This deletes `.data/store` and `.data/uploads`; the seed is recreated automatically on the next demo sign-in/page load. The script refuses to run with `APP_MODE=firebase`.
+This deletes `.data/store` and `.data/uploads`; the seed is recreated automatically on the next demo sign-in/page load. The script refuses to run with `APP_MODE=postgres`.
 
-### Deploy the demo to Vercel
+### Deploy to Vercel
 
-Import <https://github.com/lorikjashari/greencard> at <https://vercel.com/new>. Next.js is detected automatically; no build command or output directory override is needed. Keep **Enable access to System Environment Variables** on so the demo can detect Vercel and use the shared Runtime Cache.
+Import <https://github.com/lorikjashari/greencard> at <https://vercel.com/new>. Next.js is detected automatically.
 
-1. Leave Firebase variables empty and set `APP_MODE=demo` explicitly.
-2. `SESSION_SECRET` is optional **only in demo mode**; without it the app uses a public demo key. Never use that key with real applicant data.
-3. Set `NEXT_PUBLIC_APP_URL` to the final Vercel URL if you want fixed magic links. If it is omitted, the app derives the URL from `VERCEL_PROJECT_PRODUCTION_URL` / `VERCEL_URL`.
-4. Deploy, open `/admin/login`, and use the seeded staff buttons. Client sign-in is at `/sq/login`.
-
-**Vercel demo limits:** Vercel runs routes in separate functions, so the demo does not use a local file. It stores data and chunked photos in [Vercel Runtime Cache](https://vercel.com/docs/caching/runtime-cache), namespaced by deployment. That makes the seeded admin, wizard, portal and outbox usable without extra credentials, but Runtime Cache is **non-durable**: entries are regional, may be evicted, and reset on each deployment. It is suitable for evaluation, not a persistent public demo or any real data. Vercel also caps request bodies at 4.5 MB, below the app's 5 MB photo limit, so use a photo under about 4 MB when testing uploads. Switch to Firebase mode for durable data.
+1. Create a Neon project and run `neon env pull` locally, or copy the connection string from the Neon console.
+2. In Vercel, set `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `SESSION_SECRET` (32+ chars), `NEXT_PUBLIC_APP_URL` and `EMAIL_PROVIDER`/`RESEND_API_KEY`/`EMAIL_FROM`.
+3. Run `npm run db:migrate` against the production branch once, then `npm run db:bootstrap -- you@example.com "Your Name" admin`.
+4. Deploy. Vercel request bodies are capped at 4.5 MB, so keep photos under about 4 MB (the app enforces a 5 MB limit).
 
 ### Useful routes
 
@@ -104,27 +109,25 @@ Copy `.env.example` to `.env.local`. Values that matter:
 | Variable | Purpose |
 |---|---|
 | `SESSION_SECRET` | HMAC key for session cookies and signed file URLs. Use ≥32 random bytes in any deployment. |
-| `APP_MODE` | `demo` or `firebase`. Leave unset to auto-detect from Firebase credentials. Set `demo` explicitly on a Vercel demo. |
-| `DEMO_DATA_DIR` | Optional local demo storage root. Defaults to `.data/`. Vercel uses Runtime Cache instead; `/tmp` is only a fallback. |
-| `NEXT_PUBLIC_FIREBASE_*` | Firebase client config for email-link auth. |
-| `FIREBASE_ADMIN_*` | Service account for server-side Firestore/Storage. Never expose with `NEXT_PUBLIC_`. |
+| `APP_MODE` | `postgres` or `demo`. Leave unset to auto-detect: Postgres when `DATABASE_URL` is set, otherwise demo. |
+| `DATABASE_URL` / `DATABASE_URL_UNPOOLED` | Neon connection strings (pooled for the app, unpooled for migrations). Pulled by `neon env pull`. |
+| `DEMO_DATA_DIR` | Optional local demo storage root. Defaults to `.data/`. |
 | `EMAIL_PROVIDER` / `RESEND_API_KEY` / `EMAIL_FROM` | Real email delivery. Without these, messages are `not_configured` and stay in the outbox. |
 | `PAYMENT_PROVIDER` / `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | Card payments. Leaving `disabled` keeps card hidden. |
 | `DV_ACTIVE_YEAR`, `DV_OPENS_AT`, `DV_CLOSES_AT` | Configured DV window. Verify against official instructions; the app does not replace them. |
 | `TURNSTILE_*` | Reserved; the challenge is not wired yet. |
 
-### Firebase setup (production path)
+### Neon setup (production path)
 
-1. Create a Firebase project and a web app.
-2. Enable **Authentication → Email/Google link** (passwordless). Add your production domain to authorised domains.
-3. Create **Firestore** (production mode) and a **Storage** bucket.
-4. Create a service account and set `FIREBASE_ADMIN_PROJECT_ID`, `FIREBASE_ADMIN_CLIENT_EMAIL`, `FIREBASE_ADMIN_PRIVATE_KEY` (keep newlines escaped as `\n`).
-5. Set all `NEXT_PUBLIC_FIREBASE_*` values.
-6. Set `SESSION_SECRET`.
-7. Deploy rules: `firebase deploy --only firestore:rules,storage --project <id>` (requires Firebase CLI login).
-8. Set `APP_MODE=firebase` and verify `/admin/launch-checklist`.
+1. Create a Neon project and branch (or reuse the one created by `neon init`).
+2. Run `neon env pull` to write `DATABASE_URL` / `DATABASE_URL_UNPOOLED` into `.env.local`.
+3. Run `npm run db:migrate` to create `app_documents` and `app_blobs`.
+4. Create the first staff account: `npm run db:bootstrap -- you@example.com "Your Name" admin`.
+5. Set `SESSION_SECRET` (32+ chars), `NEXT_PUBLIC_APP_URL` and email credentials.
+6. Verify `/api/health` shows `status: ready` and the database check green.
 
-Client browsers never read Firestore or Storage directly. The rules deny all direct access by design; the Next.js server uses the Admin SDK and re-checks the session, role and ownership on every request. Do not loosen the rules to fix a client query — add a server endpoint.
+Browsers never talk to Postgres. Every read/write goes through Next.js server
+code, which re-checks the session, role and ownership on each request.
 
 ### Email
 
@@ -151,7 +154,7 @@ Card flow (when enabled): create a pending card order → create a Stripe Checko
 - Every privileged action re-checks `hasPermission(role, …)` and writes an audit record.
 - Staff guard re-reads the user record, so deactivation/role changes take effect immediately.
 - Viewer/accountant masks sensitive contact data; photo review and notes require explicit permissions.
-- Firestore/Storage rules deny all direct browser access.
+- The database is only reachable server-side; browsers never receive `DATABASE_URL`.
 - No raw IP addresses are stored. Rate-limit keys use in-memory buckets (single instance only).
 
 Known hardening gaps: no MFA, no CSRF token beyond same-origin checks on JSON endpoints, unsigned idle-timestamp cookie (30 min) enforced only in middleware, in-memory rate limiter, no automated backups/monitoring/alerts. See [docs/launch-blockers.md](docs/launch-blockers.md).
@@ -188,7 +191,7 @@ Latest verified results in this workspace:
 
 - `npm run typecheck` — passed
 - `npm run lint` — passed with no errors and no warnings
-- `npm test` — 6 files, 67 tests passed
+- `npm test` — 7 files, 70 tests passed
 - `npm run build` — passed
 - `npm run test:e2e` — not executed here; Playwright browser binaries cannot be downloaded in this sandbox
 
@@ -202,7 +205,7 @@ No launch date should be set until these are closed. The live list is also at `/
 
 **Credentials / infrastructure**
 
-1. Firebase project, Auth email-link, Firestore, Storage, service account and deployed rules.
+1. Neon project, `db:migrate` applied, first admin bootstrapped, `/api/health` ready.
 2. `SESSION_SECRET` generated and stored securely.
 3. Verified Resend domain + API key (or another email provider).
 4. Backups, restore test, monitoring and alerting.
@@ -276,7 +279,7 @@ src/
   lib/
     auth/                sessions, guards, signed URLs
     repo/                data access for applications, orders, users, etc.
-    store/               DataStore/BlobStore with file + Firebase adapters
+    store/               DataStore/BlobStore with file (demo) + Postgres adapters
     pricing/             pure tier engine
     status/              state machines + permissions
     validation/          zod schemas + per-step validation
@@ -286,8 +289,8 @@ src/
   messages/              bilingual copy dictionary
 e2e/                     Playwright smoke tests
 docs/                    pricing spec and launch blockers
-firestore.rules          deny-all client access
-storage.rules            deny-all client access
+db/neon-schema.sql       Postgres tables (documents + blobs)
+scripts/                 migrate + bootstrap scripts
 ```
 
 ### Data and money invariants

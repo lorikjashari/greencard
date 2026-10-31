@@ -280,7 +280,6 @@ export interface UserRecord {
   createdAt: string;
   lastSignInAt: string | null;
   invitedBy?: string | null;
-  firebaseUid?: string | null;
 }
 
 export interface AuditLogRecord {

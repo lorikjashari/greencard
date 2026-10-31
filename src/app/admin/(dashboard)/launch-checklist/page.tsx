@@ -134,7 +134,7 @@ export default async function LaunchChecklistPage() {
           <p className="mt-1 text-2xs text-muted">
             {mode === "demo"
               ? tx("Të dhëna lokale; email nuk dërgohet.", "Local data; email is not delivered.")
-              : tx("Backend Firebase i konfiguruar.", "Firebase backend configured.")}
+              : tx("Backend Neon Postgres i konfiguruar.", "Neon Postgres backend configured.")}
           </p>
         </div>
         <div className={`border p-4 ${failedChecks > 0 ? "border-l-2 border-warning bg-warning-50/40" : "border-l-2 border-forest-400 bg-forest-50/60"}`}>

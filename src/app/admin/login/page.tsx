@@ -130,7 +130,6 @@ export default async function AdminLoginPage({
                   t={t}
                   demo={config.demo}
                   demoAccounts={config.demo ? DEMO_ACCOUNTS.filter((account) => account.role !== "client") : []}
-                  firebaseMode={!config.demo}
                   initialError={error === "inactive" ? "inactive" : undefined}
                 />
               </div>

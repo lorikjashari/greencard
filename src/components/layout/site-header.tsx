@@ -83,7 +83,7 @@ export function SiteHeader({
       </div>
 
       <div className="container-page flex h-16 items-center justify-between gap-6">
-        <Logo href={`/${locale}`} />
+        <Logo href={`/${locale}`} priority />
 
         <nav className="hidden items-center gap-7 lg:flex" aria-label="Main">
           {links.map((link) => (

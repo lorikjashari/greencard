@@ -53,6 +53,14 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
     <>
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section className="relative overflow-hidden border-b border-line">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[url('/brand/background.webp')] bg-cover bg-center opacity-45"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-paper via-paper/92 to-paper/35"
+        />
         <div className="container-page relative grid gap-12 pb-14 pt-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] lg:items-start lg:gap-16 lg:pb-24 lg:pt-16">
           <div className="animate-rise-in">
             <div className="flex items-center gap-3">

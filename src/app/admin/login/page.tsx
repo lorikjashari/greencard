@@ -67,7 +67,7 @@ export default async function AdminLoginPage({
     <div className="min-h-dvh bg-forest-950 text-paper">
       <div className="mx-auto grid min-h-dvh max-w-6xl gap-10 px-5 py-10 lg:grid-cols-[minmax(0,1fr)_25rem] lg:items-center lg:gap-20 lg:py-16">
         <div>
-          <Logo inverted />
+          <Logo inverted priority />
           <div className="mt-12 flex items-center gap-3">
             <span className="h-px w-8 bg-clay-300" aria-hidden="true" />
             <p className="font-mono text-3xs uppercase text-clay-200" style={{ letterSpacing: "0.2em" }}>

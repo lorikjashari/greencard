@@ -629,7 +629,7 @@ export function ApplicationWizard({
                 ) : step === 8 ? (
                   <>
                     <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-                    {t.common.submit}
+                    {data.paymentMethod === "card" ? t.common.payNow : t.common.submit}
                   </>
                 ) : (
                   <>

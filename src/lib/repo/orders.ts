@@ -254,6 +254,18 @@ export async function markCardPaid(input: {
     paidAt: nowIso(),
     providerRef: input.providerRef,
   });
+  await updateApplication(order.applicationId, {
+    status: "submitted",
+    submittedAt: nowIso(),
+  });
+  await addActivity({
+    applicationId: order.applicationId,
+    type: "submitted",
+    actorId: null,
+    actorName: "Sistemi",
+    visibility: "client",
+    message: "Pagesa u konfirmua dhe aplikimi u dorëzua për shqyrtim.",
+  });
 
   await appendPaymentEvent({
     orderId: order.id,

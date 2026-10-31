@@ -32,6 +32,7 @@ export interface CreateApplicationInput {
   consents: ApplicationRecord["consents"];
   photos: PhotoRecord[];
   isDemo: boolean;
+  deferSubmission?: boolean;
   source?: ApplicationRecord["source"];
 }
 
@@ -64,7 +65,7 @@ export async function createApplication(input: CreateApplicationInput): Promise<
     draftId: input.draftId ?? null,
     dvYear: input.dvYear,
     locale: input.locale,
-    status: "submitted",
+    status: input.deferSubmission ? "draft" : "submitted",
     paymentStatus: "created",
     packageKey: input.packageKey,
     amountCents: input.amountCents,
@@ -90,7 +91,7 @@ export async function createApplication(input: CreateApplicationInput): Promise<
     ownerEmail: input.contact.email.trim().toLowerCase(),
     claimedByUid: null,
     isDemo: input.isDemo,
-    submittedAt: now,
+    submittedAt: input.deferSubmission ? null : now,
     createdAt: now,
     updatedAt: now,
     createdBy: "public",
@@ -98,14 +99,16 @@ export async function createApplication(input: CreateApplicationInput): Promise<
   };
 
   await store.set(COLLECTION, id, record);
-  await addActivity({
-    applicationId: id,
-    type: "submitted",
-    actorId: null,
-    actorName: "Sistemi",
-    visibility: "client",
-    message: "Aplikimi u dorëzua nga klienti.",
-  });
+  if (!input.deferSubmission) {
+    await addActivity({
+      applicationId: id,
+      type: "submitted",
+      actorId: null,
+      actorName: "Sistemi",
+      visibility: "client",
+      message: "Aplikimi u dorëzua nga klienti.",
+    });
+  }
 
   return record;
 }

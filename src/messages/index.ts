@@ -16,6 +16,7 @@ export const messages = {
     saving: { sq: "Duke ruajtur…", en: "Saving…" },
     saved: { sq: "U ruajt", en: "Saved" },
     submit: { sq: "Dërgo aplikimin", en: "Submit application" },
+    payNow: { sq: "Kryej pagesën", en: "Pay now" },
     cancel: { sq: "Anulo", en: "Cancel" },
     close: { sq: "Mbyll", en: "Close" },
     edit: { sq: "Ndrysho", en: "Edit" },

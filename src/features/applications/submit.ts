@@ -340,6 +340,7 @@ async function submitApplicationInner(
     consents,
     photos,
     isDemo: isDemoMode(),
+    deferSubmission: input.paymentMethod === "card",
   });
 
   await updateApplication(application.id, {

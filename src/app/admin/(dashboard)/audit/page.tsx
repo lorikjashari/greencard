@@ -7,7 +7,10 @@ import { listAudit } from "@/lib/repo/audit";
 import { formatDateTime } from "@/lib/format";
 import { AdminPageHeader, AdminEmpty, SectionCard } from "@/components/admin/ui";
 
-export const metadata: Metadata = { title: "Audit log" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await adminLocale();
+  return { title: locale === "sq" ? "Regjistri i auditimit" : "Audit log" };
+}
 export const dynamic = "force-dynamic";
 
 export default async function AuditPage({

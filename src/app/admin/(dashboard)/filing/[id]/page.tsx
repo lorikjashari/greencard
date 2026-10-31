@@ -17,7 +17,10 @@ import { AdminPageHeader, SectionCard } from "@/components/admin/ui";
 import { PrintButton } from "@/components/admin/print-button";
 import type { PersonData } from "@/lib/types";
 
-export const metadata: Metadata = { title: "Filing workspace" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await adminLocale();
+  return { title: locale === "sq" ? "Hapësira e dorëzimit" : "Filing workspace" };
+}
 export const dynamic = "force-dynamic";
 
 function personLines(

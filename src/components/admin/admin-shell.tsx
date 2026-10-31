@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X, ArrowUpRight } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { SignOutButton } from "@/components/auth/sign-out-button";
+import { AdminLocaleSwitch } from "@/components/admin/locale-switch";
 import { cn } from "@/lib/cn";
 
 export interface AdminNavItem {
@@ -30,6 +31,7 @@ export function AdminShell({
   demoLabel,
   demoNote,
   title,
+  locale,
 }: {
   children: React.ReactNode;
   groups: AdminNavGroup[];
@@ -41,6 +43,7 @@ export function AdminShell({
   demoLabel: string;
   demoNote: string;
   title: string;
+  locale: "sq" | "en";
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -122,6 +125,9 @@ export function AdminShell({
       <p className="mt-2 font-mono text-3xs uppercase text-clay-200/90" style={{ letterSpacing: "0.14em" }}>
         {roleLabel}
       </p>
+      <div className="mt-2.5">
+        <AdminLocaleSwitch locale={locale} />
+      </div>
       <div className="mt-2 flex items-center justify-between">
         <SignOutButton
           label={signOutLabel}
@@ -129,7 +135,7 @@ export function AdminShell({
           className="text-paper/55 hover:bg-white/10 hover:text-paper"
         />
         <Link
-          href="/sq"
+          href={`/${locale}`}
           className="inline-flex items-center gap-1 rounded-sm px-2 py-1 font-mono text-3xs uppercase text-paper/45 transition-colors hover:text-paper"
           style={{ letterSpacing: "0.1em" }}
         >

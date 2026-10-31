@@ -13,7 +13,10 @@ import { AdminPageHeader, AdminEmpty, AdminNotice, StatCard, StatStrip } from "@
 import { changeStatusAction } from "@/app/admin/actions";
 import type { ApplicationStatus } from "@/lib/types";
 
-export const metadata: Metadata = { title: "Review queue" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await adminLocale();
+  return { title: locale === "sq" ? "Radha e kontrollit" : "Review queue" };
+}
 export const dynamic = "force-dynamic";
 
 const OPEN: ApplicationStatus[] = ["submitted", "in_review", "needs_information"];

@@ -12,7 +12,10 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { AdminPageHeader, AdminEmpty, StatStrip, StatCard } from "@/components/admin/ui";
 import type { ApplicationStatus, PaymentStatus } from "@/lib/types";
 
-export const metadata: Metadata = { title: "Applications" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await adminLocale();
+  return { title: locale === "sq" ? "Aplikimet" : "Applications" };
+}
 export const dynamic = "force-dynamic";
 
 const APP_STATUSES: ApplicationStatus[] = [

@@ -1,14 +1,15 @@
 import "server-only";
 
-import { headers } from "next/headers";
+import { cookies } from "next/headers";
 import type { Locale } from "@/lib/i18n";
 
+export const ADMIN_LOCALE_COOKIE = "gck_admin_locale";
+
 /**
- * Staff UI language follows the browser's Accept-Language header. Public and
- * portal screens use the /sq or /en route segment instead.
+ * Staff UI language. Defaults to Albanian; staff can switch to English from
+ * the admin shell. The choice is stored in a cookie so it survives navigation.
  */
 export async function adminLocale(): Promise<Locale> {
-  const headerList = await headers();
-  const accept = headerList.get("accept-language")?.toLowerCase() ?? "";
-  return accept.startsWith("en") ? "en" : "sq";
+  const jar = await cookies();
+  return jar.get(ADMIN_LOCALE_COOKIE)?.value === "en" ? "en" : "sq";
 }

@@ -10,7 +10,10 @@ import { getActiveDvYear } from "@/lib/repo/dv-years";
 import { formatDate } from "@/lib/format";
 import { AdminPageHeader, SectionCard } from "@/components/admin/ui";
 
-export const metadata: Metadata = { title: "Launch checklist" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await adminLocale();
+  return { title: locale === "sq" ? "Lista e nisjes" : "Launch checklist" };
+}
 export const dynamic = "force-dynamic";
 
 export default async function LaunchChecklistPage() {

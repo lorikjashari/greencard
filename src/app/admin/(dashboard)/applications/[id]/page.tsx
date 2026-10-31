@@ -48,7 +48,10 @@ import {
 } from "@/app/admin/actions";
 import type { ConsentRecord, PersonData } from "@/lib/types";
 
-export const metadata: Metadata = { title: "Application" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await adminLocale();
+  return { title: locale === "sq" ? "Aplikimi" : "Application" };
+}
 export const dynamic = "force-dynamic";
 
 function maskEmail(email: string): string {

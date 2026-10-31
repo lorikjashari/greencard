@@ -11,7 +11,10 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { AdminPageHeader, AdminEmpty, AdminNotice, StatCard, StatStrip } from "@/components/admin/ui";
 import { recordCashAction, reviewPaymentMismatchAction } from "@/app/admin/actions";
 
-export const metadata: Metadata = { title: "Cash reconciliation" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await adminLocale();
+  return { title: locale === "sq" ? "Rakordimi i parave" : "Cash reconciliation" };
+}
 export const dynamic = "force-dynamic";
 
 export default async function ReconciliationPage({

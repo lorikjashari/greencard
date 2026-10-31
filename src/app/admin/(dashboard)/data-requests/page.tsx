@@ -7,7 +7,10 @@ import { formatDateTime } from "@/lib/format";
 import { AdminPageHeader, AdminEmpty, AdminNotice, SectionCard, StatCard, StatStrip } from "@/components/admin/ui";
 import { updateDataRequestAction, resolveEditRequestAction } from "@/app/admin/actions";
 
-export const metadata: Metadata = { title: "Data requests" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await adminLocale();
+  return { title: locale === "sq" ? "Kërkesat për të dhëna" : "Data requests" };
+}
 export const dynamic = "force-dynamic";
 
 const STATUSES = ["open", "in_progress", "completed", "declined"] as const;

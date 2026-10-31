@@ -7,13 +7,17 @@ import { copy, type Copy } from "@/messages/get";
 import { adminLocale } from "@/lib/admin/locale";
 import { AdminShell, type AdminNavGroup } from "@/components/admin/admin-shell";
 
-export const metadata: Metadata = {
-  title: {
-    default: "Administration · Green Card Kosova",
-    template: "%s · Admin · Green Card Kosova",
-  },
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await adminLocale();
+  const t = copy(locale);
+  return {
+    title: {
+      default: `${t.admin.title} · Green Card Kosova`,
+      template: `%s · ${t.admin.title} · Green Card Kosova`,
+    },
+    robots: { index: false, follow: false },
+  };
+}
 
 export const dynamic = "force-dynamic";
 
@@ -72,6 +76,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       demoLabel={t.admin.demoMode}
       demoNote={t.common.demoBanner}
       title={t.admin.title}
+      locale={locale}
     >
       {children}
     </AdminShell>

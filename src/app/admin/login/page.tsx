@@ -9,15 +9,19 @@ import { copy } from "@/messages/get";
 import { adminLocale } from "@/lib/admin/locale";
 import { LoginForm } from "@/components/auth/login-form";
 import { StaffLoginForm } from "@/components/auth/staff-login-form";
+import { AdminLocaleSwitch } from "@/components/admin/locale-switch";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { Logo } from "@/components/brand/logo";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Staff sign-in",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await adminLocale();
+  return {
+    title: locale === "sq" ? "Hyrja e stafit" : "Staff sign-in",
+    robots: { index: false, follow: false },
+  };
+}
 
 export default async function AdminLoginPage({
   searchParams,
@@ -64,7 +68,10 @@ export default async function AdminLoginPage({
   ];
 
   return (
-    <div className="min-h-dvh bg-forest-950 text-paper">
+    <div className="relative min-h-dvh bg-forest-950 text-paper">
+      <div className="absolute right-5 top-5 z-10">
+        <AdminLocaleSwitch locale={locale} />
+      </div>
       <div className="mx-auto grid min-h-dvh max-w-6xl gap-10 px-5 py-10 lg:grid-cols-[minmax(0,1fr)_25rem] lg:items-center lg:gap-20 lg:py-16">
         <div>
           <Logo inverted priority />

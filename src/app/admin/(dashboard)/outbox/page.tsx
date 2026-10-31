@@ -10,7 +10,10 @@ import { formatDateTime } from "@/lib/format";
 import { AdminPageHeader, AdminEmpty, AdminNotice, StatCard, StatStrip } from "@/components/admin/ui";
 import { retryEmailAction } from "@/app/admin/actions";
 
-export const metadata: Metadata = { title: "Email outbox" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await adminLocale();
+  return { title: locale === "sq" ? "Dalja e email-eve" : "Email outbox" };
+}
 export const dynamic = "force-dynamic";
 
 export default async function OutboxPage({

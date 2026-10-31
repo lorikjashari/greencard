@@ -12,7 +12,10 @@ import { photoIssues } from "@/lib/photos";
 import { reviewPhotoAction } from "@/app/admin/actions";
 import type { PhotoStatus } from "@/lib/types";
 
-export const metadata: Metadata = { title: "Photo review" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await adminLocale();
+  return { title: locale === "sq" ? "Kontrolli i fotove" : "Photo review" };
+}
 export const dynamic = "force-dynamic";
 
 const PENDING: PhotoStatus[] = ["pending", "valid", "invalid", "rejected"];

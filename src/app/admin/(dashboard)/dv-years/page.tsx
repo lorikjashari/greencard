@@ -9,7 +9,10 @@ import { formatDateTime } from "@/lib/format";
 import { AdminPageHeader, AdminNotice, SectionCard } from "@/components/admin/ui";
 import { saveDvYearAction, activateDvYearAction } from "@/app/admin/actions";
 
-export const metadata: Metadata = { title: "DV years" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await adminLocale();
+  return { title: locale === "sq" ? "Vitet DV" : "DV years" };
+}
 export const dynamic = "force-dynamic";
 
 export default async function DvYearsPage({

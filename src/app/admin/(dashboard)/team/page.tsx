@@ -8,7 +8,10 @@ import { formatDateTime } from "@/lib/format";
 import { AdminPageHeader, AdminNotice, SectionCard } from "@/components/admin/ui";
 import { addTeamMemberAction, updateTeamMemberAction } from "@/app/admin/actions";
 
-export const metadata: Metadata = { title: "Team" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await adminLocale();
+  return { title: locale === "sq" ? "Ekipi dhe rolet" : "Team" };
+}
 export const dynamic = "force-dynamic";
 
 const ROLES = ["admin", "operator", "accountant", "viewer"] as const;

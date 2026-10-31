@@ -14,7 +14,10 @@ import { AdminPageHeader, AdminEmpty, AdminNotice, StatCard, StatStrip } from "@
 import { recordFilingAction, sendConfirmationAction } from "@/app/admin/actions";
 import type { ApplicationStatus } from "@/lib/types";
 
-export const metadata: Metadata = { title: "Filing centre" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await adminLocale();
+  return { title: locale === "sq" ? "Qendra e dorëzimit" : "Filing centre" };
+}
 export const dynamic = "force-dynamic";
 
 const RELEVANT: ApplicationStatus[] = ["ready_to_file", "filed", "confirmation_sent"];

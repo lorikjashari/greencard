@@ -8,7 +8,10 @@ import { formatDateTime } from "@/lib/format";
 import { AdminPageHeader, AdminNotice, SectionCard } from "@/components/admin/ui";
 import { saveSettingsAction } from "@/app/admin/actions";
 
-export const metadata: Metadata = { title: "Settings" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await adminLocale();
+  return { title: locale === "sq" ? "Cilësimet" : "Settings" };
+}
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage({

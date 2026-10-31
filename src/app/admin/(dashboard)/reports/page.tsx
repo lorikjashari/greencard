@@ -11,7 +11,10 @@ import { formatCurrency, formatDate } from "@/lib/format";
 import { AdminPageHeader, AdminEmpty, SectionCard, StatCard, StatStrip } from "@/components/admin/ui";
 import type { ApplicationStatus, PaymentStatus } from "@/lib/types";
 
-export const metadata: Metadata = { title: "Reports" };
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await adminLocale();
+  return { title: locale === "sq" ? "Raportet" : "Reports" };
+}
 export const dynamic = "force-dynamic";
 
 function Bars({

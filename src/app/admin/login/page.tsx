@@ -8,6 +8,7 @@ import { ensureDemoSeed, DEMO_ACCOUNTS } from "@/lib/demo/seed";
 import { copy } from "@/messages/get";
 import { adminLocale } from "@/lib/admin/locale";
 import { LoginForm } from "@/components/auth/login-form";
+import { StaffLoginForm } from "@/components/auth/staff-login-form";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { Logo } from "@/components/brand/logo";
 
@@ -125,13 +126,17 @@ export default async function AdminLoginPage({
               )}
 
               <div className="mt-5">
-                <LoginForm
-                  locale={locale}
-                  t={t}
-                  demo={config.demo}
-                  demoAccounts={config.demo ? DEMO_ACCOUNTS.filter((account) => account.role !== "client") : []}
-                  initialError={error === "inactive" ? "inactive" : undefined}
-                />
+                {config.demo ? (
+                  <LoginForm
+                    locale={locale}
+                    t={t}
+                    demo
+                    demoAccounts={DEMO_ACCOUNTS.filter((account) => account.role !== "client")}
+                    initialError={error === "inactive" ? "inactive" : undefined}
+                  />
+                ) : (
+                  <StaffLoginForm locale={locale} t={t} />
+                )}
               </div>
             </>
           )}

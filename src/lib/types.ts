@@ -280,6 +280,10 @@ export interface UserRecord {
   createdAt: string;
   lastSignInAt: string | null;
   invitedBy?: string | null;
+  /** Argon2id hash. Never sent to the client. */
+  passwordHash?: string | null;
+  failedSignIns?: number;
+  lockedUntil?: string | null;
 }
 
 export interface AuditLogRecord {

@@ -400,6 +400,14 @@ export const messages = {
     demoNote: { sq: "Këto llogari ekzistojnë vetëm në modin demo.", en: "These accounts exist only in demo mode." },
     noAccess: { sq: "Nuk ke akses në këtë seksion.", en: "You do not have access to this section." },
     pendingApproval: { sq: "Llogaria jote pret aprovim nga administratori.", en: "Your account is awaiting administrator approval." },
+    passwordIntro: { sq: "Për stafin. Hyr me emailin dhe fjalëkalimin e llogarisë.", en: "For staff. Sign in with your account email and password." },
+    passwordLabel: { sq: "Fjalëkalimi", en: "Password" },
+    passwordSignIn: { sq: "Hyr me fjalëkalim", en: "Sign in with password" },
+    passwordSigningIn: { sq: "Duke hyrë…", en: "Signing in…" },
+    useEmailLink: { sq: "Hyr me lidhje email", en: "Sign in with an email link" },
+    usePassword: { sq: "Hyr me fjalëkalim", en: "Sign in with a password" },
+    passwordWrong: { sq: "Email ose fjalëkalim i gabuar.", en: "Wrong email or password." },
+    passwordLocked: { sq: "Shumë tentativa të gabuara. Provo përsëri pas 15 minutash.", en: "Too many failed attempts. Try again in 15 minutes." },
   },
 
   account: {

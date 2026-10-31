@@ -3,11 +3,14 @@
  * Create (or promote) a staff account in Neon.
  *
  *   npm run db:bootstrap -- admin@example.com "Full Name" admin
+ *   ADMIN_PASSWORD='...' npm run db:bootstrap -- admin@example.com "Full Name" admin
  *
  * Roles: admin | operator | accountant | viewer. Defaults to admin.
  * Safe to re-run: an existing account is promoted/renamed, not duplicated.
+ * Set ADMIN_PASSWORD to enable password sign-in (Argon2id) at /admin/login.
  */
 import { neon } from "@neondatabase/serverless";
+import { Algorithm, hash } from "@node-rs/argon2";
 
 const url = process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
 if (!url) {
@@ -30,6 +33,19 @@ if (!allowed.has(role)) {
 }
 
 const name = (rawName ?? "").trim() || email.split("@")[0];
+const rawPassword = process.env.ADMIN_PASSWORD ?? "";
+if (rawPassword && rawPassword.length < 10) {
+  console.error("ADMIN_PASSWORD must be at least 10 characters.");
+  process.exit(1);
+}
+const passwordHash = rawPassword
+  ? await hash(rawPassword, {
+      algorithm: Algorithm.Argon2id,
+      memoryCost: 19_456,
+      timeCost: 2,
+      parallelism: 1,
+    })
+  : null;
 const sql = neon(url);
 const now = new Date().toISOString();
 
@@ -43,7 +59,13 @@ let id = existing[0]?.id;
 let action = "updated";
 
 if (id) {
-  const patch = JSON.stringify({ email, name, role, active: true });
+  const patch = JSON.stringify({
+    email,
+    name,
+    role,
+    active: true,
+    ...(passwordHash ? { passwordHash, failedSignIns: 0, lockedUntil: null } : {}),
+  });
   await sql`
     UPDATE app_documents
     SET data = data || ${patch}::jsonb, updated_at = now()
@@ -60,6 +82,7 @@ if (id) {
     createdAt: now,
     lastSignInAt: null,
     invitedBy: null,
+    ...(passwordHash ? { passwordHash } : {}),
   };
   await sql`
     INSERT INTO app_documents (collection, id, data)
@@ -69,4 +92,8 @@ if (id) {
 }
 
 console.log(`${action} ${role} account: ${email} (id ${id})`);
-console.log("Sign in at /admin/login with a magic link sent to this address.");
+console.log(
+  passwordHash
+    ? "Sign in at /admin/login with this email and the password you set."
+    : "Sign in at /admin/login with a magic link sent to this address.",
+);

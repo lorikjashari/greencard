@@ -25,7 +25,7 @@ Fonts are self-hosted from npm (`@fontsource-variable/*`), so builds never depen
 | Role matrix (admin/operator/accountant/viewer/client) + audit log | Working |
 | Demo mode with explicitly labelled seeded data | Working |
 | Neon Postgres data store + private blob storage (photos) | Working |
-| Magic-link auth, signed session cookies, staff roles | Working (email delivery needs Resend) |
+| Password + magic-link auth (Argon2id), signed session cookies, staff roles | Working (email delivery needs Resend) |
 | Resend email delivery | Implemented, credentials required |
 | Stripe adapter + authoritative webhook | Implemented, **not usable for Kosovo merchants** |
 | Unit tests (pricing, state machines, permissions, photos, validation, filing readiness, next-action) | 70 passing |
@@ -45,6 +45,7 @@ neon login                     # if the Neon CLI is not linked yet
 neon env pull                  # writes DATABASE_URL into .env.local
 npm run db:migrate             # creates app_documents + app_blobs
 npm run db:bootstrap -- you@example.com "Your Name" admin
+ADMIN_PASSWORD='choose-a-strong-password' npm run db:set-password -- you@example.com
 cp .env.example .env.local     # then keep the Neon values, set SESSION_SECRET
 npm run dev
 ```
@@ -70,7 +71,7 @@ Staff sign-in: <http://localhost:3000/admin/login>. Client sign-in: <http://loca
 
 The client owns seeded application `GCK-4KT9M`. Other seeded references include `GCK-8QW2N`, `GCK-2MX7P`, `GCK-9RB4T`, `GCK-5CN8K`, `GCK-7HD3V`, `GCK-3PL6W`, `GCK-6TJ9S`, `GCK-1VK5D`.
 
-Demo authentication buttons are only available in demo mode; the demo auth routes are hard-disabled outside it. In Postgres mode, sign in with a magic link sent to the address. When email is not configured yet, the link is also printed to the server log and stored in `/admin/outbox`.
+Demo authentication buttons are only available in demo mode; the demo auth routes are hard-disabled outside it. In Postgres mode, staff sign in at `/admin/login` with email + password (Argon2id, 5 failed attempts → 15-minute lockout) or request a magic link. Set a password with `ADMIN_PASSWORD='...' npm run db:set-password -- email`; `db:bootstrap` also accepts `ADMIN_PASSWORD`. Clients sign in with magic links. When email is not configured yet, the link is printed to the server log and stored in `/admin/outbox`.
 
 ### Reset demo data
 
@@ -122,7 +123,7 @@ Copy `.env.example` to `.env.local`. Values that matter:
 1. Create a Neon project and branch (or reuse the one created by `neon init`).
 2. Run `neon env pull` to write `DATABASE_URL` / `DATABASE_URL_UNPOOLED` into `.env.local`.
 3. Run `npm run db:migrate` to create `app_documents` and `app_blobs`.
-4. Create the first staff account: `npm run db:bootstrap -- you@example.com "Your Name" admin`.
+4. Create the first staff account: `npm run db:bootstrap -- you@example.com "Your Name" admin`, then set its password with `ADMIN_PASSWORD='...' npm run db:set-password -- you@example.com`.
 5. Set `SESSION_SECRET` (32+ chars), `NEXT_PUBLIC_APP_URL` and email credentials.
 6. Verify `/api/health` shows `status: ready` and the database check green.
 
@@ -146,6 +147,7 @@ Card flow (when enabled): create a pending card order → create a Stripe Checko
 ## Security model
 
 - HMAC-signed, httpOnly, SameSite=Lax `gck_session` cookie. Staff lifetime 8h; clients 30 days.
+- Staff passwords are Argon2id (m=19 MiB, t=2, p=1) with per-account lockout after 5 failures for 15 minutes.
 - Single-use magic-link tokens stored as SHA-256 hashes with expiry. Resume rotates the draft secret.
 - Draft access requires the draft id **and** secret; stale-version saves are rejected.
 - Photo access requires a short-lived signed URL, an owning client session, or staff permission.

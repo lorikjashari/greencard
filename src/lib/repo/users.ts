@@ -129,3 +129,45 @@ export async function countActiveAdmins(): Promise<number> {
   const users = await listUsers();
   return users.filter((user) => user.role === "admin" && user.active).length;
 }
+
+export const MAX_FAILED_SIGN_INS = 5;
+export const LOCK_MINUTES = 15;
+
+export function isUserLocked(user: UserRecord, now = Date.now()): boolean {
+  return Boolean(user.lockedUntil && new Date(user.lockedUntil).getTime() > now);
+}
+
+export async function registerFailedSignIn(user: UserRecord): Promise<{
+  attempts: number;
+  lockedUntil: string | null;
+}> {
+  const attempts = (user.failedSignIns ?? 0) + 1;
+  const lock =
+    attempts >= MAX_FAILED_SIGN_INS
+      ? new Date(Date.now() + LOCK_MINUTES * 60_000).toISOString()
+      : null;
+  await getStore().merge<UserRecord>(COLLECTION, user.id, {
+    failedSignIns: lock ? 0 : attempts,
+    lockedUntil: lock ?? user.lockedUntil ?? null,
+  });
+  return { attempts, lockedUntil: lock };
+}
+
+export async function registerSuccessfulSignIn(userId: string): Promise<void> {
+  await getStore().merge<UserRecord>(COLLECTION, userId, {
+    failedSignIns: 0,
+    lockedUntil: null,
+    lastSignInAt: nowIso(),
+  });
+}
+
+export async function setUserPasswordHash(email: string, passwordHash: string): Promise<UserRecord | null> {
+  const user = await findUserByEmail(email);
+  if (!user) return null;
+  await getStore().merge<UserRecord>(COLLECTION, user.id, {
+    passwordHash,
+    failedSignIns: 0,
+    lockedUntil: null,
+  });
+  return { ...user, passwordHash, failedSignIns: 0, lockedUntil: null };
+}

@@ -209,71 +209,95 @@ export function renderEmail(
       : "For your security, this link expires and can be used once. If you did not request this email, ignore it."
     : null;
 
+  const configuredBase = process.env.EMAIL_ASSET_BASE_URL || "";
+  const publicAppUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+  const appBase =
+    publicAppUrl && !publicAppUrl.includes("localhost") && !publicAppUrl.includes("YOUR-DOMAIN")
+      ? publicAppUrl
+      : "";
+  const assetBase = (
+    configuredBase ||
+    appBase ||
+    "https://raw.githubusercontent.com/lorikjashari/greencard/main/public"
+  ).replace(/\/+$/, "");
+  const logoUrl = `${assetBase}/brand/email-logo.png`;
+  const markUrl = `${assetBase}/brand/email-mark.png`;
+
+  const detail = (label: string, value: string) => `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:22px 0 0;">
+      <tr>
+        <td style="border-left:2px solid #C5A56A;padding:2px 0 2px 14px;">
+          <div style="font-family:Arial,Helvetica,sans-serif;font-size:9px;letter-spacing:1.8px;text-transform:uppercase;color:#9A7A45;">${escapeHtml(label)}</div>
+          <div style="margin-top:5px;font-family:'Courier New',Courier,monospace;font-size:16px;font-weight:bold;letter-spacing:1.2px;color:#143229;">${escapeHtml(value)}</div>
+        </td>
+      </tr>
+    </table>`;
+
   const html = `<!doctype html>
 <html lang="${locale}" dir="ltr">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="x-apple-disable-message-reformatting">
+    <meta name="color-scheme" content="light only">
     <title>${escapeHtml(subject)}</title>
   </head>
-  <body style="margin:0;padding:0;background:#F4F1E8;">
+  <body style="margin:0;padding:0;background:#EFEBE0;">
     <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${escapeHtml(content.heading)}${reference ? ` · ${escapeHtml(reference)}` : ""}</div>
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F4F1E8;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#EFEBE0;">
       <tr>
-        <td align="center" style="padding:28px 14px;">
-          <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;">
+        <td align="center" style="padding:34px 14px;">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background:#FBF9F3;border:1px solid #DCD5C4;border-top:3px solid #153D32;">
             <tr>
-              <td style="background:#0F2E26;border-radius:14px 14px 0 0;padding:26px 32px;">
+              <td style="padding:26px 36px 20px;">
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                   <tr>
-                    <td style="font-family:Georgia,'Times New Roman',serif;font-size:19px;font-weight:bold;color:#F4F1E8;">Green Card Kosova</td>
-                    <td align="right" style="font-family:Arial,Helvetica,sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#C5A56A;">DV Lottery Service</td>
+                    <td style="vertical-align:middle;">
+                      <img src="${logoUrl}" width="196" height="42" alt="Green Card Kosova" style="display:block;width:196px;height:42px;border:0;outline:none;text-decoration:none;">
+                    </td>
+                    <td align="right" style="vertical-align:middle;font-family:Arial,Helvetica,sans-serif;font-size:9px;line-height:1.6;letter-spacing:2px;text-transform:uppercase;color:#8A9188;">DV Lottery<br>Prishtinë</td>
                   </tr>
                 </table>
-                <div style="height:2px;width:44px;background:#C5A56A;margin-top:16px;font-size:0;line-height:0;">&nbsp;</div>
+                <div style="height:1px;background:#E4DECF;margin-top:20px;font-size:0;line-height:0;">&nbsp;</div>
               </td>
             </tr>
             <tr>
-              <td style="background:#FFFFFF;border-left:1px solid #E4E1D6;border-right:1px solid #E4E1D6;padding:34px 32px 8px;">
-                <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:10px;letter-spacing:1.8px;text-transform:uppercase;color:#8A6D3B;">${escapeHtml(eyebrow)}</p>
-                <h1 style="margin:10px 0 20px;font-family:Georgia,'Times New Roman',serif;font-size:25px;line-height:1.28;color:#102E26;font-weight:normal;">${escapeHtml(content.heading)}</h1>
-                ${content.paragraphs.map((p) => `<p style="margin:0 0 15px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.7;color:#33403A;">${escapeHtml(p)}</p>`).join("")}
-                ${
-                  reference
-                    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:22px 0 0;background:#F7F5EC;border:1px solid #E7E2D2;border-radius:10px;">
-                        <tr>
-                          <td style="padding:14px 18px;">
-                            <div style="font-family:Arial,Helvetica,sans-serif;font-size:9px;letter-spacing:1.6px;text-transform:uppercase;color:#8A6D3B;">${sq ? "Referenca" : "Reference"}</div>
-                            <div style="font-family:'Courier New',Courier,monospace;font-size:16px;font-weight:bold;color:#153D32;letter-spacing:1px;margin-top:4px;">${escapeHtml(reference)}</div>
-                          </td>
-                        </tr>
-                      </table>`
-                    : ""
-                }
+              <td style="padding:10px 36px 0;">
+                <p style="margin:18px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:10px;letter-spacing:2.2px;text-transform:uppercase;color:#9A7A45;">${escapeHtml(eyebrow)}</p>
+                <h1 style="margin:12px 0 22px;font-family:Georgia,'Times New Roman',serif;font-size:29px;line-height:1.22;color:#143229;font-weight:normal;letter-spacing:-0.2px;">${escapeHtml(content.heading)}</h1>
+                ${content.paragraphs.map((p) => `<p style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.75;color:#3A463F;">${escapeHtml(p)}</p>`).join("")}
+                ${reference ? detail(sq ? "Referenca" : "Reference", reference) : ""}
+                ${ctx.confirmationNumber ? detail(sq ? "Numri i konfirmimit" : "Confirmation number", ctx.confirmationNumber) : ""}
                 ${
                   isLink
-                    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:26px 0 0;">
+                    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 0;">
                         <tr>
-                          <td align="center" bgcolor="#153D32" style="border-radius:8px;">
-                            <a href="${escapeHtml(link!)}" style="display:block;padding:15px 24px;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;color:#FFFFFF;text-decoration:none;">${escapeHtml(content.cta!)}</a>
+                          <td align="center" bgcolor="#153D32" style="border-radius:2px;">
+                            <a href="${escapeHtml(link!)}" style="display:block;padding:16px 24px;font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:bold;letter-spacing:1.8px;text-transform:uppercase;color:#F7F3E7;text-decoration:none;text-align:center;">${escapeHtml(content.cta!)}</a>
                           </td>
                         </tr>
                       </table>
-                      <p style="margin:12px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:1.6;color:#6B7670;word-break:break-all;">${sq ? "Nëse butoni nuk hapet, kopjo këtë lidhje:" : "If the button does not open, copy this link:"}<br><a href="${escapeHtml(link!)}" style="color:#153D32;">${escapeHtml(link!)}</a></p>
-                      ${expiry ? `<p style="margin:10px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:1.6;color:#8A6D3B;">${sq ? `Lidhja skadon pas ${expiry} minutash.` : `This link expires in ${expiry} minutes.`}</p>` : ""}`
+                      ${expiry ? `<p style="margin:12px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:10.5px;line-height:1.6;color:#9A7A45;">${sq ? `Lidhja skadon pas ${expiry} minutash.` : `This link expires in ${expiry} minutes.`}</p>` : ""}
+                      <p style="margin:14px 0 0;font-family:'Courier New',Courier,monospace;font-size:10px;line-height:1.7;color:#6E7A72;word-break:break-all;">${sq ? "Nëse butoni nuk hapet, kopjo këtë lidhje:" : "If the button does not open, copy this link:"}<br><a href="${escapeHtml(link!)}" style="color:#4A5A51;text-decoration:underline;">${escapeHtml(link!)}</a></p>`
                     : ""
                 }
-                ${securityNote ? `<p style="margin:18px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:1.65;color:#6B7670;">${escapeHtml(securityNote)}</p>` : ""}
+                ${securityNote ? `<p style="margin:20px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:10.5px;line-height:1.7;color:#7A857D;">${escapeHtml(securityNote)}</p>` : ""}
               </td>
             </tr>
             <tr>
-              <td style="background:#FFFFFF;border:1px solid #E4E1D6;border-top:0;border-radius:0 0 14px 14px;padding:0 32px 30px;">
-                <div style="border-top:1px solid #EDEAE0;margin-top:20px;padding-top:18px;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:1.7;color:#6B7670;">${escapeHtml(footer)}</div>
+              <td style="padding:28px 36px 32px;">
+                <div style="height:1px;background:#E4DECF;font-size:0;line-height:0;">&nbsp;</div>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;">
+                  <tr>
+                    <td width="20" style="vertical-align:middle;"><img src="${markUrl}" width="20" height="20" alt="" style="display:block;width:20px;height:20px;border:0;"></td>
+                    <td style="vertical-align:middle;padding-left:8px;font-family:Arial,Helvetica,sans-serif;font-size:9px;letter-spacing:1.8px;text-transform:uppercase;color:#5F6B63;">Green Card Kosova</td>
+                    <td align="right" style="vertical-align:middle;font-family:Arial,Helvetica,sans-serif;font-size:9px;letter-spacing:1px;color:#9AA39C;">${new Date().getFullYear()}</td>
+                  </tr>
+                </table>
+                <p style="margin:14px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:10.5px;line-height:1.7;color:#7A857D;">${escapeHtml(footer)}</p>
               </td>
             </tr>
           </table>
-          <p style="margin:16px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:10px;line-height:1.6;color:#8A918B;">&copy; ${new Date().getFullYear()} Green Card Kosova</p>
         </td>
       </tr>
     </table>

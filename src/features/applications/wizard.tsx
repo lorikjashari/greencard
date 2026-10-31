@@ -390,7 +390,9 @@ export function ApplicationWizard({
         return;
       }
 
-      clearStoredDraft();
+      // Keep card drafts until payment has completed so a cancelled checkout
+      // or a lost network response can restore the applicant's answers.
+      if (!result.checkoutUrl) clearStoredDraft();
       if (result.portalLink) {
         window.sessionStorage.setItem("gck_demo_portal", result.portalLink);
       }

@@ -153,6 +153,39 @@ async function submitApplicationInner(
     await markDraftSubmitted(draft.id, existing.id);
 
     const config = getPublicConfig();
+    let checkoutUrl: string | null = null;
+    if (input.paymentMethod === "card" && existingOrder.status === "pending_card") {
+      const provider = getPaymentProvider();
+      if (!provider) {
+        return {
+          ok: false,
+          error: pick(
+            input.contact.preferredLocale,
+            "Pagesa me kartë nuk është e disponueshme. Provo përsëri më vonë.",
+            "Card payment is not available. Try again later.",
+          ),
+        };
+      }
+      try {
+        const checkout = await provider.createCheckout({
+          order: existingOrder,
+          application: existing,
+          locale: input.contact.preferredLocale,
+        });
+        await attachProviderRef(existingOrder.id, checkout.providerRef);
+        checkoutUrl = checkout.url;
+      } catch (error) {
+        console.error("[payments] checkout retry failed", (error as Error).message);
+        return {
+          ok: false,
+          error: pick(
+            input.contact.preferredLocale,
+            "Pagesa me kartë nuk u nis. Të dhënat u ruajtën; provo përsëri.",
+            "Card payment did not start. Your answers were saved; try again.",
+          ),
+        };
+      }
+    }
     const token = await createMagicToken({
       email: existing.contact.email,
       purpose: "portal",
@@ -164,7 +197,7 @@ async function submitApplicationInner(
       ok: true,
       application: { ...existing, paymentStatus: existingOrder.status },
       portalLink: isDemoMode() ? link : null,
-      checkoutUrl: null,
+      checkoutUrl,
       warnings: [
         pick(
           input.contact.preferredLocale,
@@ -377,10 +410,15 @@ async function submitApplicationInner(
       await attachProviderRef(order.id, checkout.providerRef);
       checkoutUrl = checkout.url;
     } catch (error) {
-      // The application and a pending card order exist at this point. Do not
-      // pretend the payment started; surface a warning and let the client use
-      // the portal/support while staff reconcile the pending order.
       console.error("[payments] checkout creation failed", (error as Error).message);
+      return {
+        ok: false,
+        error: pick(
+          input.contact.preferredLocale,
+          "Pagesa me kartë nuk u nis. Të dhënat u ruajtën; provo përsëri.",
+          "Card payment did not start. Your answers were saved; try again.",
+        ),
+      };
     }
   }
 

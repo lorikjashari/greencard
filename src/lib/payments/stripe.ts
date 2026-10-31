@@ -40,7 +40,7 @@ class StripeProvider implements PaymentProvider {
         },
       ],
       success_url: `${config.appUrl}/api/payments/stripe/return?session_id={CHECKOUT_SESSION_ID}&order=${input.order.id}`,
-      cancel_url: `${config.appUrl}/${input.locale}/account/${input.application.id}?payment=cancelled`,
+      cancel_url: `${config.appUrl}/${input.locale}/apply?payment=cancelled`,
       expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
     });
 

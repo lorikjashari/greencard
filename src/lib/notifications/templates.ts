@@ -255,7 +255,7 @@ export function renderEmail(
                     <td style="vertical-align:middle;">
                       <img src="${logoUrl}" width="196" height="42" alt="Green Card Kosova" style="display:block;width:196px;height:42px;border:0;outline:none;text-decoration:none;">
                     </td>
-                    <td align="right" style="vertical-align:middle;font-family:Arial,Helvetica,sans-serif;font-size:9px;line-height:1.6;letter-spacing:2px;text-transform:uppercase;color:#8A9188;">DV Lottery<br>Prishtinë</td>
+                    <td align="right" style="vertical-align:middle;font-family:Arial,Helvetica,sans-serif;font-size:9px;line-height:1.6;letter-spacing:2px;text-transform:uppercase;color:#8A9188;">DV Lottery<br>Viti</td>
                   </tr>
                 </table>
                 <div style="height:1px;background:#E4DECF;margin-top:20px;font-size:0;line-height:0;">&nbsp;</div>

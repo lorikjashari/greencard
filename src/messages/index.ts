@@ -192,7 +192,7 @@ export const messages = {
     factFreeTitle: { sq: "Aplikimi zyrtar është falas", en: "The official entry is free" },
     factFreeBody: { sq: "Regjistrimi në dvprogram.state.gov nuk kushton asgjë. Ne paguhemi vetëm për përgatitjen, kontrollin dhe dorëzimin.", en: "Registering at dvprogram.state.gov costs nothing. You only pay us for preparation, review and submission." },
     factIndependentTitle: { sq: "Nuk jemi agjenci qeveritare", en: "We are not a government agency" },
-    factIndependentBody: { sq: "Green Card Kosova është biznes privat në Prishtinë, i pavarur nga Qeveria e Shteteve të Bashkuara.", en: "Green Card Kosova is a private business in Prishtina, independent of the United States government." },
+    factIndependentBody: { sq: "Green Card Kosova është biznes privat në Viti, i pavarur nga Qeveria e Shteteve të Bashkuara.", en: "Green Card Kosova is a private business in Viti, Kosovo, independent of the United States government." },
     factNoGuaranteeTitle: { sq: "Askush nuk garanton përzgjedhje", en: "No one can guarantee selection" },
     factNoGuaranteeBody: { sq: "Përzgjedhja bëhet vetëm nga lotaria zyrtare. Ne garantojmë vetëm cilësinë e shërbimit tonë.", en: "Selection is made only by the official lottery. We only stand behind the quality of our service." },
     footerAbout: { sq: "Shërbim privat për përgatitjen dhe dorëzimin e aplikimeve DV. I pavarur nga Qeveria e SHBA-së.", en: "Private service for preparing and submitting DV applications. Independent of the US government." },

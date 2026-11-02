@@ -73,8 +73,8 @@ export function getPublicConfig(): PublicConfig {
     emailConfigured: emailConfigured(),
     contact: {
       email: process.env.CONTACT_EMAIL ?? "info@greencardkosova.com",
-      phone: process.env.CONTACT_PHONE ?? "+383 44 151 335",
-      address: process.env.OFFICE_ADDRESS ?? "Rr. Eqrem Qabej Nr. 112, 10000 Prishtinë",
+      phone: process.env.CONTACT_PHONE ?? "+383 43 852 828",
+      address: process.env.OFFICE_ADDRESS ?? "Rruga Mejdi Korrani, Pozhoran, Viti, 61060",
     },
     dv: {
       year: Number(process.env.DV_ACTIVE_YEAR ?? 2027),

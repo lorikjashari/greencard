@@ -4,6 +4,7 @@ import { getOrder, markCardPaid } from "@/lib/repo/orders";
 import { getApplication } from "@/lib/repo/applications";
 import { logAudit } from "@/lib/repo/audit";
 import { getPaymentProvider } from "@/lib/payments/stripe";
+import { getPublicConfig } from "@/lib/config";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,9 +14,10 @@ export const dynamic = "force-dynamic";
  * marking anything paid; the webhook remains the primary confirmation path.
  */
 export async function GET(request: NextRequest) {
+  const { appUrl } = getPublicConfig();
   const sessionId = request.nextUrl.searchParams.get("session_id");
   const orderId = request.nextUrl.searchParams.get("order");
-  const fallback = new URL("/sq/account", request.url);
+  const fallback = new URL("/sq/account", appUrl);
 
   if (!sessionId || !orderId) {
     return NextResponse.redirect(fallback);
@@ -23,7 +25,7 @@ export async function GET(request: NextRequest) {
 
   const provider = getPaymentProvider();
   if (!provider) {
-    return NextResponse.redirect(new URL("/sq/account?payment=unavailable", request.url));
+    return NextResponse.redirect(new URL("/sq/account?payment=unavailable", appUrl));
   }
 
   const order = await getOrder(orderId);
@@ -31,7 +33,7 @@ export async function GET(request: NextRequest) {
 
   const application = await getApplication(order.applicationId);
   const locale = application?.locale ?? "sq";
-  const target = new URL(`/${locale}/account/${order.applicationId}`, request.url);
+  const target = new URL(`/${locale}/account/${order.applicationId}`, appUrl);
 
   try {
     const result = await provider.retrieveCheckout(sessionId);

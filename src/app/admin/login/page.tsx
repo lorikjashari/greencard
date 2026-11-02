@@ -55,7 +55,12 @@ export default async function AdminLoginPage({
               sq: "Llogaria është çaktivizuar ose pret aprovim.",
               en: "The account is deactivated or awaiting approval.",
             }
-          : null;
+          : error === "expired"
+            ? {
+                sq: "Lidhja ka skaduar ose është përdorur. Kërko një lidhje të re.",
+                en: "This link expired or was already used. Request a new one.",
+              }
+            : null;
 
   const facts = [
     locale === "sq"

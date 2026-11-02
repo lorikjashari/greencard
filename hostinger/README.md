@@ -1,4 +1,4 @@
-# Deploying Green Card Kosova on Hostinger
+# Deploying Aplikodv on Hostinger
 
 This app needs a Node.js runtime (SSR, API routes, Stripe webhooks). Hostinger
 supports it in two ways:
@@ -93,7 +93,7 @@ working production site:
 | `NEXT_PUBLIC_DEFAULT_LOCALE` | `sq` |
 | `EMAIL_PROVIDER` | `resend` |
 | `RESEND_API_KEY` | Resend API key |
-| `EMAIL_FROM` | verified sender, e.g. `Green Card Kosova <no-reply@YOUR-DOMAIN>` |
+| `EMAIL_FROM` | verified sender, e.g. `Aplikodv <no-reply@YOUR-DOMAIN>` |
 | `PAYMENT_PROVIDER` | `stripe` |
 | `STRIPE_SECRET_KEY` | `sk_live_...` (or `sk_test_...` while testing) |
 | `STRIPE_WEBHOOK_SECRET` | signing secret of the endpoint for this domain |

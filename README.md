@@ -1,4 +1,4 @@
-# Green Card Kosova
+# Aplikodv
 
 A production-minded, bilingual (Albanian/English) DV lottery application service for Kosovo. It covers the public site, an 8-step application wizard, an applicant portal, payments, filing records, and a role-protected staff dashboard.
 
@@ -63,13 +63,13 @@ Staff sign-in: <http://localhost:3000/admin/login>. Client sign-in: <http://loca
 
 | Role | Email |
 |---|---|
-| Admin | `admin@demo.greencardkosova.com` |
-| Operator | `operator@demo.greencardkosova.com` |
-| Accountant | `accountant@demo.greencardkosova.com` |
-| Viewer | `viewer@demo.greencardkosova.com` |
-| Client | `client@demo.greencardkosova.com` |
+| Admin | `admin@demo.aplikodv.com` |
+| Operator | `operator@demo.aplikodv.com` |
+| Accountant | `accountant@demo.aplikodv.com` |
+| Viewer | `viewer@demo.aplikodv.com` |
+| Client | `client@demo.aplikodv.com` |
 
-The client owns seeded application `GCK-4KT9M`. Other seeded references include `GCK-8QW2N`, `GCK-2MX7P`, `GCK-9RB4T`, `GCK-5CN8K`, `GCK-7HD3V`, `GCK-3PL6W`, `GCK-6TJ9S`, `GCK-1VK5D`.
+The client owns seeded application `APL-4KT9M`. Other seeded references include `APL-8QW2N`, `APL-2MX7P`, `APL-9RB4T`, `APL-5CN8K`, `APL-7HD3V`, `APL-3PL6W`, `APL-6TJ9S`, `APL-1VK5D`.
 
 Demo authentication buttons are only available in demo mode; the demo auth routes are hard-disabled outside it. In Postgres mode, staff sign in at `/admin/login` with email + password (Argon2id, 5 failed attempts → 15-minute lockout) or request a magic link. Set a password with `ADMIN_PASSWORD='...' npm run db:set-password -- email`; `db:bootstrap` also accepts `ADMIN_PASSWORD`. Clients sign in with magic links. When email is not configured yet, the link is printed to the server log and stored in `/admin/outbox`.
 
@@ -302,4 +302,4 @@ scripts/                 migrate + bootstrap scripts
 - Payment status changes only through the state machine; card status changes only from the provider webhook/verified return.
 - Emails are never marked `sent` without provider acceptance.
 - Staff-facing audit records are append-only by convention; do not add delete/update paths.
-- The official DV entry is free at <https://dvprogram.state.gov>. Green Card Kosova is an independent preparation service, not a government site.
+- The official DV entry is free at <https://dvprogram.state.gov>. Aplikodv is an independent preparation service, not a government site.

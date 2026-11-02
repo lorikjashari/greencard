@@ -2,7 +2,7 @@
 export const POLICY_VERSION = "2026-10-draft";
 
 /** Contact address shown in legal copy; must match the configured controller. */
-export const LEGAL_CONTROLLER = "N.Sh. Green Card Kosova";
+export const LEGAL_CONTROLLER = "N.Sh. Aplikodv";
 
 /** Data retention defaults. 0 means "pending approval" and is surfaced on the launch checklist. */
 export const RETENTION_MONTHS = {

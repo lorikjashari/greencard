@@ -30,7 +30,7 @@ class StripeProvider implements PaymentProvider {
             currency: "eur",
             unit_amount: input.order.amountCents,
             product_data: {
-              name: `Green Card Kosova — ${input.application.ref}`,
+              name: `Aplikodv — ${input.application.ref}`,
               description:
                 input.locale === "sq"
                   ? "Shërbim i pavarur përgatitjeje aplikimi; nuk është faqja zyrtare e qeverisë amerikane."

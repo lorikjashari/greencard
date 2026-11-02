@@ -182,7 +182,7 @@ async function seedApplication(spec: SeedSpec): Promise<ApplicationRecord> {
       rulesVersion: "2027.1",
       uploadedAt: daysAgo(spec.createdDays, 11),
       reviewedAt: status === "approved" || status === "rejected" ? daysAgo(spec.createdDays - 1, 9) : undefined,
-      reviewedBy: status === "approved" || status === "rejected" ? "operator@demo.greencardkosova.com" : undefined,
+      reviewedBy: status === "approved" || status === "rejected" ? "operator@demo.aplikodv.com" : undefined,
     });
   }
 
@@ -289,7 +289,7 @@ async function seedOrder(input: {
     updatedAt: daysAgo(input.paidDays ?? input.createdDays, 12),
     paidAt: input.paidDays != null ? daysAgo(input.paidDays, 12) : null,
     expiresAt: daysFromNow(input.status === "pending_cash" ? 4 : -1),
-    receivedBy: input.receivedBy ?? (input.paidDays != null ? "accountant@demo.greencardkosova.com" : null),
+    receivedBy: input.receivedBy ?? (input.paidDays != null ? "accountant@demo.aplikodv.com" : null),
     receivedAt: input.paidDays != null ? daysAgo(input.paidDays, 12) : null,
     receivedAmountCents: input.paidDays != null ? input.amountCents : null,
     receivingMethod: input.paidDays != null ? "office" : null,
@@ -324,7 +324,7 @@ async function runSeed(): Promise<void> {
   const users: UserRecord[] = [
     {
       id: "demo-user-admin",
-      email: "admin@demo.greencardkosova.com",
+      email: "admin@demo.aplikodv.com",
       name: "Arta Berisha",
       role: "admin",
       active: true,
@@ -333,7 +333,7 @@ async function runSeed(): Promise<void> {
     },
     {
       id: "demo-user-operator",
-      email: "operator@demo.greencardkosova.com",
+      email: "operator@demo.aplikodv.com",
       name: "Driton Krasniqi",
       role: "operator",
       active: true,
@@ -342,7 +342,7 @@ async function runSeed(): Promise<void> {
     },
     {
       id: "demo-user-accountant",
-      email: "accountant@demo.greencardkosova.com",
+      email: "accountant@demo.aplikodv.com",
       name: "Vjosa Hoxha",
       role: "accountant",
       active: true,
@@ -351,7 +351,7 @@ async function runSeed(): Promise<void> {
     },
     {
       id: "demo-user-viewer",
-      email: "viewer@demo.greencardkosova.com",
+      email: "viewer@demo.aplikodv.com",
       name: "Besnik Gashi",
       role: "viewer",
       active: true,
@@ -360,7 +360,7 @@ async function runSeed(): Promise<void> {
     },
     {
       id: "demo-user-client",
-      email: "client@demo.greencardkosova.com",
+      email: "client@demo.aplikodv.com",
       name: "Elira Dema",
       role: "client",
       active: true,
@@ -376,7 +376,7 @@ async function runSeed(): Promise<void> {
 
   const spec1: SeedSpec = {
     id: "demo-app-1",
-    ref: "GCK-4KT9M",
+    ref: "APL-4KT9M",
     status: "submitted",
     paymentStatus: "pending_cash",
     packageKey: "individual",
@@ -385,8 +385,8 @@ async function runSeed(): Promise<void> {
     applicant: elira,
     spouse: null,
     children: [],
-    contact: contact("client@demo.greencardkosova.com"),
-    ownerEmail: "client@demo.greencardkosova.com",
+    contact: contact("client@demo.aplikodv.com"),
+    ownerEmail: "client@demo.aplikodv.com",
     assigneeId: null,
     createdDays: 2,
     submittedDays: 2,
@@ -397,7 +397,7 @@ async function runSeed(): Promise<void> {
   const blerta = person("Blerta", "Krasniqi", "1991-07-19", "female", "Prizren");
   const spec2: SeedSpec = {
     id: "demo-app-2",
-    ref: "GCK-8QW2N",
+    ref: "APL-8QW2N",
     status: "in_review",
     paymentStatus: "paid",
     packageKey: "couple",
@@ -420,7 +420,7 @@ async function runSeed(): Promise<void> {
   const luan = child("demo-child-2", "Luan", "Berisha", "2017-09-08", "male");
   const spec3: SeedSpec = {
     id: "demo-app-3",
-    ref: "GCK-2MX7P",
+    ref: "APL-2MX7P",
     status: "ready_to_file",
     paymentStatus: "paid",
     packageKey: "family",
@@ -442,7 +442,7 @@ async function runSeed(): Promise<void> {
   const nora = child("demo-child-3", "Nora", "Gashi", "2012-12-02", "female");
   const spec4: SeedSpec = {
     id: "demo-app-4",
-    ref: "GCK-9RB4T",
+    ref: "APL-9RB4T",
     status: "filed",
     paymentStatus: "paid",
     packageKey: "family",
@@ -464,7 +464,7 @@ async function runSeed(): Promise<void> {
   const hana = child("demo-child-5", "Hana", "Syla", "2019-01-27", "female");
   const spec5: SeedSpec = {
     id: "demo-app-5",
-    ref: "GCK-5CN8K",
+    ref: "APL-5CN8K",
     status: "needs_information",
     paymentStatus: "pending_cash",
     packageKey: "family",
@@ -484,7 +484,7 @@ async function runSeed(): Promise<void> {
     createdDays: 6,
     submittedDays: 6,
     photoState: "approved",
-    duplicateRefs: ["GCK-6TJ9S"],
+    duplicateRefs: ["APL-6TJ9S"],
     statusReason: "Kërkohet dokumentacion për kujdestarinë dhe sqarim i përbërjes familjare.",
   };
 
@@ -492,7 +492,7 @@ async function runSeed(): Promise<void> {
   const vesa = person("Vesa", "Bytyqi", "1994-10-05", "female", "Ferizaj");
   const spec6: SeedSpec = {
     id: "demo-app-6",
-    ref: "GCK-7HD3V",
+    ref: "APL-7HD3V",
     status: "needs_information",
     paymentStatus: "paid",
     packageKey: "couple",
@@ -507,14 +507,14 @@ async function runSeed(): Promise<void> {
     createdDays: 9,
     submittedDays: 9,
     photoState: "rejected",
-    duplicateRefs: ["GCK-6TJ9S"],
+    duplicateRefs: ["APL-6TJ9S"],
     statusReason: "Fotografia e bashkëshortit/kes nuk përputhet me kërkesat.",
   };
 
   const alban = person("Alban", "Morina", "1980-12-09", "male", "Gjilan");
   const spec7: SeedSpec = {
     id: "demo-app-7",
-    ref: "GCK-3PL6W",
+    ref: "APL-3PL6W",
     status: "rejected",
     paymentStatus: "refunded",
     packageKey: "individual",
@@ -539,7 +539,7 @@ async function runSeed(): Promise<void> {
   const blend = child("demo-child-8", "Blend", "Rexha", "2020-07-07", "male");
   const spec8: SeedSpec = {
     id: "demo-app-8",
-    ref: "GCK-6TJ9S",
+    ref: "APL-6TJ9S",
     status: "submitted",
     paymentStatus: "pending_cash",
     packageKey: "family",
@@ -560,7 +560,7 @@ async function runSeed(): Promise<void> {
   const rina = person("Rina", "Hoxha", "1989-02-22", "female", "Prishtinë");
   const spec9: SeedSpec = {
     id: "demo-app-9",
-    ref: "GCK-1VK5D",
+    ref: "APL-1VK5D",
     status: "confirmation_sent",
     paymentStatus: "paid",
     packageKey: "couple",
@@ -668,7 +668,7 @@ async function runSeed(): Promise<void> {
       dvYear: 2027,
       confirmationNumber: "2027-DEMO-48213",
       filedAt: daysAgo(10, 14),
-      filedBy: "operator@demo.greencardkosova.com",
+      filedBy: "operator@demo.aplikodv.com",
       notes: "Dorëzuar manualisht në faqen zyrtare (demo).",
       createdAt: daysAgo(10, 14),
     },
@@ -678,7 +678,7 @@ async function runSeed(): Promise<void> {
       dvYear: 2027,
       confirmationNumber: "2027-DEMO-91077",
       filedAt: daysAgo(18, 11),
-      filedBy: "operator@demo.greencardkosova.com",
+      filedBy: "operator@demo.aplikodv.com",
       notes: null,
       createdAt: daysAgo(18, 11),
     },
@@ -720,7 +720,7 @@ async function runSeed(): Promise<void> {
   ]);
 
   await logAudit({
-    actor: { uid: "demo-user-admin", email: "admin@demo.greencardkosova.com" },
+    actor: { uid: "demo-user-admin", email: "admin@demo.aplikodv.com" },
     action: "application.status_changed",
     entityType: "application",
     entityId: "demo-app-3",
@@ -728,21 +728,21 @@ async function runSeed(): Promise<void> {
     metadata: { from: "in_review", to: "ready_to_file" },
   });
   await logAudit({
-    actor: { uid: "demo-user-operator", email: "operator@demo.greencardkosova.com" },
+    actor: { uid: "demo-user-operator", email: "operator@demo.aplikodv.com" },
     action: "filing.recorded",
     entityType: "application",
     entityId: "demo-app-4",
     summary: "Dorëzimi u regjistrua me numër konfirmimi.",
   });
   await logAudit({
-    actor: { uid: "demo-user-accountant", email: "accountant@demo.greencardkosova.com" },
+    actor: { uid: "demo-user-accountant", email: "accountant@demo.aplikodv.com" },
     action: "payment.cash_recorded",
     entityType: "order",
     entityId: "demo-order-3",
     summary: "Pagesa në dorë u konfirmua.",
   });
   await logAudit({
-    actor: { uid: "demo-user-admin", email: "admin@demo.greencardkosova.com" },
+    actor: { uid: "demo-user-admin", email: "admin@demo.aplikodv.com" },
     action: "settings.viewed",
     entityType: "settings",
     entityId: "main",
@@ -771,11 +771,11 @@ async function runSeed(): Promise<void> {
 
 /** Returns the seeded demo accounts for the sign-in screen. */
 export const DEMO_ACCOUNTS = [
-  { email: "admin@demo.greencardkosova.com", name: "Arta Berisha", role: "admin" as const },
-  { email: "operator@demo.greencardkosova.com", name: "Driton Krasniqi", role: "operator" as const },
-  { email: "accountant@demo.greencardkosova.com", name: "Vjosa Hoxha", role: "accountant" as const },
-  { email: "viewer@demo.greencardkosova.com", name: "Besnik Gashi", role: "viewer" as const },
-  { email: "client@demo.greencardkosova.com", name: "Elira Dema", role: "client" as const },
+  { email: "admin@demo.aplikodv.com", name: "Arta Berisha", role: "admin" as const },
+  { email: "operator@demo.aplikodv.com", name: "Driton Krasniqi", role: "operator" as const },
+  { email: "accountant@demo.aplikodv.com", name: "Vjosa Hoxha", role: "accountant" as const },
+  { email: "viewer@demo.aplikodv.com", name: "Besnik Gashi", role: "viewer" as const },
+  { email: "client@demo.aplikodv.com", name: "Elira Dema", role: "client" as const },
 ];
 
 export async function demoDvYear(): Promise<DvYearRecord> {

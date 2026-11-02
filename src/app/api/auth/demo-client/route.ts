@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
   if (!limit.ok) return tooMany(limit.retryAfterSeconds);
 
   const body = await readJson<{ email?: string }>(request, 2048);
-  const email = (body?.email ?? "client@demo.greencardkosova.com").trim().toLowerCase();
+  const email = (body?.email ?? "client@demo.aplikodv.com").trim().toLowerCase();
 
   await ensureDemoSeed();
 

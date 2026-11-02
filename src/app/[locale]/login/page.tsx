@@ -5,16 +5,32 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { getSession, isStaffRole } from "@/lib/auth/session";
 import { getPublicConfig } from "@/lib/config";
 import { isLocale, pick, type Locale } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/seo";
 import { copy } from "@/messages/get";
 import { LoginForm } from "@/components/auth/login-form";
 import { DEMO_ACCOUNTS, ensureDemoSeed } from "@/lib/demo/seed";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Hyr",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale: Locale = isLocale(raw) ? raw : "sq";
+  return pageMetadata({
+    locale,
+    path: "/login",
+    title: pick(locale, "Hyr", "Sign in"),
+    description: pick(
+      locale,
+      "Hyr në llogarinë e klientit ose në panelin e stafit të Aplikodv.",
+      "Sign in to your Aplikodv client account or the staff panel.",
+    ),
+    noindex: true,
+  });
+}
 
 export default async function LoginPage({
   params,

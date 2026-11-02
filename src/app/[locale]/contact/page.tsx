@@ -4,13 +4,29 @@ import { notFound } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { getPublicConfig } from "@/lib/config";
 import { isLocale, pick, type Locale } from "@/lib/i18n";
+import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 import { copy } from "@/messages/get";
 import { PageHeader } from "@/components/layout/page-header";
+import { JsonLd } from "@/components/seo/json-ld";
 
-export const metadata: Metadata = {
-  title: "Kontakti",
-  description: "Kontakto Green Card Kosova për pyetje rreth aplikimit DV, pagesës ose portalit.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale: Locale = isLocale(raw) ? raw : "sq";
+  return pageMetadata({
+    locale,
+    path: "/contact",
+    title: pick(locale, "Kontakti", "Contact"),
+    description: pick(
+      locale,
+      "Kontakto Aplikodv për pyetje rreth aplikimit DV, pagesës ose portalit.",
+      "Contact Aplikodv with questions about your DV application, payment or the client portal.",
+    ),
+  });
+}
 
 export default async function ContactPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
@@ -21,6 +37,12 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
 
   return (
     <div>
+      <JsonLd
+        data={breadcrumbSchema(locale, [
+          { name: t.common.brand, path: "" },
+          { name: t.nav.contact, path: "/contact" },
+        ])}
+      />
       <PageHeader
         eyebrow={t.legal.contactTitle}
         title={pick(locale, "Bisedo me një njeri.", "Talk to a person.")}

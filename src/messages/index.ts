@@ -5,10 +5,10 @@
 
 export const messages = {
   common: {
-    brand: { sq: "Green Card Kosova", en: "Green Card Kosova" },
+    brand: { sq: "Aplikodv", en: "Aplikodv" },
     tagline: {
-      sq: "Përgatitje e kujdesshme e aplikimit DV",
-      en: "Careful preparation of your DV application",
+      sq: "Apliko Green Card USA",
+      en: "Apliko Green Card USA",
     },
     continue: { sq: "Vazhdo", en: "Continue" },
     back: { sq: "Kthehu", en: "Back" },
@@ -90,8 +90,8 @@ export const messages = {
     eyebrow: { sq: "SHËRBIM PËR APLIKIMIN DV", en: "DV APPLICATION SERVICE" },
     h1: { sq: "Aplikimi yt, i përgatitur me kujdes.", en: "Your application, carefully prepared." },
     sub: {
-      sq: "Green Card Kosova të ndihmon të përgatisësh, të kontrollosh dhe të dorëzosh aplikimin për Lotarinë e Vizave të Diversitetit — me një proces të qartë, hap pas hapi, dhe mbështetje nga njerëz.",
-      en: "Green Card Kosova helps you prepare, review and submit your Diversity Visa application — with a clear step-by-step process and human support.",
+      sq: "Aplikodv të ndihmon të përgatisësh, të kontrollosh dhe të dorëzosh aplikimin për Lotarinë e Vizave të Diversitetit — me një proces të qartë, hap pas hapi, dhe mbështetje nga njerëz.",
+      en: "Aplikodv helps you prepare, review and submit your Diversity Visa application — with a clear step-by-step process and human support.",
     },
     ctaPrimary: { sq: "Fillo aplikimin", en: "Start application" },
     ctaSecondary: { sq: "Shiko si funksionon", en: "See how it works" },
@@ -102,8 +102,8 @@ export const messages = {
 
     disclosureTitle: { sq: "Shërbim privat, i pavarur", en: "An independent private service" },
     disclosureBody: {
-      sq: "Green Card Kosova është shërbim privat dhe nuk ka lidhje me Qeverinë e Shteteve të Bashkuara. Aplikimi zyrtar për Lotarinë e Vizave të Diversitetit është falas në faqen zyrtare të qeverisë. Tarifa që shfaqet këtu është për përgatitjen, kontrollin dhe dorëzimin e aplikimit nga ana jonë. Askush nuk mund të garantojë përzgjedhje, vizë ose ndonjë rezultat imigrimi, dhe kërkesat e qeverisë mund të ndryshojnë.",
-      en: "Green Card Kosova is a private service and is not affiliated with the United States government. The official Diversity Visa entry is free on the government's official website. The fee shown here is for our preparation, review and submission service. No one can guarantee selection, a visa or any immigration outcome, and government requirements can change.",
+      sq: "Aplikodv është shërbim privat dhe nuk ka lidhje me Qeverinë e Shteteve të Bashkuara. Aplikimi zyrtar për Lotarinë e Vizave të Diversitetit është falas në faqen zyrtare të qeverisë. Tarifa që shfaqet këtu është për përgatitjen, kontrollin dhe dorëzimin e aplikimit nga ana jonë. Askush nuk mund të garantojë përzgjedhje, vizë ose ndonjë rezultat imigrimi, dhe kërkesat e qeverisë mund të ndryshojnë.",
+      en: "Aplikodv is a private service and is not affiliated with the United States government. The official Diversity Visa entry is free on the government's official website. The fee shown here is for our preparation, review and submission service. No one can guarantee selection, a visa or any immigration outcome, and government requirements can change.",
     },
     officialLink: { sq: "Faqja zyrtare e programit DV", en: "Official DV program website" },
 
@@ -192,7 +192,7 @@ export const messages = {
     factFreeTitle: { sq: "Aplikimi zyrtar është falas", en: "The official entry is free" },
     factFreeBody: { sq: "Regjistrimi në dvprogram.state.gov nuk kushton asgjë. Ne paguhemi vetëm për përgatitjen, kontrollin dhe dorëzimin.", en: "Registering at dvprogram.state.gov costs nothing. You only pay us for preparation, review and submission." },
     factIndependentTitle: { sq: "Nuk jemi agjenci qeveritare", en: "We are not a government agency" },
-    factIndependentBody: { sq: "Green Card Kosova është biznes privat në Viti, i pavarur nga Qeveria e Shteteve të Bashkuara.", en: "Green Card Kosova is a private business in Viti, Kosovo, independent of the United States government." },
+    factIndependentBody: { sq: "Aplikodv është biznes privat në Viti, i pavarur nga Qeveria e Shteteve të Bashkuara.", en: "Aplikodv is a private business in Viti, Kosovo, independent of the United States government." },
     factNoGuaranteeTitle: { sq: "Askush nuk garanton përzgjedhje", en: "No one can guarantee selection" },
     factNoGuaranteeBody: { sq: "Përzgjedhja bëhet vetëm nga lotaria zyrtare. Ne garantojmë vetëm cilësinë e shërbimit tonë.", en: "Selection is made only by the official lottery. We only stand behind the quality of our service." },
     footerAbout: { sq: "Shërbim privat për përgatitjen dhe dorëzimin e aplikimeve DV. I pavarur nga Qeveria e SHBA-së.", en: "Private service for preparing and submitting DV applications. Independent of the US government." },
@@ -339,7 +339,7 @@ export const messages = {
     consentPrivacy: { sq: "Kam lexuar dhe pranoj Politikën e Privatësisë.", en: "I have read and accept the Privacy Policy." },
     consentImmediate: { sq: "Pranoj që shërbimi të fillojë menjëherë dhe kuptoj se e drejta e tërheqjes humbet pasi aplikimi dorëzohet në faqen zyrtare.", en: "I consent to the service starting immediately and understand that the right of withdrawal is lost once the entry is filed on the official site." },
     consentAccuracy: { sq: "Konfirmoj se informacioni është i saktë dhe i plotë.", en: "I confirm the information is accurate and complete." },
-    consentIndependent: { sq: "Kuptoj se Green Card Kosova është shërbim privat, i pavarur nga Qeveria e SHBA-së, dhe se aplikimi zyrtar është falas.", en: "I understand Green Card Kosova is a private service, independent of the US government, and the official entry is free." },
+    consentIndependent: { sq: "Kuptoj se Aplikodv është shërbim privat, i pavarur nga Qeveria e SHBA-së, dhe se aplikimi zyrtar është falas.", en: "I understand Aplikodv is a private service, independent of the US government, and the official entry is free." },
     consentGuardian: { sq: "Pranoj përpunimin e të dhënave të fëmijëve për të cilët jam prind ose kujdestar ligjor.", en: "I consent to processing the data of children for whom I am the parent or legal guardian." },
     consentRequired: { sq: "Duhet të pranosh të gjitha përjashtimet e detyrueshme për të vazhduar.", en: "You must accept all required consents to continue." },
     policyVersion: { sq: "Versioni i politikave", en: "Policy version" },

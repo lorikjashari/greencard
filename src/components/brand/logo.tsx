@@ -32,9 +32,9 @@ export function Logo({
     <span className={cn("inline-flex items-center", className)}>
       <Image
         src={src}
-        alt="Green Card Kosova"
-        width={compact ? 306 : 1200}
-        height={compact ? 306 : 259}
+        alt="Aplikodv"
+        width={compact ? 512 : 1200}
+        height={compact ? 512 : 251}
         priority={priority}
         className={compact ? "h-[30px] w-[30px]" : "h-[30px] w-auto sm:h-[34px]"}
       />
@@ -43,7 +43,7 @@ export function Logo({
 
   if (href) {
     return (
-      <Link href={href} className="rounded-sm" aria-label="Green Card Kosova">
+      <Link href={href} className="rounded-sm" aria-label="Aplikodv">
         {content}
       </Link>
     );

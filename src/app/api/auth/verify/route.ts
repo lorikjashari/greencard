@@ -40,11 +40,11 @@ function confirmationPage(token: string, locale: "sq" | "en", origin: string): s
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="robots" content="noindex,nofollow">
-    <title>${title} · Green Card Kosova</title>
+    <title>${title} · Aplikodv</title>
   </head>
   <body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#EFEBE0;padding:24px;font-family:Arial,Helvetica,sans-serif;color:#143229;">
     <main style="width:100%;max-width:420px;background:#FBF9F3;border:1px solid #DCD5C4;border-top:3px solid #153D32;padding:36px 32px;text-align:center;">
-      <img src="${escapeHtml(origin)}/brand/logo.png" width="196" height="42" alt="Green Card Kosova" style="display:inline-block;width:196px;height:42px;border:0;">
+      <img src="${escapeHtml(origin)}/brand/logo.png" width="196" height="41" alt="Aplikodv" style="display:inline-block;width:196px;height:41px;border:0;">
       <h1 style="margin:28px 0 10px;font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1.25;font-weight:normal;">${title}</h1>
       <p style="margin:0 0 24px;font-size:14px;line-height:1.7;color:#3A463F;">${body}</p>
       <form method="POST" style="margin:0;">

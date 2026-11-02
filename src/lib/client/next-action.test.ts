@@ -10,7 +10,7 @@ import type { ApplicationRecord, OrderRecord } from "@/lib/types";
 function application(overrides: Partial<ApplicationRecord> = {}): ApplicationRecord {
   return {
     id: "app-1",
-    ref: "GCK-TEST1",
+    ref: "APL-TEST1",
     dvYear: 2027,
     locale: "sq",
     status: "submitted",

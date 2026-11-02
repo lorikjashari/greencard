@@ -4,14 +4,29 @@ import { notFound } from "next/navigation";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { getPublicConfig } from "@/lib/config";
 import { isLocale, pick, type Locale } from "@/lib/i18n";
+import { breadcrumbSchema, faqSchema, pageMetadata } from "@/lib/seo";
 import { copy } from "@/messages/get";
 import { PageHeader, FaqList } from "@/components/layout/page-header";
+import { JsonLd } from "@/components/seo/json-ld";
 
-export const metadata: Metadata = {
-  title: "Pyetje të shpeshta",
-  description:
-    "Përgjigje për çmimin, pagesën, afatet, fotografitë, konfidencialitetin dhe procesin e aplikimit DV.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale: Locale = isLocale(raw) ? raw : "sq";
+  return pageMetadata({
+    locale,
+    path: "/faq",
+    title: pick(locale, "Pyetje të shpeshta për aplikimin DV", "DV application FAQ"),
+    description: pick(
+      locale,
+      "Përgjigje për çmimin, pagesën, afatet, fotografitë, konfidencialitetin dhe procesin e aplikimit DV me Aplikodv.",
+      "Answers about pricing, payment, deadlines, photos, confidentiality and the DV application process with Aplikodv.",
+    ),
+  });
+}
 
 const EXTRA_FAQS = [
   {
@@ -59,8 +74,8 @@ const EXTRA_FAQS = [
   {
     q: { sq: "A jeni të lidhur me qeverinë e SHBA-së?", en: "Are you affiliated with the US government?" },
     a: {
-      sq: "Jo. Green Card Kosova është shërbim privat. Regjistrimi zyrtar është falas në dvprogram.state.gov dhe askush nuk mund të garantojë përzgjedhje ose vizë.",
-      en: "No. Green Card Kosova is a private service. The official entry is free at dvprogram.state.gov, and no one can guarantee selection or a visa.",
+      sq: "Jo. Aplikodv është shërbim privat. Regjistrimi zyrtar është falas në dvprogram.state.gov dhe askush nuk mund të garantojë përzgjedhje ose vizë.",
+      en: "No. Aplikodv is a private service. The official entry is free at dvprogram.state.gov, and no one can guarantee selection or a visa.",
     },
   },
 ];
@@ -86,6 +101,13 @@ export default async function FaqPage({ params }: { params: Promise<{ locale: st
 
   return (
     <div>
+      <JsonLd data={faqSchema(items)} />
+      <JsonLd
+        data={breadcrumbSchema(locale, [
+          { name: t.common.brand, path: "" },
+          { name: t.nav.faq, path: "/faq" },
+        ])}
+      />
       <PageHeader
         eyebrow={t.legal.faqTitle}
         title={t.home.faqTitle}

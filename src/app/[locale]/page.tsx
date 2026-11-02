@@ -100,7 +100,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             <div className="relative border border-line-strong bg-paper">
               <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-3">
                 <p className="meta text-[10px] text-forest-700">
-                  GCK · DV {dvYear.year}
+                  APL · DV {dvYear.year}
                 </p>
                 <span className={`stamp ${windowOpen ? "border-forest-300 text-forest-700" : "border-line-strong text-muted"}`}>
                   {windowOpen ? t.home.windowOpen : t.home.windowClosed}
@@ -112,7 +112,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
 
                 <dl className="mt-4 divide-y divide-line border-y border-line">
                   {[
-                    { label: t.home.fileNumber, value: "GCK-7F3K2", mono: true },
+                    { label: t.home.fileNumber, value: "APL-7F3K2", mono: true },
                     { label: t.complete.package, value: t.common.pkgIndividual },
                     { label: t.complete.amount, value: formatCurrency(settings.prices.individual, locale), mono: true },
                   ].map((row) => (

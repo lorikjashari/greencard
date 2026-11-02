@@ -13,7 +13,7 @@ export function publicRef(): string {
   for (let i = 0; i < 5; i += 1) {
     body += REF_ALPHABET[randomInt(0, REF_ALPHABET.length)];
   }
-  return `GCK-${body}`;
+  return `APL-${body}`;
 }
 
 export function randomToken(bytes = 32): string {

@@ -119,7 +119,7 @@ export function SiteFooter({
       <div className="border-t border-white/10">
         <div className="container-page flex flex-col gap-2 py-5 text-[11px] leading-5 text-paper/45 md:flex-row md:items-start md:justify-between md:gap-10">
           <p className="shrink-0 font-mono uppercase" style={{ letterSpacing: "0.1em" }}>
-            © {year} Green Card Kosova
+            © {year} Aplikodv
           </p>
           <p className="max-w-2xl md:text-right">{t.home.footerDisclaimer}</p>
         </div>

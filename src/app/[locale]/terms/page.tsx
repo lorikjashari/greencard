@@ -3,13 +3,29 @@ import { notFound } from "next/navigation";
 import { LegalDocument, type LegalSection } from "@/components/legal/legal-document";
 import { getPublicConfig } from "@/lib/config";
 import { LEGAL_CONTROLLER, POLICY_VERSION } from "@/lib/policy";
-import { isLocale, type Locale } from "@/lib/i18n";
+import { isLocale, pick, type Locale } from "@/lib/i18n";
+import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 import { copy } from "@/messages/get";
+import { JsonLd } from "@/components/seo/json-ld";
 
-export const metadata: Metadata = {
-  title: "Kushtet e Shërbimit",
-  description: "Kushtet e shërbimit për përgatitjen dhe dorëzimin e aplikimeve DV. Draft në pritje të miratimit ligjor.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale: Locale = isLocale(raw) ? raw : "sq";
+  return pageMetadata({
+    locale,
+    path: "/terms",
+    title: pick(locale, "Kushtet e Shërbimit", "Terms of Service"),
+    description: pick(
+      locale,
+      "Kushtet e shërbimit për përgatitjen dhe dorëzimin e aplikimeve DV. Draft në pritje të miratimit ligjor.",
+      "Terms of service for preparing and submitting DV applications. Draft pending legal approval.",
+    ),
+  });
+}
 
 const SECTIONS: LegalSection[] = [
   {
@@ -144,19 +160,27 @@ export default async function TermsPage({ params }: { params: Promise<{ locale: 
   const config = getPublicConfig();
 
   return (
-    <LegalDocument
-      locale={locale}
-      t={t}
-      title={t.legal.termsTitle}
-      intro={
-        locale === "sq"
-          ? "Këto kushte përshkruajnë marrëdhënien mes teje dhe Green Card Kosova kur përdor faqen dhe shërbimin e përgatitjes së aplikimit DV."
-          : "These terms describe the relationship between you and Green Card Kosova when you use the site and the DV application preparation service."
-      }
-      sections={SECTIONS}
-      version={POLICY_VERSION}
-      contactEmail={config.contact.email}
-      address={config.contact.address}
-    />
+    <>
+      <JsonLd
+        data={breadcrumbSchema(locale, [
+          { name: t.common.brand, path: "" },
+          { name: t.legal.termsTitle, path: "/terms" },
+        ])}
+      />
+      <LegalDocument
+        locale={locale}
+        t={t}
+        title={t.legal.termsTitle}
+        intro={
+          locale === "sq"
+            ? "Këto kushte përshkruajnë marrëdhënien mes teje dhe Aplikodv kur përdor faqen dhe shërbimin e përgatitjes së aplikimit DV."
+            : "These terms describe the relationship between you and Aplikodv when you use the site and the DV application preparation service."
+        }
+        sections={SECTIONS}
+        version={POLICY_VERSION}
+        contactEmail={config.contact.email}
+        address={config.contact.address}
+      />
+    </>
   );
 }

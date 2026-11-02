@@ -13,15 +13,31 @@ import { getPublicConfig } from "@/lib/config";
 import { ensureDemoSeed } from "@/lib/demo/seed";
 import { nextActionFor } from "@/lib/client/next-action";
 import { formatCurrency, formatDate } from "@/lib/format";
-import { isLocale, type Locale } from "@/lib/i18n";
+import { isLocale, pick, type Locale } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/seo";
 import { copy } from "@/messages/get";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Llogaria ime",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale: Locale = isLocale(raw) ? raw : "sq";
+  return pageMetadata({
+    locale,
+    path: "/account",
+    title: pick(locale, "Llogaria ime", "My account"),
+    description: pick(
+      locale,
+      "Ndjek statusin e aplikimit, pagesat dhe numrin e konfirmimit në Aplikodv.",
+      "Track your application status, payments and confirmation number at Aplikodv.",
+    ),
+    noindex: true,
+  });
+}
 
 export default async function AccountPage({
   params,

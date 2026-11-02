@@ -170,8 +170,8 @@ export function renderEmail(
       .replaceAll("'", "&#39;");
 
   const footer = sq
-    ? "Green Card Kosova është shërbim privat dhe nuk ka lidhje me Qeverinë e SHBA-së. Aplikimi zyrtar DV është falas në faqen zyrtare. Askush nuk mund të garantojë përzgjedhje."
-    : "Green Card Kosova is a private service and is not affiliated with the US government. The official DV entry is free on the government site. No one can guarantee selection.";
+    ? "Aplikodv është shërbim privat dhe nuk ka lidhje me Qeverinë e SHBA-së. Aplikimi zyrtar DV është falas në faqen zyrtare. Askush nuk mund të garantojë përzgjedhje."
+    : "Aplikodv is a private service and is not affiliated with the US government. The official DV entry is free on the government site. No one can guarantee selection.";
 
   const reference =
     ctx.reference && ctx.reference !== "—" && ctx.reference !== "-" ? ctx.reference : null;
@@ -253,9 +253,9 @@ export function renderEmail(
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                   <tr>
                     <td style="vertical-align:middle;">
-                      <img src="${logoUrl}" width="196" height="42" alt="Green Card Kosova" style="display:block;width:196px;height:42px;border:0;outline:none;text-decoration:none;">
+                      <img src="${logoUrl}" width="196" height="41" alt="Aplikodv" style="display:block;width:196px;height:41px;border:0;outline:none;text-decoration:none;">
                     </td>
-                    <td align="right" style="vertical-align:middle;font-family:Arial,Helvetica,sans-serif;font-size:9px;line-height:1.6;letter-spacing:2px;text-transform:uppercase;color:#8A9188;">DV Lottery<br>Viti</td>
+                    <td align="right" style="vertical-align:middle;font-family:Arial,Helvetica,sans-serif;font-size:9px;line-height:1.6;letter-spacing:2px;text-transform:uppercase;color:#8A9188;">Apliko Green<br>Card USA</td>
                   </tr>
                 </table>
                 <div style="height:1px;background:#E4DECF;margin-top:20px;font-size:0;line-height:0;">&nbsp;</div>
@@ -290,7 +290,7 @@ export function renderEmail(
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;">
                   <tr>
                     <td width="20" style="vertical-align:middle;"><img src="${markUrl}" width="20" height="20" alt="" style="display:block;width:20px;height:20px;border:0;"></td>
-                    <td style="vertical-align:middle;padding-left:8px;font-family:Arial,Helvetica,sans-serif;font-size:9px;letter-spacing:1.8px;text-transform:uppercase;color:#5F6B63;">Green Card Kosova</td>
+                    <td style="vertical-align:middle;padding-left:8px;font-family:Arial,Helvetica,sans-serif;font-size:9px;letter-spacing:1.8px;text-transform:uppercase;color:#5F6B63;">Aplikodv</td>
                     <td align="right" style="vertical-align:middle;font-family:Arial,Helvetica,sans-serif;font-size:9px;letter-spacing:1px;color:#9AA39C;">${new Date().getFullYear()}</td>
                   </tr>
                 </table>
@@ -305,7 +305,7 @@ export function renderEmail(
 </html>`;
 
   const text = [
-    "GREEN CARD KOSOVA",
+    "APLIKODV",
     "-----------------------------",
     "",
     content.heading.toUpperCase(),
@@ -322,7 +322,7 @@ export function renderEmail(
     "",
     "-----------------------------",
     footer,
-    `© ${new Date().getFullYear()} Green Card Kosova`,
+    `© ${new Date().getFullYear()} Aplikodv`,
   ]
     .filter(Boolean)
     .join("\n");

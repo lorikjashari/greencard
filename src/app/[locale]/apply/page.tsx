@@ -4,15 +4,31 @@ import { ApplicationWizard } from "@/features/applications/wizard";
 import { getPublicConfig } from "@/lib/config";
 import { getSettings } from "@/lib/repo/settings";
 import { POLICY_VERSION } from "@/lib/policy";
-import { isLocale, type Locale } from "@/lib/i18n";
+import { isLocale, pick, type Locale } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/seo";
 import { copy } from "@/messages/get";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Aplikimi DV",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale: Locale = isLocale(raw) ? raw : "sq";
+  return pageMetadata({
+    locale,
+    path: "/apply",
+    title: pick(locale, "Aplikimi DV", "DV application"),
+    description: pick(
+      locale,
+      "Formulari i aplikimit DV, i ruajtur në mënyrë të sigurt dhe i kontrolluar nga stafi.",
+      "The DV application form, securely saved and reviewed by staff.",
+    ),
+    noindex: true,
+  });
+}
 
 export default async function ApplyPage({
   params,

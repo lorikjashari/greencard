@@ -12,8 +12,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = copy(locale);
   return {
     title: {
-      default: `${t.admin.title} · Green Card Kosova`,
-      template: `%s · ${t.admin.title} · Green Card Kosova`,
+      default: `${t.admin.title} · Aplikodv`,
+      template: `%s · ${t.admin.title} · Aplikodv`,
     },
     robots: { index: false, follow: false },
   };

@@ -3,21 +3,37 @@ import { notFound } from "next/navigation";
 import { LegalDocument, type LegalSection } from "@/components/legal/legal-document";
 import { getPublicConfig } from "@/lib/config";
 import { LEGAL_CONTROLLER, POLICY_VERSION, RETENTION_MONTHS } from "@/lib/policy";
-import { isLocale, type Locale } from "@/lib/i18n";
+import { isLocale, pick, type Locale } from "@/lib/i18n";
+import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 import { copy } from "@/messages/get";
+import { JsonLd } from "@/components/seo/json-ld";
 
-export const metadata: Metadata = {
-  title: "Politika e Privatësisë",
-  description: "Si mblidhen, përdoren dhe mbrohen të dhënat personale në Green Card Kosova. Draft në pritje të miratimit ligjor.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale: Locale = isLocale(raw) ? raw : "sq";
+  return pageMetadata({
+    locale,
+    path: "/privacy",
+    title: pick(locale, "Politika e Privatësisë", "Privacy Policy"),
+    description: pick(
+      locale,
+      "Si mblidhen, përdoren dhe mbrohen të dhënat personale në Aplikodv. Draft në pritje të miratimit ligjor.",
+      "How personal data is collected, used and protected at Aplikodv. Draft pending legal approval.",
+    ),
+  });
+}
 
 const SECTIONS: LegalSection[] = [
   {
     title: { sq: "Kush është kontrolluesi", en: "Who is the controller" },
     paragraphs: [
       {
-        sq: `${LEGAL_CONTROLLER} është kontrolluesi i të dhënave për këtë faqe dhe shërbimin e përgatitjes së aplikimeve DV. Green Card Kosova është shërbim privat dhe nuk përfaqëson Qeverinë e Shteteve të Bashkuara.`,
-        en: `${LEGAL_CONTROLLER} is the data controller for this website and the DV application preparation service. Green Card Kosova is a private service and does not represent the United States government.`,
+        sq: `${LEGAL_CONTROLLER} është kontrolluesi i të dhënave për këtë faqe dhe shërbimin e përgatitjes së aplikimeve DV. Aplikodv është shërbim privat dhe nuk përfaqëson Qeverinë e Shteteve të Bashkuara.`,
+        en: `${LEGAL_CONTROLLER} is the data controller for this website and the DV application preparation service. Aplikodv is a private service and does not represent the United States government.`,
       },
       {
         sq: "Kontaktet për çështje të të dhënave janë në fund të këtij dokumenti. Nëse kërkesa lidhet me një aplikim konkret, përfshi numrin e referencës.",
@@ -147,19 +163,27 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
   const config = getPublicConfig();
 
   return (
-    <LegalDocument
-      locale={locale}
-      t={t}
-      title={t.legal.privacyTitle}
-      intro={
-        locale === "sq"
-          ? "Ky dokument shpjegon si mblidhen dhe përdoren të dhënat personale kur përdor faqen, formularin dhe portalin e Green Card Kosova."
-          : "This document explains how personal data is collected and used when you use the Green Card Kosova website, form and portal."
-      }
-      sections={SECTIONS}
-      version={POLICY_VERSION}
-      contactEmail={config.contact.email}
-      address={config.contact.address}
-    />
+    <>
+      <JsonLd
+        data={breadcrumbSchema(locale, [
+          { name: t.common.brand, path: "" },
+          { name: t.legal.privacyTitle, path: "/privacy" },
+        ])}
+      />
+      <LegalDocument
+        locale={locale}
+        t={t}
+        title={t.legal.privacyTitle}
+        intro={
+          locale === "sq"
+            ? "Ky dokument shpjegon si mblidhen dhe përdoren të dhënat personale kur përdor faqen, formularin dhe portalin e Aplikodv."
+            : "This document explains how personal data is collected and used when you use the Aplikodv website, form and portal."
+        }
+        sections={SECTIONS}
+        version={POLICY_VERSION}
+        contactEmail={config.contact.email}
+        address={config.contact.address}
+      />
+    </>
   );
 }

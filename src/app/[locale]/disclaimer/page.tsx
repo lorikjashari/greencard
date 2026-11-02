@@ -3,13 +3,29 @@ import { notFound } from "next/navigation";
 import { LegalDocument, type LegalSection } from "@/components/legal/legal-document";
 import { getPublicConfig } from "@/lib/config";
 import { LEGAL_CONTROLLER, POLICY_VERSION } from "@/lib/policy";
-import { isLocale, type Locale } from "@/lib/i18n";
+import { isLocale, pick, type Locale } from "@/lib/i18n";
+import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 import { copy } from "@/messages/get";
+import { JsonLd } from "@/components/seo/json-ld";
 
-export const metadata: Metadata = {
-  title: "Shënim mbi pavarësinë",
-  description: "Green Card Kosova është shërbim privat, i pavarur nga Qeveria e SHBA-së. Regjistrimi zyrtar DV është falas.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale: Locale = isLocale(raw) ? raw : "sq";
+  return pageMetadata({
+    locale,
+    path: "/disclaimer",
+    title: pick(locale, "Shënim mbi pavarësinë", "Independence notice"),
+    description: pick(
+      locale,
+      "Aplikodv është shërbim privat, i pavarur nga Qeveria e SHBA-së. Regjistrimi zyrtar DV është falas.",
+      "Aplikodv is a private service, independent of the US government. The official DV entry is free.",
+    ),
+  });
+}
 
 const SECTIONS: LegalSection[] = [
   {
@@ -80,19 +96,27 @@ export default async function DisclaimerPage({ params }: { params: Promise<{ loc
   const config = getPublicConfig();
 
   return (
-    <LegalDocument
-      locale={locale}
-      t={t}
-      title={t.legal.disclaimerTitle}
-      intro={
-        locale === "sq"
-          ? "Ky shënim përmbledh pavarësinë e shërbimit dhe kufijtë e asaj që mund të premtojmë."
-          : "This notice summarises the independence of the service and the limits of what we can promise."
-      }
-      sections={SECTIONS}
-      version={POLICY_VERSION}
-      contactEmail={config.contact.email}
-      address={config.contact.address}
-    />
+    <>
+      <JsonLd
+        data={breadcrumbSchema(locale, [
+          { name: t.common.brand, path: "" },
+          { name: t.legal.disclaimerTitle, path: "/disclaimer" },
+        ])}
+      />
+      <LegalDocument
+        locale={locale}
+        t={t}
+        title={t.legal.disclaimerTitle}
+        intro={
+          locale === "sq"
+            ? "Ky shënim përmbledh pavarësinë e shërbimit dhe kufijtë e asaj që mund të premtojmë."
+            : "This notice summarises the independence of the service and the limits of what we can promise."
+        }
+        sections={SECTIONS}
+        version={POLICY_VERSION}
+        contactEmail={config.contact.email}
+        address={config.contact.address}
+      />
+    </>
   );
 }

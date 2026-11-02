@@ -99,7 +99,7 @@ export default async function ApplyCompletePage({ params }: { params: Promise<{ 
           <div className="mt-9 border border-line-strong bg-paper">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3">
               <p className="meta text-[10px] text-forest-700">
-                GCK · DV {config.dv.year}
+                APL · DV {config.dv.year}
               </p>
               <span className="stamp inline-flex items-center gap-1.5 border-forest-300 text-forest-700">
                 <Check className="h-3 w-3" aria-hidden="true" />

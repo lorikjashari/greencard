@@ -11,6 +11,6 @@ import path from "node:path";
 export function demoDataRoot(): string {
   const configured = process.env.DEMO_DATA_DIR?.trim();
   if (configured) return path.resolve(configured);
-  if (process.env.VERCEL) return path.join(os.tmpdir(), "greencardkosova-demo");
+  if (process.env.VERCEL) return path.join(os.tmpdir(), "aplikodv-demo");
   return path.join(process.cwd(), ".data");
 }
